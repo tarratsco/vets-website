@@ -27,7 +27,7 @@ export const blindnessDetailsUiSchema = {
   }),
   'view:correctedVisionHeading': inlineTitleUI(
     'Corrected vision',
-    <p className="usa-hint">If applicable</p>,
+    <p className="usa-hint vads-u-margin-bottom--0">If applicable</p>,
   ),
   leftEye: textUI({ title: 'Left eye' }),
   rightEye: textUI({ title: 'Right eye' }),
