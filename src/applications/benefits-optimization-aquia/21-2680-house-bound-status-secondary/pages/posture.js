@@ -17,9 +17,6 @@ export const postureUiSchema = {
   posture: textareaUI({
     title: 'What is the posture and general appearance of the patient?',
     hint: 'Describe',
-    errorMessages: {
-      required: 'A description of posture is required',
-    },
   }),
 };
 
@@ -29,7 +26,6 @@ export const postureUiSchema = {
  */
 export const postureSchema = {
   type: 'object',
-  required: ['posture'],
   properties: {
     posture: { type: 'string' },
   },
