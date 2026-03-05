@@ -12,6 +12,8 @@ import {
   textareaUI,
   textUI,
   titleUI,
+  inlineTitleUI,
+  inlineTitleSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 /**
@@ -23,14 +25,10 @@ export const blindnessDetailsUiSchema = {
   blindnessExplanation: textareaUI({
     title: "Provide an explanation of the patient's blindness",
   }),
-  'view:correctedVisionHeading': {
-    'ui:description': React.createElement(
-      'div',
-      null,
-      React.createElement('h4', null, 'Corrected vision'),
-      React.createElement('p', null, 'If applicable'),
-    ),
-  },
+  'view:correctedVisionHeading': inlineTitleUI(
+    'Corrected vision',
+    <p className="usa-hint">If applicable</p>,
+  ),
   leftEye: textUI({ title: 'Left eye' }),
   rightEye: textUI({ title: 'Right eye' }),
 };
@@ -43,7 +41,7 @@ export const blindnessDetailsSchema = {
   type: 'object',
   properties: {
     blindnessExplanation: { type: 'string' },
-    'view:correctedVisionHeading': { type: 'object', properties: {} },
+    'view:correctedVisionHeading': inlineTitleSchema,
     leftEye: { type: 'string' },
     rightEye: { type: 'string' },
   },
