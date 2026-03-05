@@ -14,9 +14,6 @@ export const gaitUiSchema = {
   gait: textareaUI({
     title: 'Gait',
     labelHeaderLevel: '3',
-    errorMessages: {
-      required: 'Gait information is required',
-    },
   }),
 };
 
@@ -26,7 +23,6 @@ export const gaitUiSchema = {
  */
 export const gaitSchema = {
   type: 'object',
-  required: ['gait'],
   properties: {
     gait: { type: 'string' },
   },
