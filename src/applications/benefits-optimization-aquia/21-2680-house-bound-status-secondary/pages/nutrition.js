@@ -14,9 +14,6 @@ export const nutritionUiSchema = {
   nutrition: textareaUI({
     title: 'Nutrition',
     labelHeaderLevel: '3',
-    errorMessages: {
-      required: 'Nutrition information is required',
-    },
   }),
 };
 
@@ -26,7 +23,6 @@ export const nutritionUiSchema = {
  */
 export const nutritionSchema = {
   type: 'object',
-  required: ['nutrition'],
   properties: {
     nutrition: { type: 'string' },
   },
