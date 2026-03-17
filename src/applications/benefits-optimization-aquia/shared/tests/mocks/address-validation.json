@@ -14,7 +14,7 @@
         "zipCodeSuffix": "3939"
       },
       "addressMetaData": {
-        "confidenceScore": 100,
+        "confidenceScore": 70,
         "addressType": "Domestic",
         "deliveryPointValidation": "CONFIRMED"
       }
