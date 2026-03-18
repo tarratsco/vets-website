@@ -19,16 +19,20 @@ const COUNTRY_CODE_ISO3 = 'country_code_iso3';
 const STATE_CODE = 'state_code';
 const ZIP_CODE = 'zip_code';
 
-export const prepareAddressForAPI = address => ({
-  [ADDRESS_LINE1]: address.street,
-  [ADDRESS_LINE2]: address.street2 || undefined,
-  [ADDRESS_POU]: 'CORRESPONDENCE',
-  [ADDRESS_TYPE]: address.country === 'USA' ? 'DOMESTIC' : 'INTERNATIONAL',
-  city: address.city,
-  [COUNTRY_CODE_ISO3]: address.country || 'USA',
-  [STATE_CODE]: address.state,
-  [ZIP_CODE]: address.postalCode,
-});
+export const prepareAddressForAPI = address => {
+  const countryCode = address.country || 'USA';
+
+  return {
+    [ADDRESS_LINE1]: address.street,
+    [ADDRESS_LINE2]: address.street2 || undefined,
+    [ADDRESS_POU]: 'CORRESPONDENCE',
+    [ADDRESS_TYPE]: countryCode === 'USA' ? 'DOMESTIC' : 'INTERNATIONAL',
+    city: address.city,
+    [COUNTRY_CODE_ISO3]: countryCode,
+    [STATE_CODE]: address.state,
+    [ZIP_CODE]: address.postalCode,
+  };
+};
 
 /**
  * Calls the address validation endpoint and returns the
@@ -67,7 +71,8 @@ export const fetchSuggestedAddress = async userAddress => {
           postalCode: suggested.zipCode,
         },
         confidenceScore,
-        showSuggestions: confidenceScore !== 100,
+        showSuggestions:
+          typeof confidenceScore === 'number' && confidenceScore !== 100,
         deliveryPointValidation:
           res.addresses[0]?.addressMetaData?.deliveryPointValidation,
       };
