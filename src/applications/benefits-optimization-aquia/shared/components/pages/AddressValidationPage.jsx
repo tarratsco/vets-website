@@ -8,6 +8,9 @@ import { fetchSuggestedAddress } from '@bio-aquia/shared/utils/validators/addres
 import AddressConfirmation from './AddressConfirmation';
 import SuggestedAddressRadio from './SuggestedAddressRadio';
 
+const USER_ENTERED_VALUE = 'user-entered';
+const SUGGESTED_VALUE = 'usps-suggested';
+
 /**
  * Higher-order function that returns a CustomPage component for address
  * validation. Each form passes its own configuration so the same logic
@@ -23,10 +26,6 @@ export function createAddressValidationPage({
   addressPath,
   title = 'Confirm your address',
 }) {
-  // Tracks whether the address was already validated with high confidence
-  // so that navigating back through this page skips it automatically.
-  let addressConfirmed = false;
-
   function AddressValidationCustomPage({
     goBack,
     goForward,
@@ -43,13 +42,6 @@ export function createAddressValidationPage({
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     useEffect(() => {
-      // If the address was already confirmed (user is navigating back),
-      // skip this page and go straight to the previous page.
-      if (addressConfirmed) {
-        goBack();
-        return;
-      }
-
       const validate = async () => {
         const address = get(addressPath, formData) || {};
         setUserAddress(address);
@@ -64,17 +56,16 @@ export function createAddressValidationPage({
           setShowSuggestions(false);
           // If confidence is 100, auto-advance — address is confirmed
           if (result.confidenceScore === 100) {
-            addressConfirmed = true;
-            // Update form data with the normalized address from USPS
+            const nextFormData = result.suggestedAddress
+              ? set(addressPath, result.suggestedAddress, formData)
+              : formData;
+
             if (result.suggestedAddress) {
-              const updated = set(
-                addressPath,
-                result.suggestedAddress,
-                formData,
-              );
-              dispatch(setData(updated));
+              // Persist USPS-normalized address before continuing.
+              dispatch(setData(nextFormData));
             }
-            goForward(formData);
+
+            goForward(nextFormData);
             return;
           }
         }
@@ -101,7 +92,18 @@ export function createAddressValidationPage({
     );
 
     const onChangeSelectedAddress = event => {
-      const selected = JSON.parse(event.detail.value);
+      const selectedValue = event?.detail?.value;
+      const selected =
+        selectedValue === SUGGESTED_VALUE ? suggestedAddress : userAddress;
+
+      const isKnownSelection =
+        selectedValue === USER_ENTERED_VALUE ||
+        selectedValue === SUGGESTED_VALUE;
+
+      if (!selected || !isKnownSelection) {
+        return;
+      }
+
       setSelectedAddress(selected);
 
       const updated = set(addressPath, selected, formData);

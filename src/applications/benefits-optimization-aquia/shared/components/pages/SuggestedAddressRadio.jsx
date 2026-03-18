@@ -2,6 +2,9 @@ import React from 'react';
 import { VaRadio } from '@department-of-veterans-affairs/component-library/dist/react-bindings';
 import { formatAddress } from '@bio-aquia/shared/utils/validators/address-validation';
 
+const USER_ENTERED_VALUE = 'user-entered';
+const SUGGESTED_VALUE = 'usps-suggested';
+
 /**
  * Renders radio tile options allowing the user to choose between the
  * address they entered and a USPS-suggested address.
@@ -35,7 +38,7 @@ export default function SuggestedAddressRadio({
             name="addressGroup"
             label="Address you entered:"
             description={formatAddress(userAddress)}
-            value={JSON.stringify(userAddress)}
+            value={USER_ENTERED_VALUE}
             tile
             checked={
               JSON.stringify(selectedAddress) === JSON.stringify(userAddress)
@@ -48,7 +51,7 @@ export default function SuggestedAddressRadio({
             name="addressGroup"
             label="Suggested address:"
             description={formatAddress(suggestedAddress)}
-            value={JSON.stringify(suggestedAddress)}
+            value={SUGGESTED_VALUE}
             tile
             checked={
               JSON.stringify(selectedAddress) ===
