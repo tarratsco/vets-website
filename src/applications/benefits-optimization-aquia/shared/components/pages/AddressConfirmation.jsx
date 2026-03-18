@@ -10,8 +10,13 @@ import { addressConfirmationRenderLine } from '@bio-aquia/shared/utils/validator
  * @param {Object} props
  * @param {string} props.subHeader - Section heading displayed above the alert
  * @param {Object} props.userAddress - The address the user entered
+ * @param {boolean} props.isExactMatch - Whether USPS returned an exact match
  */
-export default function AddressConfirmation({ subHeader, userAddress }) {
+export default function AddressConfirmation({
+  subHeader,
+  userAddress,
+  isExactMatch,
+}) {
   const cityStatePostal = [
     userAddress?.city,
     userAddress?.city && (userAddress?.state || userAddress?.postalCode)
@@ -30,17 +35,31 @@ export default function AddressConfirmation({ subHeader, userAddress }) {
   return (
     <>
       <h3>{subHeader}</h3>
-      <va-alert
-        close-btn-aria-label="Close notification"
-        status="warning"
-        visible
-      >
-        <h3 slot="headline">Check the address you entered</h3>
-        <p className="vads-u-margin-y--0">
-          We can't confirm the address you entered with the U.S. Postal Service.
-          Check the address before continuing.
-        </p>
-      </va-alert>
+      {isExactMatch ? (
+        <va-alert
+          close-btn-aria-label="Close notification"
+          status="success"
+          visible
+        >
+          <h3 slot="headline">Your address was an exact match</h3>
+          <p className="vads-u-margin-y--0">
+            We found an exact match to the address you entered with the U.S.
+            Postal Service.
+          </p>
+        </va-alert>
+      ) : (
+        <va-alert
+          close-btn-aria-label="Close notification"
+          status="warning"
+          visible
+        >
+          <h3 slot="headline">Check the address you entered</h3>
+          <p className="vads-u-margin-y--0">
+            We can't confirm the address you entered with the U.S. Postal
+            Service. Check the address before continuing.
+          </p>
+        </va-alert>
+      )}
       <p style={{ marginTop: '1em' }}>You entered:</p>
       <div className="blue-bar-block">
         <p>
@@ -55,13 +74,15 @@ export default function AddressConfirmation({ subHeader, userAddress }) {
         If the address is correct, you can continue. If you need to edit the
         address, you can go back.
       </p>
-      <va-additional-info trigger="Why we can't confirm the address you entered">
-        <p>
-          The address you entered may not be in the U.S. Postal Service's
-          system. Or, you may have entered an error or other incorrect
-          information.
-        </p>
-      </va-additional-info>
+      {!isExactMatch && (
+        <va-additional-info trigger="Why we can't confirm the address you entered">
+          <p>
+            The address you entered may not be in the U.S. Postal Service's
+            system. Or, you may have entered an error or other incorrect
+            information.
+          </p>
+        </va-additional-info>
+      )}
     </>
   );
 }

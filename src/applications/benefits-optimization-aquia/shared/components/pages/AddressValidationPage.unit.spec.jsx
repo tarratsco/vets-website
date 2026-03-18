@@ -1,10 +1,9 @@
 import React from 'react';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { render, waitFor, cleanup } from '@testing-library/react';
+import { render, waitFor, cleanup, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import set from 'platform/utilities/data/set';
 import { createAddressValidationPage } from './AddressValidationPage';
 import * as addressValidationUtils from '../../utils/validators/address-validation';
 
@@ -26,7 +25,7 @@ describe('AddressValidationPage', () => {
     cleanup();
   });
 
-  it('auto-advances with normalized form data for 100 confidence', async () => {
+  it('renders exact-match confirmation and waits for manual continue when confidence is 100', async () => {
     const addressPath = 'applicant.mailingAddress';
     const originalAddress = {
       street: '37 N 1st St',
@@ -61,7 +60,7 @@ describe('AddressValidationPage', () => {
       title: 'Confirm mailing address',
     });
 
-    render(
+    const view = render(
       <Provider store={buildStore(formData)}>
         <CustomPage
           goBack={goBack}
@@ -73,20 +72,27 @@ describe('AddressValidationPage', () => {
     );
 
     await waitFor(() => {
-      expect(goForward.calledOnce).to.equal(true);
+      expect(fetchSuggestedAddressStub.calledOnce).to.equal(true);
     });
 
     expect(goBack.called).to.equal(false);
-    expect(fetchSuggestedAddressStub.calledOnce).to.equal(true);
+    expect(goForward.called).to.equal(false);
     expect(fetchSuggestedAddressStub.firstCall.args[0]).to.deep.equal(
       originalAddress,
     );
+    expect(
+      view.getByText('Your address was an exact match').textContent,
+    ).to.not.equal('');
 
-    const expectedFormData = set(addressPath, suggestedAddress, formData);
-    expect(goForward.firstCall.args[0]).to.deep.equal(expectedFormData);
+    fireEvent.click(view.getByText('Continue'));
+
+    await waitFor(() => {
+      expect(goForward.calledOnce).to.equal(true);
+    });
+    expect(goForward.firstCall.args[0]).to.deep.equal(formData);
   });
 
-  it('does not call goBack on remount after a 100-confidence validation', async () => {
+  it('does not auto-forward on remount for confidence 100, allowing back navigation', async () => {
     const addressPath = 'applicant.mailingAddress';
     const formData = {
       applicant: {
@@ -132,7 +138,7 @@ describe('AddressValidationPage', () => {
     );
 
     await waitFor(() => {
-      expect(goForward.calledOnce).to.equal(true);
+      expect(fetchSuggestedAddressStub.calledOnce).to.equal(true);
     });
 
     firstRender.unmount();
@@ -149,10 +155,10 @@ describe('AddressValidationPage', () => {
     );
 
     await waitFor(() => {
-      expect(goForward.calledTwice).to.equal(true);
+      expect(fetchSuggestedAddressStub.calledTwice).to.equal(true);
     });
 
     expect(goBack.called).to.equal(false);
-    expect(fetchSuggestedAddressStub.calledTwice).to.equal(true);
+    expect(goForward.called).to.equal(false);
   });
 });

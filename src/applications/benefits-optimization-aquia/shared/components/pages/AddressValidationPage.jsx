@@ -40,6 +40,7 @@ export function createAddressValidationPage({
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [suggestedAddress, setSuggestedAddress] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [confidenceScore, setConfidenceScore] = useState(null);
 
     useEffect(() => {
       const validate = async () => {
@@ -48,26 +49,13 @@ export function createAddressValidationPage({
         setSelectedAddress(address);
 
         const result = await fetchSuggestedAddress(address);
+        setConfidenceScore(result.confidenceScore ?? null);
 
         if (result.suggestedAddress && result.showSuggestions) {
           setSuggestedAddress(result.suggestedAddress);
           setShowSuggestions(true);
         } else {
           setShowSuggestions(false);
-          // If confidence is 100, auto-advance — address is confirmed
-          if (result.confidenceScore === 100) {
-            const nextFormData = result.suggestedAddress
-              ? set(addressPath, result.suggestedAddress, formData)
-              : formData;
-
-            if (result.suggestedAddress) {
-              // Persist USPS-normalized address before continuing.
-              dispatch(setData(nextFormData));
-            }
-
-            goForward(nextFormData);
-            return;
-          }
         }
 
         setIsLoading(false);
@@ -139,7 +127,11 @@ export function createAddressValidationPage({
       </div>
     ) : (
       <div>
-        <AddressConfirmation subHeader={title} userAddress={userAddress} />
+        <AddressConfirmation
+          subHeader={title}
+          userAddress={userAddress}
+          isExactMatch={confidenceScore === 100}
+        />
         {contentBeforeButtons}
         <FormNavButtons goBack={goBack} goForward={handleContinue} />
         {contentAfterButtons}
