@@ -36,34 +36,43 @@ export function createAddressValidationPage({
     const formData = useSelector(state => state.form?.data);
 
     const [isLoading, setIsLoading] = useState(true);
+    const [hasResolvedValidation, setHasResolvedValidation] = useState(false);
     const [userAddress, setUserAddress] = useState(null);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [suggestedAddress, setSuggestedAddress] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [confidenceScore, setConfidenceScore] = useState(null);
 
-    useEffect(() => {
-      const validate = async () => {
-        const address = get(addressPath, formData) || {};
-        setUserAddress(address);
-        setSelectedAddress(address);
-
-        const result = await fetchSuggestedAddress(address);
-        setConfidenceScore(result.confidenceScore ?? null);
-
-        if (result.suggestedAddress && result.showSuggestions) {
-          setSuggestedAddress(result.suggestedAddress);
-          setShowSuggestions(true);
-        } else {
-          setShowSuggestions(false);
+    useEffect(
+      () => {
+        if (hasResolvedValidation) {
+          return;
         }
 
-        setIsLoading(false);
-      };
+        setHasResolvedValidation(true);
 
-      validate();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        const validate = async () => {
+          const address = get(addressPath, formData) || {};
+          setUserAddress(address);
+          setSelectedAddress(address);
+
+          const result = await fetchSuggestedAddress(address);
+          setConfidenceScore(result.confidenceScore ?? null);
+
+          if (result.suggestedAddress && result.showSuggestions) {
+            setSuggestedAddress(result.suggestedAddress);
+            setShowSuggestions(true);
+          } else {
+            setShowSuggestions(false);
+          }
+
+          setIsLoading(false);
+        };
+
+        validate();
+      },
+      [addressPath, dispatch, formData, hasResolvedValidation],
+    );
 
     // Maintain screen reader focus after loading resolves
     useEffect(

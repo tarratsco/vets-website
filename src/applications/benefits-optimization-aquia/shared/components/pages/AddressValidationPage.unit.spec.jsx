@@ -8,7 +8,13 @@ import { createAddressValidationPage } from './AddressValidationPage';
 import * as addressValidationUtils from '../../utils/validators/address-validation';
 
 const buildStore = formData =>
-  createStore((state = { form: { data: formData } }) => state);
+  createStore(
+    (
+      state = {
+        form: { data: formData },
+      },
+    ) => state,
+  );
 
 describe('AddressValidationPage', () => {
   let fetchSuggestedAddressStub;
