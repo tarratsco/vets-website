@@ -123,6 +123,8 @@ const formConfig = {
         employerAddressValidation: {
           title: 'Confirm employer address',
           path: 'employer-address-validation',
+          depends: formData =>
+            formData?.['view:bioAquiaUspsAddressValidation'] === true,
           CustomPage: createAddressValidationPage({
             addressPath: 'employerInformation.employerAddress',
             title: "Confirm employer's address",

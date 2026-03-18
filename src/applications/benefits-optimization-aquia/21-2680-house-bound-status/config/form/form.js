@@ -145,6 +145,8 @@ const formConfig = {
         veteranAddressValidation: {
           title: 'Confirm Veteran address',
           path: 'veteran-address-validation',
+          depends: formData =>
+            formData?.['view:bioAquiaUspsAddressValidation'] === true,
           CustomPage: createAddressValidationPage({
             addressPath: 'veteranAddress.veteranAddress',
             title: "Confirm Veteran's address",
@@ -221,7 +223,8 @@ const formConfig = {
           title: 'Confirm claimant address',
           path: 'claimant-address-validation',
           depends: formData =>
-            formData?.claimantRelationship?.relationship !== 'veteran',
+            formData?.claimantRelationship?.relationship !== 'veteran' &&
+            formData?.['view:bioAquiaUspsAddressValidation'] === true,
           CustomPage: createAddressValidationPage({
             addressPath: 'claimantAddress.claimantAddress',
             title: "Confirm claimant's address",
@@ -373,7 +376,8 @@ const formConfig = {
           title: 'Confirm hospital address',
           path: 'hospitalization-facility-address-validation',
           depends: formData =>
-            formData?.hospitalizationStatus?.isCurrentlyHospitalized === true,
+            formData?.hospitalizationStatus?.isCurrentlyHospitalized === true &&
+            formData?.['view:bioAquiaUspsAddressValidation'] === true,
           CustomPage: createAddressValidationPage({
             addressPath: 'hospitalizationFacility.facilityAddress',
             title: 'Confirm hospital address',

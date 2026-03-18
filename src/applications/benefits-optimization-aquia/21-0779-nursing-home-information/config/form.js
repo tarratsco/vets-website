@@ -104,6 +104,8 @@ const formConfig = {
         nursingHomeAddressValidation: {
           title: 'Confirm nursing home address',
           path: 'nursing-home-address-validation',
+          depends: formData =>
+            formData?.['view:bioAquiaUspsAddressValidation'] === true,
           CustomPage: createAddressValidationPage({
             addressPath: 'nursingHomeDetails.nursingHomeAddress',
             title: 'Confirm nursing home address',

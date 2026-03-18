@@ -97,6 +97,8 @@ const formConfig = {
         mailingAddressValidation: {
           title: 'Confirm mailing address',
           path: 'organization-mailing-address-validation',
+          depends: formData =>
+            formData?.['view:bioAquiaUspsAddressValidation'] === true,
           CustomPage: createAddressValidationPage({
             addressPath: 'burialInformation.recipientOrganization.address',
             title: 'Confirm mailing address',
