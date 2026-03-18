@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import sinon from 'sinon';
+import { mockApiRequest } from 'platform/testing/unit/helpers';
 import {
   prepareAddressForAPI,
   formatAddress,
@@ -118,38 +118,27 @@ describe('address-validation utils', () => {
   });
 
   describe('fetchSuggestedAddress', () => {
-    let fetchStub;
-
-    beforeEach(() => {
-      fetchStub = sinon.stub(global, 'fetch');
-    });
-
-    afterEach(() => {
-      fetchStub.restore();
-    });
-
     it('returns suggestedAddress and showSuggestions=false when confidence is 100', async () => {
-      fetchStub.resolves({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            addresses: [
-              {
-                address: {
-                  addressLine1: '37 N 1st St',
-                  city: 'Brooklyn',
-                  countryCodeIso3: 'USA',
-                  stateCode: 'NY',
-                  zipCode: '11249',
-                },
-                addressMetaData: {
-                  confidenceScore: 100,
-                  deliveryPointValidation: 'CONFIRMED',
-                },
+      mockApiRequest(
+        {
+          addresses: [
+            {
+              address: {
+                addressLine1: '37 N 1st St',
+                city: 'Brooklyn',
+                countryCodeIso3: 'USA',
+                stateCode: 'NY',
+                zipCode: '11249',
               },
-            ],
-          }),
-      });
+              addressMetaData: {
+                confidenceScore: 100,
+                deliveryPointValidation: 'CONFIRMED',
+              },
+            },
+          ],
+        },
+        true,
+      );
 
       const result = await fetchSuggestedAddress({
         street: '37 N 1st St',
@@ -165,27 +154,26 @@ describe('address-validation utils', () => {
     });
 
     it('returns showSuggestions=true when confidence is below 100', async () => {
-      fetchStub.resolves({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            addresses: [
-              {
-                address: {
-                  addressLine1: '37 North 1st Street',
-                  city: 'Brooklyn',
-                  countryCodeIso3: 'USA',
-                  stateCode: 'NY',
-                  zipCode: '11249',
-                },
-                addressMetaData: {
-                  confidenceScore: 85,
-                  deliveryPointValidation: 'CONFIRMED',
-                },
+      mockApiRequest(
+        {
+          addresses: [
+            {
+              address: {
+                addressLine1: '37 North 1st Street',
+                city: 'Brooklyn',
+                countryCodeIso3: 'USA',
+                stateCode: 'NY',
+                zipCode: '11249',
               },
-            ],
-          }),
-      });
+              addressMetaData: {
+                confidenceScore: 85,
+                deliveryPointValidation: 'CONFIRMED',
+              },
+            },
+          ],
+        },
+        true,
+      );
 
       const result = await fetchSuggestedAddress({
         street: '37 N 1st St',
@@ -200,7 +188,7 @@ describe('address-validation utils', () => {
     });
 
     it('returns fallback when API call fails', async () => {
-      fetchStub.rejects(new Error('Network error'));
+      mockApiRequest({}, false);
 
       const result = await fetchSuggestedAddress({
         street: '37 N 1st St',
