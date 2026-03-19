@@ -201,5 +201,34 @@ describe('address-validation utils', () => {
       expect(result.suggestedAddress).to.be.null;
       expect(result.showSuggestions).to.be.false;
     });
+
+    it('returns safe fallback when API response omits addresses[0].address', async () => {
+      mockApiRequest(
+        {
+          addresses: [
+            {
+              addressMetaData: {
+                confidenceScore: 75,
+                deliveryPointValidation: 'UNCONFIRMED',
+              },
+            },
+          ],
+        },
+        true,
+      );
+
+      const result = await fetchSuggestedAddress({
+        street: '37 N 1st St',
+        city: 'Brooklyn',
+        state: 'NY',
+        postalCode: '11249',
+        country: 'USA',
+      });
+
+      expect(result.suggestedAddress).to.be.null;
+      expect(result.showSuggestions).to.be.false;
+      expect(result.confidenceScore).to.equal(75);
+      expect(result.deliveryPointValidation).to.equal('UNCONFIRMED');
+    });
   });
 });

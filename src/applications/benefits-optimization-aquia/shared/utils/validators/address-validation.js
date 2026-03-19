@@ -1,4 +1,3 @@
-import React from 'react';
 import { apiRequest } from 'platform/utilities/api';
 import environment from '@department-of-veterans-affairs/platform-utilities/environment';
 import { countries } from 'platform/forms/address';
@@ -58,8 +57,19 @@ export const fetchSuggestedAddress = async userAddress => {
     );
 
     if (res?.addresses?.length > 0) {
-      const suggested = res.addresses[0]?.address;
-      const { confidenceScore } = res.addresses[0]?.addressMetaData || {};
+      const firstAddress = res.addresses[0] || {};
+      const suggested = firstAddress.address;
+      const { confidenceScore } = firstAddress.addressMetaData || {};
+
+      if (!suggested) {
+        return {
+          suggestedAddress: null,
+          confidenceScore,
+          showSuggestions: false,
+          deliveryPointValidation:
+            firstAddress?.addressMetaData?.deliveryPointValidation,
+        };
+      }
 
       return {
         suggestedAddress: {
@@ -74,7 +84,7 @@ export const fetchSuggestedAddress = async userAddress => {
         showSuggestions:
           typeof confidenceScore === 'number' && confidenceScore !== 100,
         deliveryPointValidation:
-          res.addresses[0]?.addressMetaData?.deliveryPointValidation,
+          firstAddress?.addressMetaData?.deliveryPointValidation,
       };
     }
   } catch {
@@ -114,18 +124,3 @@ export const formatAddress = address => {
 
   return display.trim();
 };
-
-/**
- * Renders a line of address content followed by a <br />.
- * Returns null when content is falsy.
- *
- * @param {string|null} content
- * @returns {JSX.Element|null}
- */
-export const addressConfirmationRenderLine = content =>
-  content ? (
-    <>
-      {content}
-      <br />
-    </>
-  ) : null;

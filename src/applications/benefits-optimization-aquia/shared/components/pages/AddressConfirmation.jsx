@@ -1,7 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { countries } from 'platform/forms/address';
-import { addressConfirmationRenderLine } from '@bio-aquia/shared/utils/validators/address-validation';
+
+const renderAddressLine = content =>
+  content ? (
+    <>
+      {content}
+      <br />
+    </>
+  ) : null;
 
 const addressPropType = PropTypes.shape({
   street: PropTypes.string,
@@ -73,11 +80,11 @@ export default function AddressConfirmation({
       <p style={{ marginTop: '1em' }}>You entered:</p>
       <div className="blue-bar-block">
         <p>
-          {addressConfirmationRenderLine(userAddress?.street)}
-          {addressConfirmationRenderLine(userAddress?.street2)}
-          {cityStatePostal && addressConfirmationRenderLine(cityStatePostal)}
+          {renderAddressLine(userAddress?.street)}
+          {renderAddressLine(userAddress?.street2)}
+          {cityStatePostal && renderAddressLine(cityStatePostal)}
           {userAddress?.country !== 'USA' &&
-            addressConfirmationRenderLine(getCountry(userAddress?.country))}
+            renderAddressLine(getCountry(userAddress?.country))}
         </p>
       </div>
       <p>
