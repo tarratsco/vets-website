@@ -17,10 +17,13 @@ const addressPropType = PropTypes.shape({
  * Renders radio tile options allowing the user to choose between the
  * address they entered and a USPS-suggested address.
  *
+ * The selected tile is controlled by a stable token value so this component
+ * does not depend on object-shape/order comparisons.
+ *
  * @param {Object} props
  * @param {string} props.title - Heading text
  * @param {Object} props.userAddress - The address the user originally entered
- * @param {Object} props.selectedAddress - Currently selected address
+ * @param {string} props.selectedAddressValue - Selected token value
  * @param {Object} props.suggestedAddress - Address suggested by validation API
  * @param {Function} props.onChangeSelectedAddress - Callback on radio change
  */
@@ -37,6 +40,8 @@ export default function SuggestedAddressRadio({
       <p>We found a similar address to the one you entered.</p>
       <VaRadio
         label="Tell us which address you'd like to use."
+        // Web component emits selected option token in event.detail.value.
+        // Tokens make state durable even when address object shape/order varies.
         onVaValueChange={onChangeSelectedAddress}
         required
       >

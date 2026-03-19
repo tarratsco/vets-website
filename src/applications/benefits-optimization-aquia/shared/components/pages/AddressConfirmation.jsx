@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { countries } from 'platform/forms/address';
 
+// Render only populated address lines to avoid empty spacing in the block.
 const renderAddressLine = content =>
   content ? (
     <>
@@ -20,9 +21,12 @@ const addressPropType = PropTypes.shape({
 });
 
 /**
- * Displays a warning alert when the user's address cannot be confirmed
- * by USPS data. Shows the entered address and gives the user the option
- * to continue or go back and edit.
+ * Displays the no-suggestion branch of USPS validation.
+ *
+ * If confidence is 100, show a success exact-match message.
+ * Otherwise show a warning and explain why USPS may not confirm the address.
+ * In both cases, the user-entered address is shown and the user manually
+ * chooses whether to continue or go back.
  *
  * @param {Object} props
  * @param {string} props.subHeader - Section heading displayed above the alert

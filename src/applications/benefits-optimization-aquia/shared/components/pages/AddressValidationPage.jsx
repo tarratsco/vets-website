@@ -12,8 +12,15 @@ import { SUGGESTED_VALUE, USER_ENTERED_VALUE } from './constants';
 
 /**
  * Higher-order function that returns a CustomPage component for address
- * validation. Each form passes its own configuration so the same logic
- * can be reused across all aquia bio forms.
+ * validation. Each form passes a path to the form-data address field and
+ * a page title so this USPS confirmation flow can be reused across BO Aquia
+ * forms.
+ *
+ * Runtime behavior:
+ * 1. Read the user-entered address from form data and call USPS validation.
+ * 2. If USPS returns confidence below 100, show two radio options.
+ * 3. Otherwise show a confirmation alert for exact match or fallback warning.
+ * 4. Persist the selected address back to form data before Continue.
  *
  * @param {Object} config
  * @param {string} config.addressPath - Dot-notation path to the address
@@ -33,6 +40,8 @@ export function createAddressValidationPage({
   }) {
     const dispatch = useDispatch();
     const formData = useSelector(state => state.form?.data);
+    // Read only the target address so this effect does not rerun on unrelated
+    // form changes elsewhere in the state tree.
     const userAddressFromStore = useSelector(state =>
       get(addressPath, state.form?.data),
     );
@@ -45,6 +54,7 @@ export function createAddressValidationPage({
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [confidenceScore, setConfidenceScore] = useState(null);
 
+    // Validate once per page mount and stop state updates after unmount.
     useEffect(
       () => {
         if (hasResolvedValidationRef.current) {
@@ -55,6 +65,8 @@ export function createAddressValidationPage({
         hasResolvedValidationRef.current = true;
 
         const address = userAddressFromStore || {};
+        // Default selection is always the user-entered address so users must
+        // explicitly choose the USPS suggestion when shown.
         setUserAddress(address);
         setSelectedAddress(address);
 
@@ -71,6 +83,8 @@ export function createAddressValidationPage({
             setSuggestedAddress(result.suggestedAddress);
             setShowSuggestions(true);
           } else {
+            // For 100 confidence or API fallback, we show confirmation and let
+            // users continue manually instead of auto-advancing.
             setShowSuggestions(false);
           }
 
@@ -115,11 +129,13 @@ export function createAddressValidationPage({
 
       setSelectedAddress(selected);
 
+      // Keep form state in sync with the selection shown on this page.
       const updated = set(addressPath, selected, formData);
       dispatch(setData(updated));
     };
 
     const handleContinue = () => {
+      // Preserve current formData behavior used by FormNavButtons consumers.
       goForward(formData);
     };
 
@@ -138,6 +154,7 @@ export function createAddressValidationPage({
         <SuggestedAddressRadio
           title={title}
           userAddress={userAddress}
+          // Radio tiles are driven by stable tokens instead of object equality.
           selectedAddressValue={
             selectedAddress === suggestedAddress
               ? SUGGESTED_VALUE

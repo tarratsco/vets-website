@@ -62,6 +62,9 @@ export const fetchSuggestedAddress = async userAddress => {
       const { confidenceScore } = firstAddress.addressMetaData || {};
 
       if (!suggested) {
+        // Some upstream responses can include metadata without a usable
+        // normalized address payload. Treat this as "no suggestion" so the UI
+        // falls back to confirmation instead of crashing.
         return {
           suggestedAddress: null,
           confidenceScore,
@@ -81,6 +84,8 @@ export const fetchSuggestedAddress = async userAddress => {
           postalCode: suggested.zipCode,
         },
         confidenceScore,
+        // Match Medallions app UX: confidence 100 goes to confirmation page,
+        // while lower confidence shows side-by-side address choice.
         showSuggestions:
           typeof confidenceScore === 'number' && confidenceScore !== 100,
         deliveryPointValidation:
@@ -88,7 +93,7 @@ export const fetchSuggestedAddress = async userAddress => {
       };
     }
   } catch {
-    // If validation API fails, allow the user to proceed with their address
+    // If USPS is unavailable, do not block form progress.
     return { suggestedAddress: null, showSuggestions: false };
   }
 
