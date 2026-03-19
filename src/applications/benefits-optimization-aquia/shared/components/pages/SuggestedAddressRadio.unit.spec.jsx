@@ -31,6 +31,7 @@ describe('SuggestedAddressRadio', () => {
       postalCode: '11249',
       country: 'USA',
     },
+    selectedAddressValue: 'user-entered',
     onChangeSelectedAddress: () => {},
   };
 
@@ -59,11 +60,11 @@ describe('SuggestedAddressRadio', () => {
     expect(options[0].getAttribute('label')).to.equal('Address you entered:');
   });
 
-  it('marks suggested option as checked when selectedAddress matches it', () => {
+  it('marks suggested option as checked when selectedAddressValue is usps-suggested', () => {
     const { container } = render(
       <SuggestedAddressRadio
         {...baseProps}
-        selectedAddress={baseProps.suggestedAddress}
+        selectedAddressValue="usps-suggested"
       />,
     );
 

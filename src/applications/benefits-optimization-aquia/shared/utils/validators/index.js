@@ -26,5 +26,4 @@ export {
   prepareAddressForAPI,
   fetchSuggestedAddress,
   formatAddress,
-  addressConfirmationRenderLine,
 } from './address-validation';

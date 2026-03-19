@@ -167,4 +167,115 @@ describe('AddressValidationPage', () => {
     expect(goBack.called).to.equal(false);
     expect(goForward.called).to.equal(false);
   });
+
+  it('shows warning confirmation when API validation returns fallback (no suggested address)', async () => {
+    const addressPath = 'applicant.mailingAddress';
+    const formData = {
+      applicant: {
+        mailingAddress: {
+          street: '37 N 1st St',
+          city: 'Brooklyn',
+          state: 'NY',
+          postalCode: '11249',
+          country: 'USA',
+        },
+      },
+    };
+
+    fetchSuggestedAddressStub.resolves({
+      suggestedAddress: null,
+      showSuggestions: false,
+      confidenceScore: null,
+    });
+
+    const goBack = sinon.spy();
+    const goForward = sinon.spy();
+    const CustomPage = createAddressValidationPage({
+      addressPath,
+      title: 'Confirm mailing address',
+    });
+
+    const view = render(
+      <Provider store={buildStore(formData)}>
+        <CustomPage
+          goBack={goBack}
+          goForward={goForward}
+          contentBeforeButtons={null}
+          contentAfterButtons={null}
+        />
+      </Provider>,
+    );
+
+    await waitFor(() => {
+      expect(fetchSuggestedAddressStub.calledOnce).to.equal(true);
+    });
+
+    expect(
+      view.getByText('Check the address you entered').textContent,
+    ).to.not.equal('');
+    expect(view.container.querySelector('va-additional-info')).to.exist;
+    expect(goForward.called).to.equal(false);
+  });
+
+  it('shows suggestion radio flow for confidence below 100 and allows manual continue', async () => {
+    const addressPath = 'applicant.mailingAddress';
+    const formData = {
+      applicant: {
+        mailingAddress: {
+          street: '37 N 1st St',
+          city: 'Brooklyn',
+          state: 'NY',
+          postalCode: '11249',
+          country: 'USA',
+        },
+      },
+    };
+
+    fetchSuggestedAddressStub.resolves({
+      suggestedAddress: {
+        street: '37 North 1st Street',
+        city: 'Brooklyn',
+        state: 'NY',
+        postalCode: '11249',
+        country: 'USA',
+      },
+      showSuggestions: true,
+      confidenceScore: 85,
+    });
+
+    const goBack = sinon.spy();
+    const goForward = sinon.spy();
+    const CustomPage = createAddressValidationPage({
+      addressPath,
+      title: 'Confirm mailing address',
+    });
+
+    const view = render(
+      <Provider store={buildStore(formData)}>
+        <CustomPage
+          goBack={goBack}
+          goForward={goForward}
+          contentBeforeButtons={null}
+          contentAfterButtons={null}
+        />
+      </Provider>,
+    );
+
+    await waitFor(() => {
+      expect(fetchSuggestedAddressStub.calledOnce).to.equal(true);
+    });
+
+    const radio = view.container.querySelector('va-radio');
+    expect(radio).to.exist;
+    expect(radio.getAttribute('label')).to.equal(
+      "Tell us which address you'd like to use.",
+    );
+    expect(goForward.called).to.equal(false);
+
+    fireEvent.click(view.getByText('Continue'));
+
+    await waitFor(() => {
+      expect(goForward.calledOnce).to.equal(true);
+    });
+  });
 });

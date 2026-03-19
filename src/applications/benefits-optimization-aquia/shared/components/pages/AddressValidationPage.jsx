@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setData } from 'platform/forms-system/src/js/actions';
@@ -8,9 +8,7 @@ import get from 'platform/utilities/data/get';
 import { fetchSuggestedAddress } from '@bio-aquia/shared/utils/validators/address-validation';
 import AddressConfirmation from './AddressConfirmation';
 import SuggestedAddressRadio from './SuggestedAddressRadio';
-
-const USER_ENTERED_VALUE = 'user-entered';
-const SUGGESTED_VALUE = 'usps-suggested';
+import { SUGGESTED_VALUE, USER_ENTERED_VALUE } from './constants';
 
 /**
  * Higher-order function that returns a CustomPage component for address
@@ -35,9 +33,12 @@ export function createAddressValidationPage({
   }) {
     const dispatch = useDispatch();
     const formData = useSelector(state => state.form?.data);
+    const userAddressFromStore = useSelector(state =>
+      get(addressPath, state.form?.data),
+    );
 
     const [isLoading, setIsLoading] = useState(true);
-    const [hasResolvedValidation, setHasResolvedValidation] = useState(false);
+    const hasResolvedValidationRef = useRef(false);
     const [userAddress, setUserAddress] = useState(null);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [suggestedAddress, setSuggestedAddress] = useState(null);
@@ -46,18 +47,24 @@ export function createAddressValidationPage({
 
     useEffect(
       () => {
-        if (hasResolvedValidation) {
-          return;
+        if (hasResolvedValidationRef.current) {
+          return undefined;
         }
 
-        setHasResolvedValidation(true);
+        let isActive = true;
+        hasResolvedValidationRef.current = true;
+
+        const address = userAddressFromStore || {};
+        setUserAddress(address);
+        setSelectedAddress(address);
 
         const validate = async () => {
-          const address = get(addressPath, formData) || {};
-          setUserAddress(address);
-          setSelectedAddress(address);
-
           const result = await fetchSuggestedAddress(address);
+
+          if (!isActive) {
+            return;
+          }
+
           setConfidenceScore(result.confidenceScore ?? null);
 
           if (result.suggestedAddress && result.showSuggestions) {
@@ -71,8 +78,12 @@ export function createAddressValidationPage({
         };
 
         validate();
+
+        return () => {
+          isActive = false;
+        };
       },
-      [dispatch, formData, hasResolvedValidation],
+      [userAddressFromStore],
     );
 
     // Maintain screen reader focus after loading resolves
@@ -127,7 +138,11 @@ export function createAddressValidationPage({
         <SuggestedAddressRadio
           title={title}
           userAddress={userAddress}
-          selectedAddress={selectedAddress}
+          selectedAddressValue={
+            selectedAddress === suggestedAddress
+              ? SUGGESTED_VALUE
+              : USER_ENTERED_VALUE
+          }
           suggestedAddress={suggestedAddress}
           onChangeSelectedAddress={onChangeSelectedAddress}
         />
