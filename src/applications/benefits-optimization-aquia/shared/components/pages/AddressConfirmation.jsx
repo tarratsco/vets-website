@@ -1,6 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { countries } from 'platform/forms/address';
 import { addressConfirmationRenderLine } from '@bio-aquia/shared/utils/validators/address-validation';
+
+const addressPropType = PropTypes.shape({
+  street: PropTypes.string,
+  street2: PropTypes.string,
+  city: PropTypes.string,
+  state: PropTypes.string,
+  postalCode: PropTypes.string,
+  country: PropTypes.string,
+});
 
 /**
  * Displays a warning alert when the user's address cannot be confirmed
@@ -86,3 +96,13 @@ export default function AddressConfirmation({
     </>
   );
 }
+
+AddressConfirmation.propTypes = {
+  subHeader: PropTypes.string.isRequired,
+  userAddress: addressPropType.isRequired,
+  isExactMatch: PropTypes.bool,
+};
+
+AddressConfirmation.defaultProps = {
+  isExactMatch: false,
+};

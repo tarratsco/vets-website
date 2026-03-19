@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setData } from 'platform/forms-system/src/js/actions';
 import FormNavButtons from 'platform/forms-system/src/js/components/FormNavButtons';
@@ -149,6 +150,18 @@ export function createAddressValidationPage({
   }
 
   AddressValidationCustomPage.displayName = `AddressValidation(${addressPath})`;
+
+  AddressValidationCustomPage.propTypes = {
+    goBack: PropTypes.func.isRequired,
+    goForward: PropTypes.func.isRequired,
+    contentBeforeButtons: PropTypes.node,
+    contentAfterButtons: PropTypes.node,
+  };
+
+  AddressValidationCustomPage.defaultProps = {
+    contentBeforeButtons: null,
+    contentAfterButtons: null,
+  };
 
   return AddressValidationCustomPage;
 }
