@@ -75,10 +75,10 @@ export default function SuggestedAddressRadio({
 
 SuggestedAddressRadio.propTypes = {
   title: PropTypes.string.isRequired,
-  userAddress: addressPropType,
+  onChangeSelectedAddress: PropTypes.func.isRequired,
   selectedAddress: addressPropType,
   suggestedAddress: addressPropType,
-  onChangeSelectedAddress: PropTypes.func.isRequired,
+  userAddress: addressPropType,
 };
 
 SuggestedAddressRadio.defaultProps = {

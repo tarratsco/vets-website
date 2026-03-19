@@ -72,7 +72,7 @@ export function createAddressValidationPage({
 
         validate();
       },
-      [addressPath, dispatch, formData, hasResolvedValidation],
+      [dispatch, formData, hasResolvedValidation],
     );
 
     // Maintain screen reader focus after loading resolves
@@ -154,8 +154,8 @@ export function createAddressValidationPage({
   AddressValidationCustomPage.propTypes = {
     goBack: PropTypes.func.isRequired,
     goForward: PropTypes.func.isRequired,
-    contentBeforeButtons: PropTypes.node,
     contentAfterButtons: PropTypes.node,
+    contentBeforeButtons: PropTypes.node,
   };
 
   AddressValidationCustomPage.defaultProps = {
