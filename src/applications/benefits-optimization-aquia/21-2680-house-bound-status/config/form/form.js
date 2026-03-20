@@ -21,7 +21,7 @@ import { IntroductionPage } from '@bio-aquia/21-2680-house-bound-status/containe
 import { ConfirmationPage } from '@bio-aquia/21-2680-house-bound-status/containers/confirmation-page';
 import { submitTransformer } from '@bio-aquia/21-2680-house-bound-status/config/submit-transformer';
 import { customSubmit } from '@bio-aquia/shared/utils';
-import { createAddressValidationPage } from '@bio-aquia/shared/components/pages';
+import { createAddressValidationPage } from '@bio-aquia/shared/components/pages/AddressValidationPage';
 import manifest from '@bio-aquia/21-2680-house-bound-status/manifest.json';
 
 // Import page configurations (uiSchema and schema)

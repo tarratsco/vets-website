@@ -11,7 +11,7 @@ import { IntroductionPage } from '@bio-aquia/21-0779-nursing-home-information/co
 import manifest from '@bio-aquia/21-0779-nursing-home-information/manifest.json';
 import { transform } from '@bio-aquia/21-0779-nursing-home-information/config/transform';
 import { customSubmit } from '@bio-aquia/shared/utils';
-import { createAddressValidationPage } from '@bio-aquia/shared/components/pages';
+import { createAddressValidationPage } from '@bio-aquia/shared/components/pages/AddressValidationPage';
 import { GetHelp } from '@bio-aquia/21-0779-nursing-home-information/components/get-help';
 import { preSubmitSignatureConfig } from '@bio-aquia/21-0779-nursing-home-information/components/pre-submit-signature';
 import {

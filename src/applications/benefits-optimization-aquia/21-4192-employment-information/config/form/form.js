@@ -18,7 +18,7 @@ import { GetHelp } from '@bio-aquia/21-4192-employment-information/components/ge
 import { transformForSubmit } from '@bio-aquia/21-4192-employment-information/config/submit-transformer';
 import { PreSubmitInfo } from '@bio-aquia/21-4192-employment-information/components/pre-submit-info';
 import { customSubmit } from '@bio-aquia/shared/utils';
-import { createAddressValidationPage } from '@bio-aquia/shared/components/pages';
+import { createAddressValidationPage } from '@bio-aquia/shared/components/pages/AddressValidationPage';
 import manifest from '@bio-aquia/21-4192-employment-information/manifest.json';
 
 // Import page configurations (uiSchema and schema)
