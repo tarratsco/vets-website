@@ -1,8 +1,8 @@
 import {
   VaButtonPair,
+  VaSearchInput,
   VaSelect,
   VaSort,
-  VaTextInput,
 } from '@department-of-veterans-affairs/component-library/dist/react-bindings';
 import { focusElement } from '@department-of-veterans-affairs/platform-utilities/ui';
 import React, { useState } from 'react';
@@ -34,7 +34,6 @@ export default function InboxLayoutNew({
 }) {
   const [pendingCategoriesFilter, setPendingCategoriesFilter] = useState('All');
   const [pendingStatusesFilter, setPendingStatusesFilter] = useState('All');
-  const [pendingQuery, setPendingQuery] = useState('');
   const [sortOrder, setSortOrder] = useState(
     filterAndSort.sortOptions.lastUpdate.newest,
   );
@@ -52,22 +51,23 @@ export default function InboxLayoutNew({
 
   return (
     <div id="inbox">
-      <h2 className="vads-u-margin-top--4 vads-u-margin-bottom--0">
-        Your questions
-      </h2>
+      <h2 className="vads-u-margin--0">Your questions</h2>
       {inquiryTypes.length ? (
         <>
+          <div id="search-container">
+            <p className="vads-u-margin--0 vads-u-margin-bottom--1">
+              Enter a keyword, phrase, or question
+            </p>
+            <VaSearchInput
+              big
+              label="Enter a keyword, phrase, or question"
+              onSubmit={e => {
+                setFilters(curr => ({ ...curr, query: e.target.value }));
+                focusElement('#search-description');
+              }}
+            />
+          </div>
           <div className="filter-container">
-            <div className="search-container">
-              <VaTextInput
-                value={pendingQuery}
-                label="Search"
-                inputMode="search"
-                onVaInput={e => {
-                  setPendingQuery(e.target.value || '');
-                }}
-              />
-            </div>
             <div>
               <VaSelect
                 hint={null}
@@ -113,22 +113,21 @@ export default function InboxLayoutNew({
                 primaryLabel="Apply filters"
                 secondaryLabel="Clear all filters"
                 onPrimaryClick={() => {
-                  setFilters(() => ({
+                  setFilters(curr => ({
+                    ...curr,
                     categories: [pendingCategoriesFilter],
                     statuses: [pendingStatusesFilter],
-                    query: pendingQuery,
                   }));
                   focusElement('#search-description');
                 }}
                 onSecondaryClick={() => {
-                  setFilters(() => ({
+                  setFilters(curr => ({
+                    ...curr,
                     statuses: ['All'],
                     categories: ['All'],
-                    query: '',
                   }));
                   setPendingStatusesFilter('All');
                   setPendingCategoriesFilter('All');
-                  setPendingQuery('');
                   focusElement('#search-description');
                 }}
                 leftButtonText="Apply"
@@ -136,23 +135,29 @@ export default function InboxLayoutNew({
               />
             </div>
           </div>
-          {!!results.length && (
-            <VaSort
-              width="xl"
-              value={sortOrder}
-              onVaSortSelect={e => {
-                setSortOrder(e.target.value);
-                focusElement('#search-description');
-              }}
-            >
-              <option value={filterAndSort.sortOptions.lastUpdate.newest}>
-                Last Updated (newest to oldest)
-              </option>
-              <option value={filterAndSort.sortOptions.lastUpdate.oldest}>
-                Last Updated (oldest to newest)
-              </option>
-            </VaSort>
-          )}
+          <div
+            className={`sort-container ${
+              results.length ? 'vads-u-padding-top--2' : ''
+            }`}
+          >
+            {!!results.length && (
+              <VaSort
+                width="xl"
+                value={sortOrder}
+                onVaSortSelect={e => {
+                  setSortOrder(e.target.value);
+                  focusElement('#search-description');
+                }}
+              >
+                <option value={filterAndSort.sortOptions.lastUpdate.newest}>
+                  Last Updated (newest to oldest)
+                </option>
+                <option value={filterAndSort.sortOptions.lastUpdate.oldest}>
+                  Last Updated (oldest to newest)
+                </option>
+              </VaSort>
+            )}
+          </div>
 
           {inquiryTypes.includes('business') ? (
             <div className="tabs">

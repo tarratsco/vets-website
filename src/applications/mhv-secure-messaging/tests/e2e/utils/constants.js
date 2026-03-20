@@ -117,7 +117,7 @@ export const Locators = {
     FOLDER_REMOVE: 'va-button[text="Yes, remove this folder"]',
     FOLDER_REMOVE_DATA_TEST_ID: 'confirm-remove-folder',
     FOLDER_HEADER: '[data-testid="folder-header"]',
-    INBOX: '[data-testid="inbox-sidebar"] > a',
+    INBOX: 'inbox-sidebar',
     DRAFTS: '[data-testid="drafts-sidebar"]',
     SENT: '[data-testid="sent-sidebar"]',
     TRASH: '[data-testid="trash-sidebar"]',
@@ -228,7 +228,7 @@ export const Locators = {
     BACK_TOP: 'va-back-to-top',
     CERNER_ALERT: '[data-testid="cerner-facilities-alert"]',
     BLOCKED_GROUP: '[data-testid="blocked-triage-group-alert"]',
-    OH_SYNC_STATUS_ALERT: '[data-testid="oh-sync-status-alert"]',
+    OH_SYNC_STATUS_ALERT: 'oh-sync-status-alert',
     RECIPIENTS_ERROR: 'recipients-error-alert',
     RECIP_SELECT: '[data-testid="compose-recipient-select"]',
     MESS_CATAGO: '[data-testid="compose-message-categories"]',
@@ -403,7 +403,7 @@ export const Alerts = {
     'We can’t load your care team list right now',
   SEND_MESSAGE_SUCCESS: `Message sent`,
   MIGRATION_ALERT_H2: `You can’t use messages to contact providers at some facilities right now`,
-  MIGRATION_ALERT_BODY: `You can’t send or receive new messages or reply to conversations with providers at`,
+  MIGRATION_ALERT_BODY: `You can't send new messages or reply to conversations with providers at`,
   OH_SYNC_STATUS: {
     HEADER: `We're still adding some of your messages here`,
     BODY: `We're working to add all of your messages to your inbox. They should be available soon.`,
@@ -500,7 +500,7 @@ export const Data = {
     SAVE_DRAFT_WO_ATTCH: `Save draft without attachments`,
   },
   LINKS: {
-    PROFILE_SIGNATURE: `/profile/personal-information#messaging-signature`,
+    PROFILE_SIGNATURE: `/profile/message-signature`,
     HOME: '/my-health/secure-messages/',
     CONTACT_LIST: '/my-health/secure-messages/contact-list/',
     SELECT_CARE_TEAM:

@@ -125,7 +125,7 @@ class CCServiceTypeAhead extends Component {
     inputValue,
   ) => {
     return (
-      <div
+      <ul
         id="service-typeahead-listbox"
         className={`dropdown${
           this.props.useProgressiveDisclosure && this.props.isSmallDesktop
@@ -135,7 +135,7 @@ class CCServiceTypeAhead extends Component {
         role="listbox"
       >
         {this.matchingServices(inputValue).map((specialty, index) => (
-          <div
+          <li
             key={`${this.getSpecialtyName(specialty)}-${index}`}
             {...getItemProps({
               item: specialty,
@@ -145,9 +145,9 @@ class CCServiceTypeAhead extends Component {
             })}
           >
             {this.getSpecialtyName(specialty)}
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     );
   };
 
@@ -184,6 +184,7 @@ class CCServiceTypeAhead extends Component {
         onInputValueChange={inputValue => {
           if (
             currentQuery.serviceType &&
+            currentQuery.specialties &&
             inputValue !== currentQuery.specialties[currentQuery.serviceType]
           ) {
             handleServiceTypeChange({
@@ -213,12 +214,13 @@ class CCServiceTypeAhead extends Component {
               <label {...getLabelProps()} htmlFor="service-type-ahead-input">
                 Select a provider type{' '}
                 <span className="form-required-span">(*Required)</span>
-                {this.props.useProgressiveDisclosure && (
-                  <span className="usa-hint">
-                    Type a medical specialty or service to find providers
-                  </span>
-                )}
               </label>
+              {this.props.useProgressiveDisclosure && (
+                <p className="service-hint-text">
+                  Start typing to search for a service, like Chiropractor or
+                  Optometrist.
+                </p>
+              )}
               {showError && (
                 <span className="usa-input-error-message" role="alert">
                   <span id="error-message">

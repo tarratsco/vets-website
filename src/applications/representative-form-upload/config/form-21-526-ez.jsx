@@ -2,9 +2,9 @@ import environment from '@department-of-veterans-affairs/platform-utilities/envi
 import footerContent from '~/platform/forms/components/FormFooter';
 import manifest from '../manifest.json';
 import ConfirmationPage from '../containers/ConfirmationPage';
-import IntroductionPage from '../containers/IntroductionPage';
+import IntroductionPage526 from '../containers/IntroductionPage526';
 import { uploadPage } from '../pages/upload';
-import { veteranInformationPage } from '../pages/veteranInformation';
+import { veteranInformationPage } from '../pages/526ezVeteranInformation';
 import { transformForSubmit } from './submit-transformer';
 import { getMockData, scrollAndFocusTarget, getFormContent } from '../helpers';
 import { CustomTopContent } from '../pages/helpers';
@@ -29,7 +29,7 @@ const form21526Ez = (pathname = null) => {
     },
     disableSave: true,
     trackingPrefix,
-    introduction: IntroductionPage,
+    introduction: IntroductionPage526,
     confirmation: ConfirmationPage,
     CustomTopContent,
     customText: {
@@ -64,6 +64,9 @@ const form21526Ez = (pathname = null) => {
             // we want req'd fields prefilled for LOCAL testing/previewing
             // one single initialData prop here will suffice for entire form
             initialData: getMockData(),
+            depends: () => {
+              return true;
+            },
           },
         },
       },

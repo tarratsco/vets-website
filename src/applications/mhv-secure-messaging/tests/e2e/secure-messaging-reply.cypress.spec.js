@@ -6,7 +6,7 @@ import PatientReplyPage from './pages/PatientReplyPage';
 import { AXE_CONTEXT, Locators, Paths } from './utils/constants';
 import GeneralFunctionsPage from './pages/GeneralFunctionsPage';
 import singleThreadResponse from './fixtures/thread-response-new-api.json';
-import mockSignature from './fixtures/signature-response.json';
+import mockBlankSignature from './fixtures/signature-blank-response.json';
 
 describe('Secure Messaging Reply Axe Check', () => {
   it('Axe Check Message Reply', () => {
@@ -17,14 +17,16 @@ describe('Secure Messaging Reply Axe Check', () => {
     SecureMessagingSite.login();
     PatientInboxPage.loadInboxMessages();
     PatientMessageDetailsPage.loadSingleThread(updatedSingleThreadResponse);
-    PatientReplyPage.clickReplyButton(updatedSingleThreadResponse);
-    PatientInterstitialPage.getContinueButton().click();
-
     cy.intercept(
       'GET',
       Paths.SM_API_EXTENDED + Paths.SIGNATURE,
-      mockSignature,
+      mockBlankSignature,
     ).as('signature');
+    PatientReplyPage.clickReplyButton(updatedSingleThreadResponse);
+    PatientInterstitialPage.getContinueButton()
+      .should('be.visible')
+      .click();
+
     cy.wait('@signature');
 
     // Wait for reply form to be fully loaded before interacting

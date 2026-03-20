@@ -14,6 +14,7 @@ import { getReasonCode } from './getReasonCode';
 
 export function transformFormToVAOSCCRequest(state) {
   const data = getFormData(state);
+  const { ehr } = state.newAppointment;
   const provider = data.communityCareProvider;
   const residentialAddress = selectVAPResidentialAddress(state);
   const parentFacility = getChosenCCSystemById(state);
@@ -97,11 +98,13 @@ export function transformFormToVAOSCCRequest(state) {
     )?.value,
     preferredLocation,
     practitioners,
+    systemType: ehr,
   };
 }
 
 export function transformFormToVAOSVARequest(state, updateLimits = false) {
   const data = getFormData(state);
+  const { ehr } = state.newAppointment;
   const typeOfCare = getTypeOfCare(data);
 
   return {
@@ -133,12 +136,14 @@ export function transformFormToVAOSVARequest(state, updateLimits = false) {
     preferredTimesForPhoneCall: Object.entries(data.bestTimeToCall || {})
       .filter(item => item[1])
       .map(item => titleCase(item[0])),
+    systemType: ehr,
   };
 }
 
 export function transformFormToVAOSAppointment(state, updateLimits = false) {
   const data = getFormData(state);
   const { ehr } = state.newAppointment;
+  const typeOfCare = getTypeOfCare(data);
 
   // Only appointments booked in a VistA system need the clinic id
   let clinicId = null;
@@ -168,5 +173,7 @@ export function transformFormToVAOSAppointment(state, updateLimits = false) {
       isDS: true,
       updateLimits,
     }),
+    systemType: ehr,
+    serviceType: typeOfCare.idV2,
   };
 }

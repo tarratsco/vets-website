@@ -428,12 +428,6 @@ export const isBDD = formData => {
   return Boolean(result);
 };
 
-// TODO: Once vetted, drop the feature toggle _and_ drop this obsolete
-// conditionality.
-export const showNewlyBDDPages = formData => {
-  return formData.disability526ExtraBDDPagesEnabled || !isBDD(formData);
-};
-
 export const hasNewPtsdDisability = formData =>
   !isBDD(formData) &&
   isClaimingNew(formData) &&
@@ -1041,14 +1035,20 @@ export const redirectLegacyToEnhancement = props => {
  * @param {Object} props - { returnUrl, formData }
  * @returns {boolean} true if redirect needed
  */
+const ENHANCEMENT_EVIDENCE_URLS = [
+  '/supporting-evidence/evidence-request',
+  '/supporting-evidence/medical-records',
+  '/supporting-evidence/private-medical-records-upload-enhancement',
+  '/supporting-evidence/private-medical-records-upload-enhancement-v1',
+  '/supporting-evidence/additional-evidence-intro',
+  '/supporting-evidence/additional-evidence-enhancement',
+  '/supporting-evidence/additional-evidence-enhancement-v1',
+];
+
 export const redirectEnhancementToLegacy = props => {
   const { returnUrl, formData } = props;
   const isEnhancement = isEvidenceEnhancement(formData);
-  return (
-    !isEnhancement &&
-    (returnUrl === '/supporting-evidence/evidence-request' ||
-      returnUrl === '/supporting-evidence/medical-records')
-  );
+  return !isEnhancement && ENHANCEMENT_EVIDENCE_URLS.includes(returnUrl);
 };
 
 export const isNewConditionsOn = formData =>

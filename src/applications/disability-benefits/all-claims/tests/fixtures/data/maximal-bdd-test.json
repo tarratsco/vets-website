@@ -1,6 +1,5 @@
 {
   "data": {
-    "disability526ExtraBDDPagesEnabled": true,
     "disability526NewBddShaEnforcementWorkflowEnabled": true,
     "view:isBddData": true,
     "view:claimType": {
@@ -105,7 +104,8 @@
     "separationHealthAssessmentUploads": [
       {
         "name": "sha-maximal.pdf",
-        "confirmationCode": "sha-maximal-code"
+        "confirmationCode": "sha-maximal-code",
+        "attachmentId": "L702"
       }
     ],
     "view:unemployable": false,

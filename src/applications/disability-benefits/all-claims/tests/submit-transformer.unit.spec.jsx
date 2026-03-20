@@ -77,6 +77,47 @@ describe('transform', () => {
         );
       });
     });
+
+  // 0781 evidence enhancement fixtures (subdirectory)
+  const evidenceEnhancementDir = path.join(
+    dataDir,
+    '0781-evidence-enhancement',
+  );
+
+  fs.readdirSync(evidenceEnhancementDir)
+    .filter(fileName => fileName.endsWith('.json'))
+    .forEach(fileName => {
+      it(`should transform 0781-evidence-enhancement/${fileName} correctly`, () => {
+        const rawData = JSON.parse(
+          fs.readFileSync(path.join(evidenceEnhancementDir, fileName), 'utf8'),
+        );
+
+        let transformedData;
+        try {
+          transformedData = fs.readFileSync(
+            path.join(
+              dataDir,
+              'transformed-data',
+              '0781-evidence-enhancement',
+              fileName,
+            ),
+            'utf8',
+          );
+        } catch (e) {
+          throw new Error(
+            `Could not find transformed data for 0781-evidence-enhancement/${fileName}:\n${transform(
+              formConfig,
+              rawData,
+            )}`,
+          );
+        }
+        transformedData = JSON.parse(transformedData);
+
+        expect(JSON.parse(transform(formConfig, rawData))).to.deep.equal(
+          transformedData,
+        );
+      });
+    });
 });
 
 describe('Test internal transform functions', () => {
@@ -388,6 +429,7 @@ describe('SHA upload attachment transformation', () => {
           {
             name: 'sha-part-a.pdf',
             confirmationCode: 'sha-code-123',
+            attachmentId: 'L702',
             size: 1024,
             type: 'application/pdf',
           },
@@ -401,7 +443,8 @@ describe('SHA upload attachment transformation', () => {
     const hasShaAttachment = result.form526.attachments.some(
       attachment =>
         attachment.name === 'sha-part-a.pdf' &&
-        attachment.confirmationCode === 'sha-code-123',
+        attachment.confirmationCode === 'sha-code-123' &&
+        attachment.attachmentId === 'L702',
     );
     expect(hasShaAttachment).to.be.true;
     expect(result.form526).to.not.have.property(

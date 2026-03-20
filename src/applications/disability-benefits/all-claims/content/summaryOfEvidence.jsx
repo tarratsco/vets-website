@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'platform/utilities/data';
 import { DATA_PATHS } from '../constants';
-import { getBddShaUploads, isUploadingBddSha } from '../utils';
+import { getBddShaUploads, isUploadingBddSha, isBDD } from '../utils';
 
 const SECTION_CONFIGURATIONS = {
   'bdd-sha-uploads': {
@@ -15,6 +15,14 @@ const SECTION_CONFIGURATIONS = {
         : 'We’ll submit the Separation Health Assessment Part A document that you uploaded',
   },
 };
+
+const NO_EVIDENCE_MESSAGE = (
+  <p>
+    You haven’t uploaded any evidence. This may delay us processing your claim.
+    In addition, we may also schedule a claim exam for you to help us decide
+    your claim.
+  </p>
+);
 
 const SECTION_ORDERS = {
   UNENHANCED: [
@@ -53,8 +61,11 @@ const buildSectionsList = (formData, { shouldEnhance }) => {
       if (evidences.length) {
         const evidencesList = (
           <ul>
-            {evidences.map(evidence => {
-              const key = evidence[configuration.evidenceIdKey];
+            {evidences.map((evidence, index) => {
+              const key =
+                evidence[configuration.evidenceIdKey] ||
+                evidence[configuration.evidenceNameKey] ||
+                index;
               const name = evidence[configuration.evidenceNameKey];
               return <li key={key}>{name}</li>;
             })}
@@ -105,26 +116,43 @@ export const summaryOfEvidenceDescription = ({ formData }) => {
     layEvidenceUploads,
   ).length;
   const selectedEvidence = _.get('view:hasEvidence', formData, false);
+  const hasMedicalRecords = _.get('view:hasMedicalRecords', formData, false);
   const serviceTreatmentRecordsSelected = _.get(
     'view:uploadServiceTreatmentRecordsQualifier.view:hasServiceTreatmentRecordsToUpload',
     formData,
     false,
   );
+  const hasSeparationHealthAssessment = _.get(
+    'view:hasSeparationHealthAssessment',
+    formData,
+    false,
+  );
+  // Legacy/non-enhanced flow: show NO_EVIDENCE_MESSAGE when either
+  // - there's truly no evidence, or
+  // - the user explicitly chose "no" for evidence and STR, even if stale uploads remain
+  const legacyNoEvidence =
+    !formData.disability526SupportingEvidenceEnhancement &&
+    !sectionsList.length &&
+    (!evidenceLength ||
+      (!selectedEvidence && !serviceTreatmentRecordsSelected));
+
+  // Enhanced, non-BDD flow: show NO_EVIDENCE_MESSAGE only when there is truly no evidence
+  const enhancedNoEvidenceNonBdd =
+    formData.disability526SupportingEvidenceEnhancement &&
+    !isBDD(formData) &&
+    !hasMedicalRecords &&
+    layEvidenceUploads.length === 0;
+
+  const bddBothSubmitLater =
+    isBDD(formData) &&
+    selectedEvidence === false &&
+    serviceTreatmentRecordsSelected === false &&
+    !hasSeparationHealthAssessment;
   // Evidence isn't always properly cleared out from form data if removed so
   // need to also check that 'no evidence' was explicitly selected
   // TODO: refactor logic for this content when removing current flow
-  if (
-    !formData.disability526SupportingEvidenceEnhancement &&
-    !sectionsList.length &&
-    (!evidenceLength || (!selectedEvidence && !serviceTreatmentRecordsSelected))
-  ) {
-    return (
-      <p>
-        You haven’t uploaded any evidence. This may delay us processing your
-        claim. In addition, we may also schedule a claim exam for you to help us
-        decide your claim.
-      </p>
-    );
+  if (legacyNoEvidence) {
+    return NO_EVIDENCE_MESSAGE;
   }
 
   let vaContent = null;
@@ -248,10 +276,7 @@ export const summaryOfEvidenceDescription = ({ formData }) => {
     ));
     layContent = formData.disability526SupportingEvidenceEnhancement ? (
       <div className="vads-u-margin-top--2">
-        <strong>
-          We’ll submit these documents you uploaded as evidence supporting your
-          claim:
-        </strong>
+        <strong>We’ll submit these documents you uploaded:</strong>
         <ul>{layEvidenceUploadsList}</ul>
       </div>
     ) : (
@@ -264,7 +289,10 @@ export const summaryOfEvidenceDescription = ({ formData }) => {
 
   return (
     <div className="vads-u-margin-top--3">
-      {(evidenceLength || selectedEvidence || sectionsList.length) &&
+      {(bddBothSubmitLater || enhancedNoEvidenceNonBdd) && NO_EVIDENCE_MESSAGE}
+      {!bddBothSubmitLater &&
+        !enhancedNoEvidenceNonBdd &&
+        (evidenceLength || sectionsList.length > 0) &&
         formData.disability526SupportingEvidenceEnhancement && (
           <p>You provided documents to support your claim.</p>
         )}
@@ -275,10 +303,7 @@ export const summaryOfEvidenceDescription = ({ formData }) => {
       {serviceTreatmentRecordsContent}
       {layContent}
       {formData.disability526SupportingEvidenceEnhancement && (
-        <p>
-          Next, we’ll share some information about what to expect during a claim
-          exam.
-        </p>
+        <p>Next, we’ll tell you what to expect during a claim exam.</p>
       )}
     </div>
   );

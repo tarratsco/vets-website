@@ -216,4 +216,70 @@ describe('526 utils shared page', () => {
     expect(canDeleteItem({ itemData: { isLocked: true }, isReview: true })).to
       .be.false;
   });
+
+  it('arrayOptions.canAddItem hides Add another condition on review and for locked items', () => {
+    const { canAddItem } = utils.arrayOptions;
+
+    expect(canAddItem({ itemData: { isLocked: false }, isReview: false })).to.be
+      .true;
+
+    expect(canAddItem({ itemData: {}, isReview: false })).to.be.true;
+
+    expect(canAddItem({ itemData: { isLocked: true }, isReview: false })).to.be
+      .false;
+
+    expect(canAddItem({ itemData: { isLocked: false }, isReview: true })).to.be
+      .false;
+
+    expect(canAddItem({ itemData: { isLocked: true }, isReview: true })).to.be
+      .false;
+  });
+});
+
+describe('disallowWhitespaceOnly', () => {
+  let errors;
+
+  beforeEach(() => {
+    errors = {
+      addError: sinon.spy(),
+    };
+  });
+
+  it('does not add an error for undefined', () => {
+    utils.disallowWhitespaceOnly(errors, undefined);
+    expect(errors.addError.called).to.be.false;
+  });
+
+  it('does not add an error for null', () => {
+    utils.disallowWhitespaceOnly(errors, null);
+    expect(errors.addError.called).to.be.false;
+  });
+
+  it('does not add an error for an empty string', () => {
+    utils.disallowWhitespaceOnly(errors, '');
+    expect(errors.addError.called).to.be.false;
+  });
+
+  it('adds an error for spaces only', () => {
+    utils.disallowWhitespaceOnly(errors, '   ');
+    expect(errors.addError.calledOnce).to.be.true;
+    expect(errors.addError.firstCall.args[0]).to.equal(
+      'Please provide a response.',
+    );
+  });
+
+  it('adds an error for tabs/newlines only', () => {
+    utils.disallowWhitespaceOnly(errors, '\n\t   ');
+    expect(errors.addError.calledOnce).to.be.true;
+  });
+
+  it('does not add an error for non-whitespace text', () => {
+    utils.disallowWhitespaceOnly(errors, 'Back injury');
+    expect(errors.addError.called).to.be.false;
+  });
+
+  it('does not add an error for text with surrounding whitespace', () => {
+    utils.disallowWhitespaceOnly(errors, '  Back injury  ');
+    expect(errors.addError.called).to.be.false;
+  });
 });

@@ -41,6 +41,26 @@ $text-color: rgba(27, 27, 27, 1);
     border-bottom: solid thin var(--vads-color-base-lightest);
   }
 
+  #skip-map-link {
+    position: absolute !important ;
+    right: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    border-radius: 0.25rem;
+
+    &:focus {
+      right: 0.5rem;
+      top: 0.5rem;
+      width: auto;
+      height: auto;
+      padding: 0.5em 1em;
+      background-color: var(--vads-color-white);
+      z-index: 1000;
+    }
+  }
+
   #vertical-oriented-left-controls {
     display: flex;
     flex-direction: column;
@@ -81,6 +101,7 @@ $text-color: rgba(27, 27, 27, 1);
 
   .map-and-message-container {
     flex-grow: 1;
+    position: relative;
   }
 
   .search-result-title {
@@ -126,7 +147,7 @@ $text-color: rgba(27, 27, 27, 1);
   }
 
   @media screen and (max-width: $small-screen) {
-    .facility-result+.facility-result {
+    .facility-result + .facility-result {
       border-top: solid 1px var(--vads-color-base-light);
     }
   }
@@ -182,7 +203,7 @@ $text-color: rgba(27, 27, 27, 1);
     padding: 0;
   }
 
-  .react-tabs__tab+.react-tabs__tab {
+  .react-tabs__tab + .react-tabs__tab {
     border-left: none;
   }
 
@@ -343,13 +364,12 @@ $text-color: rgba(27, 27, 27, 1);
       width: 100%;
     }
 
-    .service-type-dropdown-mobile>select,
-    .service-type-dropdown-tablet>select,
-    .service-type-dropdown-desktop>select {
+    .service-type-dropdown-mobile > select,
+    .service-type-dropdown-tablet > select,
+    .service-type-dropdown-desktop > select {
       font-size: 1rem;
       height: auto;
     }
-
 
     .usa-input-error {
       right: 0;
@@ -485,6 +505,11 @@ $text-color: rgba(27, 27, 27, 1);
         align-items: flex-end;
       }
     }
+
+    p.service-hint-text {
+      color: $vads-label-hint-text-color-on-light;
+      margin: 0.5em 0;
+    }
   }
 
   .facility-detail {
@@ -581,7 +606,7 @@ $text-color: rgba(27, 27, 27, 1);
     top: 44px;
     width: 100%;
     z-index: 1010;
-
+    margin: 0;
     &.drowpdown-fl-sm-desktop {
       @media screen and (min-width: $small-desktop-screen) {
         max-width: 301px;

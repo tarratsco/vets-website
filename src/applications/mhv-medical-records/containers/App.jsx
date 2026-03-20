@@ -20,7 +20,6 @@ import {
 import { getScheduledDowntime } from 'platform/monitoring/DowntimeNotification/actions';
 import MhvServiceRequiredGuard from 'platform/mhv/components/MhvServiceRequiredGuard';
 import MrBreadcrumbs from '../components/MrBreadcrumbs';
-import ScrollToTop from '../components/shared/ScrollToTop';
 import PhrRefresh from '../components/shared/PhrRefresh';
 import TrackedSpinner from '../components/shared/TrackedSpinner';
 import { HeaderSectionProvider } from '../context/HeaderSectionContext';
@@ -185,7 +184,6 @@ const App = ({ children }) => {
               data-dd-action-name="Back to top"
               data-testid="mr-back-to-top"
             />
-            <ScrollToTop />
             <PhrRefresh statusPollBeginDate={statusPollBeginDate} />
           </div>
         </>

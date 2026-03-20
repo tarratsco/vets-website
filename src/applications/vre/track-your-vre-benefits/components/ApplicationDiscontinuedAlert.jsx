@@ -42,7 +42,7 @@ const ApplicationDiscontinuedAlert = ({ discontinuedReason, resCaseId }) => {
         </p>
         <p>{discontinuedReason || 'No reason provided.'}</p>
         {downloadErrorMessage ? (
-          <p>
+          <p aria-live="assertive" role="alert">
             <strong>Note:</strong> {downloadErrorMessage}
           </p>
         ) : (
@@ -53,12 +53,14 @@ const ApplicationDiscontinuedAlert = ({ discontinuedReason, resCaseId }) => {
               <va-loading-indicator
                 label="Loading"
                 message="Downloading your letter..."
+                set-focus
               />
             ) : (
-              <va-link-action
+              <va-link
+                download
+                filetype="PDF"
                 href="#"
-                text="View my letter"
-                type="primary"
+                text="Download the VR-58 CH31 Adverse Action Decision Letter"
                 onClick={handleDownload}
               />
             )}
