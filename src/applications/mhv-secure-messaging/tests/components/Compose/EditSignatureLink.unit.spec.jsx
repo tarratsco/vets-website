@@ -32,9 +32,7 @@ describe('EditSignatureLink component', () => {
     const link = getByTestId('edit-signature-link');
     expect(link).to.exist;
     expect(link.tagName).to.equal('VA-LINK');
-    expect(link.getAttribute('href')).to.equal(
-      '/profile/personal-information#messaging-signature',
-    );
+    expect(link.getAttribute('href')).to.equal('/profile/message-signature');
     expect(link.getAttribute('text')).to.equal(
       'Edit signature for all messages',
     );
@@ -74,10 +72,8 @@ describe('EditSignatureLink component', () => {
       const screen = setup(testState);
       const link = screen.getByTestId('edit-signature-link');
 
-      // Verify it renders with the correct href including hash
-      expect(link.getAttribute('href')).to.equal(
-        '/profile/personal-information#messaging-signature',
-      );
+      // Verify it renders with the correct href
+      expect(link.getAttribute('href')).to.equal('/profile/message-signature');
 
       // Verify it's a va-link element (RouterLink uses VaLink)
       expect(link.tagName).to.equal('VA-LINK');

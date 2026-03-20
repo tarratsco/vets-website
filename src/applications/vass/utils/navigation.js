@@ -87,8 +87,6 @@ export const routes = [
       requiresAuthorization: AUTH_LEVELS.TOKEN,
       requireFormData: [
         'uuid',
-        'lastName',
-        'dob',
         'obfuscatedEmail',
         'selectedSlot',
         'selectedTopics',
@@ -103,7 +101,7 @@ export const routes = [
     permissions: {
       requiresAuthorization: AUTH_LEVELS.TOKEN,
     },
-    flowType: FLOW_TYPES.SCHEDULE,
+    flowType: FLOW_TYPES.ANY,
   },
   // Cancel Appointment Routes
   {

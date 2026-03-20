@@ -1,25 +1,22 @@
 import React, { useEffect, useRef } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom-v5-compat';
+import { useNavigate, useParams, Navigate } from 'react-router-dom-v5-compat';
 import { VaButton } from '@department-of-veterans-affairs/component-library/dist/react-bindings';
-
-import {
-  useFeatureToggle,
-  TOGGLE_NAMES,
-} from 'platform/utilities/feature-toggles';
+import { useFeatureToggle } from 'platform/utilities/feature-toggles';
 import { focusElement } from 'platform/utilities/ui/focus';
 import useSetPageTitle from '../../../hooks/useSetPageTitle';
 import ReviewPageAlert from './ReviewPageAlert';
 import ExpensesAccordion from './ExpensesAccordion';
+import EstimatedReimbursementCard from '../../EstimatedReimbursementCard';
 import {
+  selectAppointment,
   selectComplexClaim,
   selectAllExpenses,
   selectAllDocuments,
   selectReviewPageAlert,
+  selectHasProofOfAttendance,
 } from '../../../redux/selectors';
-import { formatAmount } from '../../../util/complex-claims-helper';
-import { EXPENSE_TYPES } from '../../../constants';
 import {
   clearReviewPageAlert,
   setExpenseBackDestination,
@@ -31,15 +28,18 @@ const ReviewPage = () => {
   const { apptId, claimId } = useParams();
   const alertRef = useRef(null);
 
+  const { useToggleValue, TOGGLE_NAMES } = useFeatureToggle();
+  const ccEnabled = useToggleValue(TOGGLE_NAMES.travelPayEnableCommunityCare);
+
+  const { data: appointment } = useSelector(selectAppointment);
   const { data: claimDetails = {} } = useSelector(selectComplexClaim);
   const expenses = useSelector(selectAllExpenses) ?? [];
   const documents = useSelector(selectAllDocuments) ?? [];
   const alertMessage = useSelector(selectReviewPageAlert);
-
-  const { useToggleValue } = useFeatureToggle();
-  const ccEnabled = useToggleValue(TOGGLE_NAMES.travelPayEnableCommunityCare);
+  const hasProofOfAttendance = useSelector(selectHasProofOfAttendance);
 
   const title = 'Your unsubmitted expenses';
+  const isCCAppt = appointment?.isCC;
 
   useSetPageTitle(title);
 
@@ -69,20 +69,15 @@ const ReviewPage = () => {
     [dispatch],
   );
 
-  // Get total by expense type and return expenses in EXPENSE_TYPES order
-  const totalByExpenseType = Object.fromEntries(
-    Object.entries(
-      expenses.reduce((acc, expense) => {
-        const { expenseType } = expense;
-        acc[expenseType] =
-          (acc[expenseType] || 0) + (expense.costRequested || 0);
-        return acc;
-      }, {}),
-    ).sort(([a], [b]) => {
-      const order = Object.keys(EXPENSE_TYPES);
-      return order.indexOf(a) - order.indexOf(b);
-    }),
-  );
+  // CC appointments must complete PoA upload before reaching review
+  if (ccEnabled && isCCAppt && !hasProofOfAttendance) {
+    return (
+      <Navigate
+        to={`/file-new-claim/${apptId}/${claimId}/proof-of-attendance`}
+        replace
+      />
+    );
+  }
 
   // Create a grouped version of expenses by expenseType
   const groupedExpenses = expenses.reduce((acc, expense) => {
@@ -165,37 +160,10 @@ const ReviewPage = () => {
             headerLevel={ccEnabled ? 2 : 3}
           />
           <div className="vads-u-margin-top--3">
-            <va-card data-testid="summary-box" background>
-              <h2 className="vads-u-margin-top--1">Estimated reimbursement</h2>
-              <ul>
-                {Object.entries(totalByExpenseType)
-                  .filter(([_, total]) => total > 0) // only show if total > 0
-                  .map(([type, total]) => {
-                    return (
-                      <li key={type}>
-                        <strong>{EXPENSE_TYPES[type]?.title ?? type}</strong> $
-                        {formatAmount(total)}
-                      </li>
-                    );
-                  })}
-              </ul>
-
-              <p>
-                <strong>Total:</strong> $
-                {formatAmount(claimDetails?.totalCostRequested ?? 0)}
-              </p>
-              <p>
-                Before we can pay you back for expenses, you must pay a
-                deductible. The current deductible is <strong>$3</strong>{' '}
-                one-way or <strong>$6</strong> round-trip for each appointment.
-                You’ll pay no more than <strong>$18</strong> total each month.
-              </p>
-              <va-link
-                href="/resources/reimbursed-va-travel-expenses-and-mileage-rate/#monthlydeductible"
-                text="Learn more about deductibles for VA travel claims"
-                external
-              />
-            </va-card>
+            <EstimatedReimbursementCard
+              expenses={expenses}
+              totalCostRequested={claimDetails?.totalCostRequested}
+            />
           </div>
           <VaButton
             id="sign-agreement-button"

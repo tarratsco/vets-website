@@ -2,14 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom-v5-compat';
 import { useSelector } from 'react-redux';
+import { selectCernerFacilityIds } from 'platform/site-wide/drupal-static-data/source-files/vamc-ehr/selectors';
 import ExtraDetails from '../shared/ExtraDetails';
 import LastFilledInfo from '../shared/LastFilledInfo';
+import SendRxRenewalMessage from '../shared/SendRxRenewalMessage';
+import StatusAlertBanner from '../shared/StatusAlertBanner';
 import { OracleHealthInCardAlert } from '../shared/OracleHealthTransitionAlerts';
 import {
   dateFormat,
   getPrescriptionDetailUrl,
   getRxStatus,
   rxSourceIsNonVA,
+  getTrackingUrl,
+  isOracleHealthPrescription,
 } from '../../util/helpers';
 import { dataDogActionNames, pageType } from '../../util/dataDogConstants';
 import {
@@ -27,8 +32,10 @@ import {
   DATETIME_FORMATS,
   RX_SOURCE,
   DISPENSE_STATUS,
+  dispStatusObj,
   dispStatusObjV2,
   medicationsUrls,
+  NON_VA_MEDICATION_MESSAGE,
 } from '../../util/constants';
 
 const MedicationsListCard = ({ rx }) => {
@@ -37,13 +44,15 @@ const MedicationsListCard = ({ rx }) => {
   const useV2StatusMapping = isCernerPilot && isV2StatusMapping;
   const isPendingDispense =
     rx.prescriptionSource === RX_SOURCE.PENDING_DISPENSE;
-  const isManagementImprovements = useSelector(
+  const isMedsImprovements = useSelector(
     selectMedicationsManagementImprovementsFlag,
   );
   const isFillInProgress =
     rx.dispStatus === DISPENSE_STATUS.ACTIVE_REFILL_IN_PROCESS ||
     rx.dispStatus === DISPENSE_STATUS.ACTIVE_SUBMITTED;
-  const isInitialFill = isFillInProgress && !rx.sortedDispensedDate;
+  const isFirstFill =
+    Array.isArray(rx.rxRfRecords) && rx.rxRfRecords.length === 0;
+  const isInitialFill = isFillInProgress && isFirstFill;
   const isOracleHealthCutoverEnabled = useSelector(
     selectMhvMedicationsOracleHealthCutoverFlag,
   );
@@ -71,58 +80,123 @@ const MedicationsListCard = ({ rx }) => {
         rx?.refillStatus?.toLowerCase() === 'renew'
       : rx?.dispStatus === DISPENSE_STATUS.RENEW);
   const latestTrackingStatus = rx?.trackingList?.[0];
+  const isRecentlyShipped =
+    rx.dispStatus === DISPENSE_STATUS.ACTIVE_SHIPPED &&
+    rx.isTrackable &&
+    Boolean(latestTrackingStatus);
+  const trackingUrl =
+    getTrackingUrl(
+      latestTrackingStatus?.carrier,
+      latestTrackingStatus?.trackingNumber,
+    ) || latestTrackingStatus?.trackingNumber;
   const isNonVaPrescription = rxSourceIsNonVA(rx);
+  const cernerFacilityIds = useSelector(selectCernerFacilityIds);
+  const isOracleHealth = isOracleHealthPrescription(rx, cernerFacilityIds);
   const rxStatus = getRxStatus(rx);
+  const isOnHold = rx.dispStatus === dispStatusObj.onHold;
+  const isDiscontinued = rx.dispStatus === dispStatusObj.discontinued;
+  const isTransferred = rx.dispStatus === dispStatusObj.transferred;
+  const isActiveNoRefills =
+    rx.dispStatus === DISPENSE_STATUS.ACTIVE &&
+    rx.refillRemaining === 0 &&
+    !isNonVaPrescription;
+  const isExpiredRenewable =
+    rx.dispStatus === DISPENSE_STATUS.EXPIRED &&
+    rx.isRenewable &&
+    rx.refillRemaining === 0 &&
+    !isNonVaPrescription;
+  const showMedImprovementCard =
+    isMedsImprovements &&
+    (isFillInProgress ||
+      isRecentlyShipped ||
+      isActiveNoRefills ||
+      isExpiredRenewable);
+
+  const renderNonVaCard = () => (
+    <>
+      <p
+        className="vads-u-margin-top--1p5 vads-u-margin-bottom--0 vads-u-font-weight--bold"
+        data-testid="non-va-medication-label"
+      >
+        Non-VA medication
+      </p>
+      <p className="vads-u-margin-y--0" data-testid="non-VA-prescription">
+        {NON_VA_MEDICATION_MESSAGE}
+      </p>
+    </>
+  );
+
+  const renderPendingCard = () => (
+    <div className="vads-u-display--flex vads-u-margin-top--2">
+      <span className="vads-u-flex--auto vads-u-padding-top--1">
+        <va-icon icon="info" size={3} aria-hidden="true" />
+      </span>
+      <p
+        className="vads-u-margin-left--2 vads-u-flex--1"
+        data-testid="pending-renewal-rx"
+        id={`pending-med-content-${rx.prescriptionId}`}
+      >
+        {pendingRenewal ? (
+          <>
+            This is a renewal you requested. Your VA pharmacy is reviewing it
+            now. Details may change.
+          </>
+        ) : (
+          <>
+            This is a new prescription from your provider. Your VA pharmacy is
+            reviewing it now. Details may change.
+          </>
+        )}
+      </p>
+    </div>
+  );
+
+  const renderTransferredCard = () => (
+    <p
+      className="vads-u-margin-top--1 vads-u-margin-bottom--0"
+      data-testid="transferred-content"
+    >
+      This is a previous record of your medication. If you need a refill, find
+      the current medication in your medications list. If you don’t have a
+      current one, contact your provider.
+    </p>
+  );
 
   const cardBodyContent = () => {
-    if (pendingRenewal || pendingMed) {
-      return (
-        <>
-          <div className="vads-u-display--flex vads-u-margin-top--2">
-            <span className="vads-u-flex--auto vads-u-padding-top--1">
-              <va-icon icon="info" size={3} aria-hidden="true" />
-            </span>
-            <p
-              className="vads-u-margin-left--2 vads-u-flex--1"
-              data-testid="pending-renewal-rx"
-              id={`pending-med-content-${rx.prescriptionId}`}
-            >
-              {pendingRenewal ? (
-                <>
-                  This is a renewal you requested. Your VA pharmacy is reviewing
-                  it now. Details may change.
-                </>
-              ) : (
-                <>
-                  This is a new prescription from your provider. Your VA
-                  pharmacy is reviewing it now. Details may change.
-                </>
-              )}
-            </p>
-          </div>
-        </>
-      );
-    }
+    if (isMedsImprovements && isNonVaPrescription) return renderNonVaCard();
+    if (isMedsImprovements && isTransferred) return renderTransferredCard();
+    if (pendingRenewal || pendingMed) return renderPendingCard();
+
     return (
       <>
-        {isManagementImprovements &&
+        {isMedsImprovements &&
           isFillInProgress && (
-            <div
-              className="vads-u-display--flex vads-u-align-items--center vads-u-background-color--green-lightest vads-u-padding--1 vads-u-margin-top--1"
-              data-testid="fill-in-progress-alert"
-              role="status"
-            >
-              <va-icon icon="schedule" size={3} aria-hidden="true" />
-              <p className="vads-u-margin-y--0 vads-u-margin-left--1">
-                {isInitialFill ? 'Fill' : 'Refill'} in progress.{' '}
-                <Link to={medicationsUrls.MEDICATIONS_IN_PROGRESS}>
-                  Go to in-progress medications
-                </Link>
-              </p>
-            </div>
+            <StatusAlertBanner testId="fill-in-progress-alert" icon="schedule">
+              {isInitialFill ? 'Fill' : 'Refill'} in progress.{' '}
+              <Link to={medicationsUrls.MEDICATIONS_IN_PROGRESS}>
+                Go to in-progress medications
+              </Link>
+            </StatusAlertBanner>
+          )}
+        {isMedsImprovements &&
+          isRecentlyShipped && (
+            <StatusAlertBanner testId="shipped-alert" icon="local_shipping">
+              {isFirstFill ? 'Fill' : 'Refill'} has shipped.{' '}
+              {trackingUrl ? (
+                <a
+                  href={trackingUrl}
+                  rel="noreferrer"
+                  data-testid="get-tracking-info-link"
+                >
+                  Get tracking info
+                </a>
+              ) : (
+                <Link to={getPrescriptionDetailUrl(rx)}>Get tracking info</Link>
+              )}
+            </StatusAlertBanner>
           )}
         {rx &&
-          (rx.isRefillable || (isManagementImprovements && isFillInProgress)) &&
+          (rx.isRefillable || showMedImprovementCard) &&
           rx.refillRemaining >= 0 && (
             <p
               className="vads-u-margin-bottom--0"
@@ -130,33 +204,58 @@ const MedicationsListCard = ({ rx }) => {
               data-dd-privacy="mask"
               id={`refill-remaining-${rx.prescriptionId}`}
             >
-              {isManagementImprovements
+              {isMedsImprovements
                 ? `Refills left: ${rx.refillRemaining}`
                 : `Refills remaining: ${rx.refillRemaining}`}
             </p>
           )}
-        {rx && <LastFilledInfo {...rx} />}
-        {latestTrackingStatus && (
-          <p
-            className="vads-u-margin-top--1p5 vads-u-padding-bottom--1p5 vads-u-border-bottom--1px vads-u-border-color--gray"
-            data-testid="rx-card-details--shipped-on"
-            data-dd-privacy="mask"
-          >
-            <va-icon icon="local_shipping" size={3} aria-hidden="true" />
-            <span
-              className="vads-u-margin-left--2"
-              data-testid="shipping-date"
+        {rx && !(isMedsImprovements && isOnHold) && <LastFilledInfo {...rx} />}
+        {showMedImprovementCard &&
+          (isActiveNoRefills || isExpiredRenewable) && (
+            <div
+              className="vads-u-margin-top--1"
+              data-testid="no-refills-left-alert"
+            >
+              <p className="vads-u-margin-y--0">
+                You have no refills left. If you need more, request a renewal.
+              </p>
+              <SendRxRenewalMessage
+                rx={rx}
+                isOracleHealth={isOracleHealth}
+                hideExpiredMessage
+                fallbackContent={
+                  <a
+                    href={medicationsUrls.RENEW_PRESCRIPTIONS_URL}
+                    data-testid="learn-to-renew-prescriptions-link"
+                  >
+                    Learn how to renew prescriptions
+                  </a>
+                }
+              />
+            </div>
+          )}
+        {latestTrackingStatus &&
+          !showMedImprovementCard && (
+            <p
+              className="vads-u-margin-top--1p5 vads-u-padding-bottom--1p5 vads-u-border-bottom--1px vads-u-border-color--gray"
+              data-testid="rx-card-details--shipped-on"
               data-dd-privacy="mask"
             >
-              Shipped on{' '}
-              {dateFormat(
-                latestTrackingStatus.completeDateTime,
-                DATETIME_FORMATS.longMonthDate,
-              )}
-            </span>
-          </p>
-        )}
-        {!isManagementImprovements &&
+              <va-icon icon="local_shipping" size={3} aria-hidden="true" />
+              <span
+                className="vads-u-margin-left--2"
+                data-testid="shipping-date"
+                data-dd-privacy="mask"
+              >
+                Shipped on{' '}
+                {dateFormat(
+                  latestTrackingStatus.completeDateTime,
+                  DATETIME_FORMATS.longMonthDate,
+                )}
+              </span>
+            </p>
+          )}
+        {!isMedsImprovements &&
           rxStatus !== 'Unknown' && (
             <p
               id={`status-${rx.prescriptionId}`}
@@ -175,22 +274,40 @@ const MedicationsListCard = ({ rx }) => {
             />
           )}
         {rx &&
-          !(isManagementImprovements && isFillInProgress) && (
+          !showMedImprovementCard &&
+          (isMedsImprovements && isOnHold ? (
+            <div className="vads-u-margin-top--1p5">
+              <ExtraDetails
+                {...rx}
+                page={pageType.LIST}
+                isRefillBlocked={isRefillBlocked}
+                isRenewalBlocked={isRenewalBlocked}
+              />
+            </div>
+          ) : (
             <ExtraDetails
               {...rx}
               page={pageType.LIST}
               isRefillBlocked={isRefillBlocked}
               isRenewalBlocked={isRenewalBlocked}
             />
-          )}
+          ))}
       </>
     );
   };
 
+  const displayGrayBackground =
+    isMedsImprovements && (isDiscontinued || isTransferred);
+
   return (
     <va-card
+      background={displayGrayBackground || undefined}
       class={`no-print rx-card-container ${
         pendingMed || pendingRenewal ? 'pending-med-or-renewal' : ''
+      }${
+        displayGrayBackground
+          ? ' vads-u-border--1px vads-u-border-color--gray-medium'
+          : ''
       } vads-u-margin-y--2 no-break`}
     >
       <div className="rx-card-details" data-testid="rx-card-info">
@@ -208,7 +325,7 @@ const MedicationsListCard = ({ rx }) => {
             {rx?.prescriptionName || rx?.orderableItem}
           </span>
         </Link>
-        {!isManagementImprovements &&
+        {!isMedsImprovements &&
           !pendingMed &&
           !pendingRenewal &&
           rxStatus !== 'Unknown' &&

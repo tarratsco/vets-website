@@ -184,6 +184,7 @@ export const arrayOptions = {
   },
   enforceYesNoOnSummary: true,
   canDeleteItem: ({ itemData, isReview }) => !isReview && !itemData?.isLocked,
+  canAddItem: ({ itemData, isReview }) => !isReview && !itemData?.isLocked,
 };
 
 export const hasSideOfBody = (formData, index) => {
@@ -294,3 +295,11 @@ export const backfillCauseForIncreaseRows = formData => {
 };
 
 export const isPlaceholderRated = v => v === 'Rated Disability';
+
+export const disallowWhitespaceOnly = (errors, value) => {
+  if (value === undefined || value === null || value === '') return;
+
+  if (typeof value === 'string' && value.trim().length === 0) {
+    errors.addError('Please provide a response.');
+  }
+};

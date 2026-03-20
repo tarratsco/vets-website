@@ -77,12 +77,9 @@ describe('SM Medications Renewal Request', () => {
 
       const expectedMessageBodyText = [
         `Medication name, strength, and form: ABACAVIR SO4 600MG/LAMIVUDINE 300MG TAB`,
-        `Prescription number: 2721195`,
         `Instructions: TAKE 1 BY MOUTH DAILY FOR 30 DAYS`,
         `Provider who prescribed it: Bob Taylor`,
-        `Number of refills left: 0`,
         `Prescription expiration date: November 8, 2025`,
-        `Reason for use: Reason for use not available`,
         `Last filled on: November 6, 2024`,
         `Quantity: 4`,
       ].join('\n');
@@ -105,6 +102,7 @@ describe('SM Medications Renewal Request', () => {
           expect(request.category).to.eq('MEDICATIONS');
           expect(request.subject).to.eq('Renewal Needed');
           expect(request.recipient_id).to.eq(+mockRecipients.data[0].id);
+          expect(request.prescription_id).to.eq('24654491');
         });
       cy.findByText('Message Sent.').should('not.exist');
       cy.url().should('include', decodeURIComponent(redirectPath));
@@ -158,12 +156,9 @@ describe('SM Medications Renewal Request', () => {
 
       const expectedMessageBodyText = [
         `Medication name, strength, and form: ABACAVIR SO4 600MG/LAMIVUDINE 300MG TAB`,
-        `Prescription number: 2721195`,
         `Instructions: TAKE 1 BY MOUTH DAILY FOR 30 DAYS`,
         `Provider who prescribed it: Bob Taylor`,
-        `Number of refills left: 0`,
         `Prescription expiration date: November 8, 2025`,
-        `Reason for use: Reason for use not available`,
         `Last filled on: November 6, 2024`,
         `Quantity: 4`,
       ].join('\n');
@@ -186,6 +181,7 @@ describe('SM Medications Renewal Request', () => {
           expect(request.category).to.eq('MEDICATIONS');
           expect(request.subject).to.eq('Renewal Needed');
           expect(request.recipient_id).to.eq(+mockRecipients.data[1].id);
+          expect(request.prescription_id).to.eq('24654491');
         });
       cy.findByText('Message Sent.').should('not.exist');
       cy.url().should('include', decodeURIComponent(redirectPath));
@@ -227,12 +223,9 @@ describe('SM Medications Renewal Request', () => {
 
       const expectedMessageBodyText = [
         `Medication name, strength, and form: `,
-        `Prescription number: `,
         `Instructions: `,
         `Provider who prescribed it: `,
-        `Number of refills left: `,
         `Prescription expiration date: `,
-        `Reason for use: `,
         `Last filled on: `,
         `Quantity: `,
       ].join('\n');
@@ -255,6 +248,7 @@ describe('SM Medications Renewal Request', () => {
           expect(request.category).to.eq('MEDICATIONS');
           expect(request.subject).to.eq('Renewal Needed');
           expect(request.recipient_id).to.eq(+mockRecipients.data[0].id);
+          expect(request.prescription_id).to.eq('24654491');
         });
       cy.findByText('Message Sent.').should('not.exist');
       cy.url().should('include', decodeURIComponent(redirectPath));
@@ -295,12 +289,9 @@ describe('SM Medications Renewal Request', () => {
 
       const expectedMessageBodyText = [
         `Medication name, strength, and form: ABACAVIR SO4 600MG/LAMIVUDINE 300MG TAB`,
-        `Prescription number: 2721195`,
         `Instructions: TAKE 1 BY MOUTH DAILY FOR 30 DAYS`,
         `Provider who prescribed it: Bob Taylor`,
-        `Number of refills left: 0`,
         `Prescription expiration date: November 8, 2025`,
-        `Reason for use: Reason for use not available`,
         `Last filled on: November 6, 2024`,
         `Quantity: 4`,
       ].join('\n');
@@ -323,6 +314,7 @@ describe('SM Medications Renewal Request', () => {
           expect(request.category).to.eq('MEDICATIONS');
           expect(request.subject).to.eq('Renewal Needed');
           expect(request.recipient_id).to.eq(+mockRecipients.data[0].id);
+          expect(request.prescription_id).to.eq('24654491');
         });
       cy.findByText(Alerts.SEND_MESSAGE_SUCCESS).should('be.visible');
       cy.url().should('include', '/my-health/secure-messages/inbox/');
@@ -370,12 +362,9 @@ describe('SM Medications Renewal Request', () => {
 
       const expectedMessageBodyText = [
         `Medication name, strength, and form: ABACAVIR SO4 600MG/LAMIVUDINE 300MG TAB`,
-        `Prescription number: 2721195`,
         `Instructions: TAKE 1 BY MOUTH DAILY FOR 30 DAYS`,
         `Provider who prescribed it: Bob Taylor`,
-        `Number of refills left: 0`,
         `Prescription expiration date: November 8, 2025`,
-        `Reason for use: Reason for use not available`,
         `Last filled on: November 6, 2024`,
         `Quantity: 4`,
       ].join('\n');
@@ -445,12 +434,9 @@ describe('SM Medications Renewal Request', () => {
 
       const expectedMessageBodyText = [
         `Medication name, strength, and form: ABACAVIR SO4 600MG/LAMIVUDINE 300MG TAB`,
-        `Prescription number: 2721195`,
         `Instructions: TAKE 1 BY MOUTH DAILY FOR 30 DAYS`,
         `Provider who prescribed it: Bob Taylor`,
-        `Number of refills left: 0`,
         `Prescription expiration date: November 8, 2025`,
-        `Reason for use: Reason for use not available`,
         `Last filled on: November 6, 2024`,
         `Quantity: 4`,
       ].join('\n');
@@ -541,12 +527,9 @@ describe('SM Medications Renewal Request', () => {
 
       const expectedMessageBodyText = [
         `Medication name, strength, and form: ABACAVIR SO4 600MG/LAMIVUDINE 300MG TAB`,
-        `Prescription number: 2721195`,
         `Instructions: TAKE 1 BY MOUTH DAILY FOR 30 DAYS`,
         `Provider who prescribed it: Bob Taylor`,
-        `Number of refills left: 0`,
         `Prescription expiration date: November 8, 2025`,
-        `Reason for use: Reason for use not available`,
         `Last filled on: November 6, 2024`,
         `Quantity: 4`,
       ].join('\n');
@@ -569,6 +552,7 @@ describe('SM Medications Renewal Request', () => {
           expect(request.category).to.eq('MEDICATIONS');
           expect(request.subject).to.eq('Renewal Needed');
           expect(request.recipient_id).to.eq(+mockRecipients.data[0].id);
+          expect(request.prescription_id).to.eq('24654491');
         });
       cy.findByText('Message Sent.').should('not.exist');
       cy.url().should('include', decodeURIComponent(redirectPath));
@@ -598,12 +582,9 @@ describe('SM Medications Renewal Request', () => {
 
       const expectedMessageBodyText = [
         `Medication name, strength, and form: `,
-        `Prescription number: `,
         `Instructions: `,
         `Provider who prescribed it: `,
-        `Number of refills left: `,
         `Prescription expiration date: `,
-        `Reason for use: `,
         `Last filled on: `,
         `Quantity: `,
       ].join('\n');
@@ -626,6 +607,7 @@ describe('SM Medications Renewal Request', () => {
           expect(request.category).to.eq('MEDICATIONS');
           expect(request.subject).to.eq('Renewal Needed');
           expect(request.recipient_id).to.eq(+mockRecipients.data[0].id);
+          expect(request.prescription_id).to.eq('24654491');
         });
       cy.findByText('Message Sent.').should('not.exist');
       cy.url().should('include', decodeURIComponent(redirectPath));
@@ -650,12 +632,9 @@ describe('SM Medications Renewal Request', () => {
 
       const expectedMessageBodyText = [
         `Medication name, strength, and form: ABACAVIR SO4 600MG/LAMIVUDINE 300MG TAB`,
-        `Prescription number: 2721195`,
         `Instructions: TAKE 1 BY MOUTH DAILY FOR 30 DAYS`,
         `Provider who prescribed it: Bob Taylor`,
-        `Number of refills left: 0`,
         `Prescription expiration date: November 8, 2025`,
-        `Reason for use: Reason for use not available`,
         `Last filled on: November 6, 2024`,
         `Quantity: 4`,
       ].join('\n');
@@ -678,6 +657,7 @@ describe('SM Medications Renewal Request', () => {
           expect(request.category).to.eq('MEDICATIONS');
           expect(request.subject).to.eq('Renewal Needed');
           expect(request.recipient_id).to.eq(+mockRecipients.data[0].id);
+          expect(request.prescription_id).to.eq('24654491');
         });
       cy.findByText(Alerts.SEND_MESSAGE_SUCCESS).should('be.visible');
       cy.url().should('include', '/my-health/secure-messages/inbox/');

@@ -127,6 +127,41 @@ When VaRadio label contains both a heading and descriptive text, separate them u
 />
 ```
 
+## Stale Closure with Web Component Inputs
+
+**When to use:** Any `useCallback` that reads state derived from VA web component `onInput` events.
+
+VA web components fire `onInput` asynchronously from React's perspective. If a `useCallback` captures state variables set by `onInput`, those values may be stale — React may not have re-rendered yet when the callback executes.
+
+**Pattern:** Read the current value from the DOM element (via ref) or a sync ref, not from React state:
+```jsx
+const folderNameRef = useRef('');
+const folderNameInput = useRef();
+
+// onInput handler keeps ref in sync
+onInput={(e) => {
+  folderNameRef.current = e.target.value;
+  setFolderName(e.target.value);
+}}
+
+// useCallback reads from DOM/ref instead of state
+const confirmAction = useCallback(async () => {
+  const currentName =
+    folderNameInput.current?.value ?? folderNameRef.current;
+  // ... use currentName, not folderName state
+}, [/* omit folderName — read from ref instead */]);
+```
+
+**Anti-pattern:**
+```jsx
+// ❌ BROKEN: await on setState (returns void) creates a microtask boundary
+// that splits React batches, and folderName may be stale in the closure
+await setNameWarning('');
+if (folderName === '') { ... } // folderName is stale!
+```
+
+**Why:** `setState` returns `void` — `await` on it creates a pointless microtask boundary that can split React batch updates. Meanwhile, the `folderName` captured by `useCallback` reflects the value at the time of the last render, not the latest `onInput`. Reading from the DOM element or a sync ref guarantees the current value.
+
 ## Form Validation
 
 ### Compose Form Validation
@@ -202,6 +237,31 @@ const validateForm = () => {
 | `HorizontalRule` | Consistent divider component |
 | `AttachmentsList` | Render attachments with remove buttons (compose vs view mode) |
 | `RouterLink` / `RouterLinkAction` | Internal navigation wrappers (see above) |
+| `DismissibleAlert` | Server-persisted dismissible tooltip alert (uses tooltip Redux slice + API) |
+
+### DismissibleAlert (Tooltip Pattern)
+
+`DismissibleAlert` wraps `VaAlert` with server-persisted dismiss state. Once a user closes it, the backend records it as hidden so it won't reappear.
+
+- **Location**: `components/shared/DismissibleAlert.jsx`
+- **Redux**: Uses `state.sm.tooltip` (`tooltipVisible`, `tooltipId`)
+- **API**: `getTooltipsList`, `createTooltip`, `incrementTooltipCounter`, `hideTooltip` from `SmApi.js`
+- **Lifecycle**: On mount, fetches or creates a tooltip by name → sets visibility → increments view counter. On close, calls `hideTooltip` API → sets `tooltipVisible: false`.
+- **Accessibility**: Always includes `closeBtnAriaLabel="Close notification"` (consistent with other closeable alerts)
+- **Datadog**: Uses `data-dd-privacy="mask"` and `data-dd-action-name` (includes `tooltipId`)
+
+```jsx
+<DismissibleAlert
+  tooltipName="my_feature_tooltip"
+  status="info"
+  headline="New feature available"
+>
+  <p>Descriptive content here.</p>
+</DismissibleAlert>
+```
+
+**When to use**: One-time or limited-display informational banners that should persist dismiss state across sessions.
+**Do NOT**: Build ad-hoc dismissible alerts with local state — always use this component for server-persisted dismissals.
 
 ## Alert & Modal Patterns
 
@@ -283,7 +343,7 @@ The `AlertBackgroundBox` component (`components/shared/AlertBackgroundBox.jsx`) 
       focusElement(document.querySelector('h1'));
     }
   }, [alertList, folder]);
-  
+
   // ❌ WRONG: Conditional focus on alert
   useEffect(() => {
     const alertVisible = alertList[alertList?.length - 1];

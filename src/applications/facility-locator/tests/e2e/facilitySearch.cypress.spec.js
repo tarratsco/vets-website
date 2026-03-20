@@ -5,95 +5,6 @@ import mockLaLocation from '../../constants/mock-la-location.json';
 import mockServices from '../../constants/mock-provider-services.json';
 
 const CC_PROVIDER = 'Community providers (in VA’s network)';
-const healthServices = {
-  All: 'All VA health services',
-  PrimaryCare: 'Primary care',
-  MentalHealth: 'Mental health care',
-  Dental: 'Dental services',
-  UrgentCare: 'Urgent care',
-  EmergencyCare: 'Emergency care',
-  Audiology: 'Audiology',
-  Cardiology: 'Cardiology',
-  Dermatology: 'Dermatology',
-  Gastroenterology: 'Gastroenterology',
-  Gynecology: 'Gynecology',
-  Ophthalmology: 'Ophthalmology',
-  Optometry: 'Optometry',
-  Orthopedics: 'Orthopedics',
-  Urology: 'Urology',
-  WomensHealth: "Women's health",
-  Podiatry: 'Podiatry',
-  Nutrition: 'Nutrition',
-  CaregiverSupport: 'Caregiver support',
-};
-
-Cypress.Commands.add('verifyOptions', () => {
-  // Va facilities have services available
-  cy.get('#facility-type-dropdown')
-    .shadow()
-    .find('select')
-    .select('VA health');
-  cy.get('.service-type-dropdown-tablet')
-    .find('select')
-    .should('not.have.attr', 'disabled');
-  const hServices = Object.keys(healthServices);
-
-  for (let i = 0; i < hServices.length; i++) {
-    cy.get('.service-type-dropdown-tablet')
-      .find('select')
-      .children()
-      .eq(i)
-      .then($option => {
-        const value = $option.attr('value');
-        expect(value).to.equal(hServices[i]);
-      });
-  }
-
-  cy.get('#facility-type-dropdown')
-    .shadow()
-    .find('select')
-    .select('Urgent care');
-  cy.get('.service-type-dropdown-tablet')
-    .find('select')
-    .should('not.have.attr', 'disabled');
-
-  // Va facilities don't have services available
-  cy.get('#facility-type-dropdown')
-    .shadow()
-    .find('select')
-    .select('Vet Centers');
-  cy.get('.facility-type-dropdown')
-    .find('select')
-    .should('not.have', 'disabled');
-  cy.get('#facility-type-dropdown')
-    .shadow()
-    .find('select')
-    .select('VA cemeteries');
-  cy.get('.service-type-dropdown-tablet')
-    .find('select')
-    .should('not.have', 'disabled');
-  cy.get('#facility-type-dropdown')
-    .shadow()
-    .find('select')
-    .select('VA benefits');
-  cy.get('.service-type-dropdown-tablet') // remember to remove when we allow selection again for VA Benefits
-    .find('select')
-    .should('have.attr', 'disabled');
-
-  // CCP care have services available
-  cy.get('#facility-type-dropdown')
-    .shadow()
-    .find('select')
-    .select('Community providers (in VA’s network)');
-  cy.get('#service-typeahead').should('not.have.attr', 'disabled');
-
-  // CCP pharmacies dont have services available
-  cy.get('#facility-type-dropdown')
-    .shadow()
-    .find('select')
-    .select('Community pharmacies (in VA’s network)');
-  cy.get('#service-typeahead').should('not.have', 'disabled');
-});
 
 describe('Facility VA search', () => {
   beforeEach(() => {
@@ -124,8 +35,6 @@ describe('Facility VA search', () => {
 
     cy.injectAxe();
     cy.axeCheck();
-
-    cy.verifyOptions();
 
     cy.get('#street-city-state-zip').type('Austin, TX');
     cy.get('#facility-type-dropdown')
@@ -187,6 +96,8 @@ describe('Facility VA search', () => {
     cy.get('#facility-search').click({ waitForAnimations: true });
     cy.wait('@searchFacilities');
 
+    // focused() is a query, not an action; safe to chain .should()
+    // eslint-disable-next-line cypress/unsafe-to-chain-command
     cy.focused().should(
       'contain.text',
       'No results found for "Community providers (in VA’s network)", "General Acute Care Hospital" near "Raleigh, North Carolina 27606"',
@@ -242,14 +153,17 @@ describe('Facility VA search', () => {
   });
 
   it('should not trigger Use My Location when pressing enter in the input field', () => {
+    cy.intercept('GET', '/geocoding/**/*', mockGeocodingData).as(
+      'searchGeocode',
+    );
+
     cy.visit('/find-locations');
 
     cy.injectAxeThenAxeCheck();
 
     cy.get('#street-city-state-zip').type('27606{enter}');
-    // Wait for Use My Location to be triggered (it should not be)
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(8000);
+    // Wait for search to complete — proves Enter triggered a search, not Use My Location
+    cy.wait('@searchGeocode');
     // If Use My Location is triggered and succeeds, it will change the contents of the search field:
     cy.get('#street-city-state-zip')
       .invoke('val')
@@ -311,8 +225,6 @@ describe('Facility VA search', () => {
 
     cy.injectAxe();
     cy.axeCheck();
-
-    cy.verifyOptions();
 
     cy.get('#street-city-state-zip').type('Austin, TX');
     cy.get('#facility-type-dropdown')

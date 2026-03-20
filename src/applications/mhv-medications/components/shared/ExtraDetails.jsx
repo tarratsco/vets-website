@@ -14,6 +14,7 @@ import {
   dispStatusObj,
   dispStatusObjV2,
   DISPENSE_STATUS,
+  NON_VA_MEDICATION_MESSAGE,
 } from '../../util/constants';
 import CallPharmacyPhone from './CallPharmacyPhone';
 import RefillButton from './RefillButton';
@@ -24,6 +25,7 @@ import {
   selectCernerPilotFlag,
   selectV2StatusMappingFlag,
   selectMhvMedicationsOracleHealthCutoverFlag,
+  selectMedicationsManagementImprovementsFlag,
 } from '../../util/selectors';
 
 const ExtraDetails = ({
@@ -43,6 +45,9 @@ const ExtraDetails = ({
   const isV2StatusMapping = useSelector(selectV2StatusMappingFlag);
   const isOracleHealthCutover = useSelector(
     selectMhvMedicationsOracleHealthCutoverFlag,
+  );
+  const isMedsImprovements = useSelector(
+    selectMedicationsManagementImprovementsFlag,
   );
   const useV2Status = isCernerPilot && isV2StatusMapping;
 
@@ -211,7 +216,7 @@ const ExtraDetails = ({
       case dispStatusObjV2.nonVA:
         return (
           <p className="vads-u-margin-y--0" data-testid="non-VA-prescription">
-            You can’t manage this medication in this online tool.
+            {NON_VA_MEDICATION_MESSAGE}
           </p>
         );
 
@@ -382,7 +387,7 @@ const ExtraDetails = ({
       case dispStatusObj.nonVA:
         return (
           <p className="vads-u-margin-y--0" data-testid="non-VA-prescription">
-            You can’t manage this medication in this online tool.
+            {NON_VA_MEDICATION_MESSAGE}
           </p>
         );
 
@@ -392,8 +397,9 @@ const ExtraDetails = ({
             className="vads-u-margin-y--0 no-print"
             data-testid="active-onHold"
           >
-            You can’t refill this prescription. Contact your VA provider if you
-            need more of this medication.
+            {isMedsImprovements
+              ? 'You can’t refill this prescription online right now. If you need a refill, call your VA pharmacy'
+              : 'You can’t refill this prescription. Contact your VA provider if you need more of this medication.'}
             <CallPharmacyPhone
               cmopDivisionPhone={pharmacyPhone}
               page={pageType.DETAILS}
@@ -441,7 +447,7 @@ const ExtraDetails = ({
     if (rxSourceIsNonVA(rx)) {
       return (
         <p className="vads-u-margin-y--0" data-testid="non-VA-prescription">
-          You can’t manage this medication in this online tool.
+          {NON_VA_MEDICATION_MESSAGE}
         </p>
       );
     }

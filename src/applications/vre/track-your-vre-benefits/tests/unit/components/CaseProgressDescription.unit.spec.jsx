@@ -6,11 +6,13 @@ import sinon from 'sinon';
 import { MemoryRouter } from 'react-router-dom-v5-compat';
 
 import CaseProgressDescription from '../../../components/CaseProgressDescription';
+import * as AppointmentScheduledAlertMod from '../../../components/AppointmentScheduledAlert';
 import * as HubCardListMod from '../../../components/HubCardList';
 import * as SelectPreferenceViewMod from '../../../components/SelectPreferenceView';
 
 const sandbox = sinon.createSandbox();
 let hubCardProps;
+let appointmentAlertProps;
 
 const makeStore = state => {
   const dispatch = sandbox.spy();
@@ -31,10 +33,15 @@ const renderWithProviders = (ui, state = {}) =>
 describe('CaseProgressDescription', () => {
   beforeEach(() => {
     hubCardProps = null;
+    appointmentAlertProps = null;
 
     sandbox.stub(HubCardListMod, 'default').callsFake(props => {
       hubCardProps = props;
       return <div data-testid="hub-card-list" />;
+    });
+    sandbox.stub(AppointmentScheduledAlertMod, 'default').callsFake(props => {
+      appointmentAlertProps = props;
+      return <div data-testid="appointment-scheduled-alert" />;
     });
     sandbox
       .stub(SelectPreferenceViewMod, 'default')
@@ -49,57 +56,42 @@ describe('CaseProgressDescription', () => {
     const { getByText } = renderWithProviders(
       <CaseProgressDescription step={1} />,
     );
-    getByText(/received your application for VR&E benefits\./i);
+    getByText(
+      /The section below contains information on steps you can take while waiting to hear back from us/i,
+    );
   });
 
-  it('renders step 2 with eligibility link', () => {
-    const { container } = renderWithProviders(
+  it('renders step 2 description', () => {
+    const { getByText } = renderWithProviders(
       <CaseProgressDescription step={2} />,
     );
-    const link = container.querySelector(
-      'va-link[href="/careers-employment/your-vre-eligibility"]',
+    getByText(
+      /currently reviewing your application to confirm your VR&E Chapter 31 eligibility/i,
     );
-    expect(link).to.exist;
   });
 
-  it('renders step 3 orientation content', () => {
+  it('renders step 3 description', () => {
     const { container, getByText } = renderWithProviders(
       <CaseProgressDescription step={3} />,
       { ch31CaseMilestones: undefined },
     );
-    getByText(/Orientation Completion/i);
+    getByText(
+      /Your next step is to complete the orientation video online or during your initial evaluation counselor meeting/i,
+    );
     expect(container.querySelector('va-card')).to.exist;
   });
 
-  it('renders step 3 success state when a preference has already been recorded', () => {
-    const {
-      container,
-      getByText,
-      queryByTestId,
-      queryByText,
-    } = renderWithProviders(<CaseProgressDescription step={3} />, {
-      ch31CaseMilestones: {
-        data: { saved: true },
-        error: null,
-      },
-    });
-
-    getByText(/Your choice has been recorded/i);
-    expect(container.querySelector('va-alert[status="success"]')).to.exist;
-    expect(queryByTestId('select-preference-view')).to.equal(null);
-    expect(queryByText(/Reading Material/i)).to.equal(null);
-  });
-
   it('renders the step 4 scheduling message when the appointment is still pending', () => {
-    const { getByText } = renderWithProviders(
+    const { getByText, queryByTestId } = renderWithProviders(
       <CaseProgressDescription step={4} status="PENDING" />,
     );
 
     getByText(/Check your email to schedule your meeting with your counselor/i);
+    expect(queryByTestId('appointment-scheduled-alert')).to.equal(null);
   });
 
   it('renders the step 4 scheduled message when appointment details are available', () => {
-    const { getByText } = renderWithProviders(
+    const { getByText, getByTestId } = renderWithProviders(
       <CaseProgressDescription
         step={4}
         status="COMPLETED"
@@ -112,7 +104,16 @@ describe('CaseProgressDescription', () => {
       />,
     );
 
-    getByText(/Your Initial Evaluation Appointment has been scheduled/i);
+    const scheduledMessage = getByText(
+      /Your Initial Evaluation Appointment has been scheduled/i,
+    );
+    const appointmentAlert = getByTestId('appointment-scheduled-alert');
+
+    expect(scheduledMessage.nextElementSibling).to.equal(appointmentAlert);
+    expect(appointmentAlertProps).to.deep.equal({
+      appointmentDateTime: '2026-03-03T10:00:00Z',
+      appointmentPlace: 'Regional office',
+    });
   });
 
   it('renders hub cards for the later workflow steps when requested', () => {
@@ -127,7 +128,7 @@ describe('CaseProgressDescription', () => {
       },
       {
         step: 7,
-        text: /Rehabilitation Plan or Career Track has started/i,
+        text: /Your Chapter 31 benefits have been initiated/i,
       },
     ];
 

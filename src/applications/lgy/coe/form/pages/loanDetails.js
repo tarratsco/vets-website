@@ -24,12 +24,13 @@ export default {
     }),
     vaLoanNumber: {
       ...numberUI({
-        title: 'VA loan number',
+        title: 'VA home loan number',
         hint: 'Enter a 12-digit loan number',
         errorMessages: {
           max: 'Make sure you include 12 digits.',
           pattern: 'Enter numbers only',
         },
+        width: 'md',
       }),
       'ui:validations': [
         (errors, formData, uiSchema, schema, errorMessages) => {

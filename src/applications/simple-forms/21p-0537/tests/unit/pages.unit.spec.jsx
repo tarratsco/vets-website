@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import sinon from 'sinon';
 
 import marriageInfo from '../../pages/marriageInfo';
 import phoneAndEmail from '../../pages/phoneAndEmail';
@@ -7,6 +8,11 @@ import spouseVeteranId from '../../pages/spouseVeteranId';
 import spouseVeteranStatus from '../../pages/spouseVeteranStatus';
 import terminationDetails from '../../pages/terminationDetails';
 import terminationStatus from '../../pages/terminationStatus';
+import { validateSpouseSsnNotMatchVeteranSsn } from '../../utils/validations';
+import {
+  marriageDateValidation,
+  terminationDateValidation,
+} from '../../helpers';
 
 describe('21P-0537 page configurations', () => {
   describe('marriageInfo', () => {
@@ -48,6 +54,20 @@ describe('21P-0537 page configurations', () => {
         marriageInfo.uiSchema.remarriage.ageAtMarriage['ui:required'];
       expect(ageRequired).to.be.a('function');
       expect(ageRequired()).to.be.true;
+    });
+
+    it('sets age max to 130', () => {
+      const { max } = marriageInfo.uiSchema.remarriage.ageAtMarriage[
+        'ui:options'
+      ];
+      expect(max).to.equal(130);
+    });
+
+    it('has page-level ui:validations with marriageDateValidation', () => {
+      expect(marriageInfo.uiSchema['ui:validations']).to.be.an('array');
+      expect(marriageInfo.uiSchema['ui:validations']).to.include(
+        marriageDateValidation,
+      );
     });
   });
 
@@ -109,6 +129,14 @@ describe('21P-0537 page configurations', () => {
         'spouseVeteranId',
       );
     });
+
+    it('includes spouse SSN cross-field validation', () => {
+      const validations =
+        spouseVeteranId.uiSchema.remarriage.spouseVeteranId.ssn[
+          'ui:validations'
+        ];
+      expect(validations).to.include(validateSpouseSsnNotMatchVeteranSsn);
+    });
   });
 
   describe('spouseVeteranStatus', () => {
@@ -146,6 +174,137 @@ describe('21P-0537 page configurations', () => {
       expect(reasonRequired).to.be.a('function');
       expect(reasonRequired()).to.be.true;
     });
+
+    it('has page-level ui:validations with terminationDateValidation', () => {
+      expect(terminationDetails.uiSchema['ui:validations']).to.be.an('array');
+      expect(terminationDetails.uiSchema['ui:validations']).to.include(
+        terminationDateValidation,
+      );
+    });
+  });
+
+  describe('marriageDateValidation', () => {
+    const makeErrors = () => ({
+      remarriage: {
+        dateOfMarriage: { addError: sinon.spy() },
+        ageAtMarriage: { addError: sinon.spy() },
+      },
+    });
+
+    it('adds error when marriage date is before spouse DOB', () => {
+      const errors = makeErrors();
+      const fields = {
+        remarriage: {
+          dateOfMarriage: '1990-01-01',
+          spouseDateOfBirth: '1995-06-15',
+        },
+      };
+      marriageDateValidation(errors, fields);
+      expect(errors.remarriage.dateOfMarriage.addError.calledOnce).to.be.true;
+    });
+
+    it('does not add error when marriage date equals spouse DOB', () => {
+      const errors = makeErrors();
+      const fields = {
+        remarriage: {
+          dateOfMarriage: '1995-06-15',
+          spouseDateOfBirth: '1995-06-15',
+        },
+      };
+      marriageDateValidation(errors, fields);
+      expect(errors.remarriage.dateOfMarriage.addError.called).to.be.false;
+    });
+
+    it('does not add error when marriage date is after spouse DOB', () => {
+      const errors = makeErrors();
+      const fields = {
+        remarriage: {
+          dateOfMarriage: '2020-03-10',
+          spouseDateOfBirth: '1995-06-15',
+        },
+      };
+      marriageDateValidation(errors, fields);
+      expect(errors.remarriage.dateOfMarriage.addError.called).to.be.false;
+    });
+
+    it('does not add error when dates are missing', () => {
+      const errors = makeErrors();
+      marriageDateValidation(errors, { remarriage: {} });
+      expect(errors.remarriage.dateOfMarriage.addError.called).to.be.false;
+    });
+
+    it('adds error when age exceeds 130', () => {
+      const errors = makeErrors();
+      const fields = { remarriage: { ageAtMarriage: '131' } };
+      marriageDateValidation(errors, fields);
+      expect(errors.remarriage.ageAtMarriage.addError.calledOnce).to.be.true;
+    });
+
+    it('adds error when age is negative', () => {
+      const errors = makeErrors();
+      const fields = { remarriage: { ageAtMarriage: '-1' } };
+      marriageDateValidation(errors, fields);
+      expect(errors.remarriage.ageAtMarriage.addError.calledOnce).to.be.true;
+    });
+
+    it('does not add error when age is within range', () => {
+      const errors = makeErrors();
+      const fields = { remarriage: { ageAtMarriage: '25' } };
+      marriageDateValidation(errors, fields);
+      expect(errors.remarriage.ageAtMarriage.addError.called).to.be.false;
+    });
+
+    it('does not add error when age is exactly 130', () => {
+      const errors = makeErrors();
+      const fields = { remarriage: { ageAtMarriage: '130' } };
+      marriageDateValidation(errors, fields);
+      expect(errors.remarriage.ageAtMarriage.addError.called).to.be.false;
+    });
+
+    it('does not add error when age is exactly 0', () => {
+      const errors = makeErrors();
+      const fields = { remarriage: { ageAtMarriage: '0' } };
+      marriageDateValidation(errors, fields);
+      expect(errors.remarriage.ageAtMarriage.addError.called).to.be.false;
+    });
+  });
+
+  describe('terminationDateValidation', () => {
+    const makeErrors = () => ({
+      remarriage: {
+        terminationDate: { addError: sinon.spy() },
+      },
+    });
+
+    it('adds error when termination date is before marriage date', () => {
+      const errors = makeErrors();
+      const fields = { remarriage: { terminationDate: '2019-01-01' } };
+      const formData = { remarriage: { dateOfMarriage: '2020-06-15' } };
+      terminationDateValidation(errors, fields, formData);
+      expect(errors.remarriage.terminationDate.addError.calledOnce).to.be.true;
+    });
+
+    it('adds error when termination date equals marriage date', () => {
+      const errors = makeErrors();
+      const fields = { remarriage: { terminationDate: '2020-06-15' } };
+      const formData = { remarriage: { dateOfMarriage: '2020-06-15' } };
+      terminationDateValidation(errors, fields, formData);
+      expect(errors.remarriage.terminationDate.addError.calledOnce).to.be.true;
+    });
+
+    it('does not add error when termination date is after marriage date', () => {
+      const errors = makeErrors();
+      const fields = { remarriage: { terminationDate: '2022-01-01' } };
+      const formData = { remarriage: { dateOfMarriage: '2020-06-15' } };
+      terminationDateValidation(errors, fields, formData);
+      expect(errors.remarriage.terminationDate.addError.called).to.be.false;
+    });
+
+    it('does not add error when dates are missing', () => {
+      const errors = makeErrors();
+      terminationDateValidation(errors, { remarriage: {} }, { remarriage: {} });
+      expect(errors.remarriage.terminationDate.addError.called).to.be.false;
+    });
   });
 
   describe('terminationStatus', () => {
@@ -167,6 +326,53 @@ describe('21P-0537 page configurations', () => {
       expect(
         terminationStatus.schema.properties.remarriage.required,
       ).to.include('hasTerminated');
+    });
+  });
+
+  describe('validateSpouseSsnNotMatchVeteranSsn', () => {
+    const buildErrors = () => {
+      const messages = [];
+      return {
+        errors: { addError: message => messages.push(message) },
+        messages,
+      };
+    };
+
+    it('adds an error when spouse and veteran SSN match', () => {
+      const { errors, messages } = buildErrors();
+
+      validateSpouseSsnNotMatchVeteranSsn(errors, '123-45-6789', {
+        veteranIdentification: { ssn: '123456789' },
+      });
+
+      expect(messages).to.have.lengthOf(1);
+    });
+
+    it('does not add an error when spouse and veteran SSN are different', () => {
+      const { errors, messages } = buildErrors();
+
+      validateSpouseSsnNotMatchVeteranSsn(errors, '123-45-6789', {
+        veteranIdentification: { ssn: '987-65-4321' },
+      });
+
+      expect(messages).to.be.empty;
+    });
+
+    it('does not add an error when either SSN is missing', () => {
+      const missingSpouse = buildErrors();
+      validateSpouseSsnNotMatchVeteranSsn(missingSpouse.errors, '', {
+        veteranIdentification: { ssn: '123456789' },
+      });
+
+      const missingVeteran = buildErrors();
+      validateSpouseSsnNotMatchVeteranSsn(
+        missingVeteran.errors,
+        '123456789',
+        {},
+      );
+
+      expect(missingSpouse.messages).to.be.empty;
+      expect(missingVeteran.messages).to.be.empty;
     });
   });
 });

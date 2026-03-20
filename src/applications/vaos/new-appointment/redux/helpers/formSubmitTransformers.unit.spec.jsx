@@ -130,6 +130,8 @@ describe('VAOS V2 data transformation', () => {
         extension: { desiredDate: '2019-12-02T00:00:00+00:00' },
         locationId: '983',
         reasonCode: reasonTextTransformed,
+        systemType: 'vista',
+        serviceType: 'primaryCare',
       });
     });
 
@@ -168,6 +170,8 @@ describe('VAOS V2 data transformation', () => {
         extension: { desiredDate: '2019-12-02T00:00:00+00:00' },
         locationId: '983',
         reasonCode: reasonTextTransformed,
+        systemType: 'cerner',
+        serviceType: 'primaryCare',
       });
     });
 
@@ -206,6 +210,8 @@ describe('VAOS V2 data transformation', () => {
         extension: { desiredDate: '2019-12-02T00:00:00+00:00' },
         locationId: '983',
         reasonCode: reasonTextTransformed,
+        systemType: 'vista',
+        serviceType: 'primaryCare',
       });
     });
   });
@@ -217,6 +223,7 @@ describe('VAOS V2 data transformation', () => {
       // Given the VA request is submitted
       const state = {
         newAppointment: {
+          ehr: 'vista',
           data: {
             phoneNumber: '5035551234',
             bestTimeToCall: {
@@ -287,6 +294,7 @@ describe('VAOS V2 data transformation', () => {
           { start: '2019-11-20T12:00:00Z', end: '2019-11-20T23:59:00Z' },
         ],
         preferredTimesForPhoneCall: ['Morning'],
+        systemType: 'vista',
       });
     });
   });
@@ -298,6 +306,7 @@ describe('VAOS V2 data transformation', () => {
       // Given the VA request is submitted
       const state = {
         newAppointment: {
+          ehr: 'hsrm',
           data: {
             phoneNumber: '5035551234',
             bestTimeToCall: {
@@ -385,6 +394,7 @@ describe('VAOS V2 data transformation', () => {
           { start: '2019-11-20T12:00:00Z', end: '2019-11-20T23:59:00Z' },
         ],
         preferredTimesForPhoneCall: ['Morning'],
+        systemType: 'hsrm',
       });
     });
   });

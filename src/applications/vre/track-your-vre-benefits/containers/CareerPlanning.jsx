@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { useFeatureToggle } from 'platform/utilities/feature-toggles';
-import { VaButton } from '@department-of-veterans-affairs/component-library/dist/react-bindings';
 import { focusElement, scrollToTop } from 'platform/utilities/ui';
-import { useHistory } from 'react-router-dom';
 import AssessYourInterestsAccordionItem from '../components/AssessYourInterestsAccordionItem';
 import FindEmploymentAccordionItem from '../components/FindEmploymentAccordionItem';
 import FindAPathAccordionItem from '../components/FindAPathAccordionItem';
@@ -10,13 +8,13 @@ import NeedHelp from '../components/NeedHelp';
 
 export default function CareerPlanning() {
   const { useToggleValue, TOGGLE_NAMES } = useFeatureToggle();
-  const history = useHistory();
 
   const showCareerPlanningPage = useToggleValue(
     TOGGLE_NAMES.vre_eligibility_status_phase_2_updates,
   );
 
   useEffect(() => {
+    document.title = `Career planning | Veterans Affairs`;
     scrollToTop();
     focusElement('h1');
   }, []);
@@ -25,7 +23,7 @@ export default function CareerPlanning() {
     return (
       <div className="row">
         <div className="usa-width-two-thirds vads-u-margin-top--0p5 vads-u-margin-x--1 medium-screen:vads-u-margin-x--0">
-          <h1>Career Planning</h1>
+          <h1>Career planning</h1>
           <p className="vads-u-color--gray-medium">
             This page isn't available right now.
           </p>
@@ -37,7 +35,7 @@ export default function CareerPlanning() {
   return (
     <div className="row">
       <article className="usa-width-two-thirds vads-u-margin-top--0p5 vads-u-margin-x--1 medium-screen:vads-u-margin-x--0 ">
-        <h1>Career Planning</h1>
+        <h1>Career planning</h1>
         <p className="vads-u-font-size--lg">
           Explore career resources and tools to help you achieve your employment
           goals.
@@ -48,14 +46,6 @@ export default function CareerPlanning() {
           <FindAPathAccordionItem />
           <FindEmploymentAccordionItem />
         </va-accordion>
-
-        <div className="medium-screen:vads-u-display--inline-block vads-u-display--none vads-u-margin-top--2">
-          <VaButton
-            back
-            onClick={() => history.push('/')}
-            text="Back to Case Tracker"
-          />
-        </div>
 
         <NeedHelp />
 

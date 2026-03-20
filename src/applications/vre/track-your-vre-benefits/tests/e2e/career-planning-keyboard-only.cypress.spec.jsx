@@ -24,7 +24,7 @@ describe('CH31 Career Planning Keyboard Only Navigation', () => {
     cy.injectAxeThenAxeCheck();
     // eslint-disable-next-line cypress/unsafe-to-chain-command
     cy.focused().then($el => {
-      expect($el.text()).to.contain('Career Planning');
+      expect($el.text()).to.contain('Career planning');
     });
   });
 
@@ -67,23 +67,5 @@ describe('CH31 Career Planning Keyboard Only Navigation', () => {
       .shadow()
       .find('button')
       .should('have.attr', 'aria-expanded', 'true');
-  });
-
-  it('navigates to Case Tracker via Back button using Enter', () => {
-    cy.visit(
-      '/careers-employment/track-your-vre-benefits/vre-benefit-status/career-planning',
-    );
-    cy.wait('@featureToggles', { timeout: 20000 });
-
-    cy.window().then(win => win.customElements.whenDefined('va-button'));
-    cy.get('va-button[back][text="Back to Case Tracker"]').should(
-      'have.class',
-      'hydrated',
-    );
-
-    cy.tabToElement('va-button[back][text="Back to Case Tracker"]');
-    cy.realPress('Enter');
-
-    cy.url().should('include', '/track-your-vre-benefits/vre-benefit-status');
   });
 });

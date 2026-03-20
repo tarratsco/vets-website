@@ -6,7 +6,10 @@ import FEATURE_FLAG_NAMES from 'platform/utilities/feature-toggles/featureFlagNa
 import prescriptionsListItem from '../../fixtures/prescriptionsListItem.json';
 import MedicationsListCard from '../../../components/MedicationsList/MedicationsListCard';
 import reducers from '../../../reducers';
-import { medicationsUrls } from '../../../util/constants';
+import {
+  medicationsUrls,
+  NON_VA_MEDICATION_MESSAGE,
+} from '../../../util/constants';
 
 describe('Medication card component', () => {
   const FLAG_COMBINATIONS = [
@@ -153,6 +156,27 @@ describe('Medication card component', () => {
       },
     };
 
+    const activeNoRefillsRx = {
+      ...prescriptionsListItem,
+      dispStatus: 'Active',
+      isRefillable: false,
+      refillRemaining: 0,
+    };
+
+    const shippedRx = {
+      ...prescriptionsListItem,
+      dispStatus: 'Active: Shipped',
+      isRefillable: false,
+      isTrackable: true,
+      trackingList: [
+        {
+          completeDateTime: new Date().toISOString(),
+          carrier: 'USPS',
+          trackingNumber: '12345678901234',
+        },
+      ],
+    };
+
     it('shows "Refills left" instead of "Refills remaining"', () => {
       const rx = {
         ...prescriptionsListItem,
@@ -235,7 +259,7 @@ describe('Medication card component', () => {
         ...prescriptionsListItem,
         dispStatus: 'Active: Refill in Process',
         isRefillable: false,
-        sortedDispensedDate: null,
+        rxRfRecords: [],
       };
       const { getByTestId, getByText } = setup(rx, managementImprovementsState);
       expect(getByTestId('fill-in-progress-alert')).to.exist;
@@ -252,7 +276,7 @@ describe('Medication card component', () => {
         ...prescriptionsListItem,
         dispStatus: 'Active: Submitted',
         isRefillable: false,
-        sortedDispensedDate: null,
+        rxRfRecords: [],
       };
       const { getByTestId, getByText } = setup(rx, managementImprovementsState);
       expect(getByTestId('fill-in-progress-alert')).to.exist;
@@ -269,7 +293,7 @@ describe('Medication card component', () => {
         ...prescriptionsListItem,
         dispStatus: 'Active: Refill in Process',
         isRefillable: false,
-        sortedDispensedDate: null,
+        rxRfRecords: [],
         refillRemaining: 3,
       };
       const { getByTestId, getByText } = setup(rx, managementImprovementsState);
@@ -284,7 +308,7 @@ describe('Medication card component', () => {
         ...prescriptionsListItem,
         dispStatus: 'Active: Submitted',
         isRefillable: false,
-        sortedDispensedDate: null,
+        rxRfRecords: [],
         refillRemaining: 3,
       };
       const { getByTestId } = setup(rx, managementImprovementsState);
@@ -327,6 +351,77 @@ describe('Medication card component', () => {
       const { container } = setup(rx, managementImprovementsState);
       expect(container.querySelector('.shipping-info')).to.be.null;
     });
+    describe('On Hold prescription card', () => {
+      const onHoldRx = {
+        ...prescriptionsListItem,
+        dispStatus: 'Active: On Hold',
+        isRefillable: false,
+        refillRemaining: 1,
+        sortedDispensedDate: '2026-01-05T05:00:00.000Z',
+      };
+
+      it('hides last filled info, status label, and rx number', () => {
+        const rx = { ...onHoldRx, prescriptionNumber: '12345' };
+        const { queryByTestId } = setup(rx, managementImprovementsState);
+        expect(queryByTestId('rx-last-filled-date')).to.be.null;
+        expect(queryByTestId('rxStatus')).to.be.null;
+        expect(queryByTestId('rx-number')).to.be.null;
+      });
+
+      it('shows updated on-hold message text', () => {
+        const { getByTestId } = setup(onHoldRx, managementImprovementsState);
+        expect(getByTestId('active-onHold').textContent).to.include(
+          'You can’t refill this prescription online right now.',
+        );
+        expect(getByTestId('active-onHold').textContent).to.include(
+          'If you need a refill, call your VA pharmacy',
+        );
+      });
+    });
+    describe('Transferred prescription card', () => {
+      const transferredRx = {
+        ...prescriptionsListItem,
+        dispStatus: 'Transferred',
+        isRefillable: false,
+        refillRemaining: 0,
+      };
+
+      it('shows previous record message', () => {
+        const { getByTestId } = setup(
+          transferredRx,
+          managementImprovementsState,
+        );
+        expect(getByTestId('transferred-content')).to.exist;
+        expect(getByTestId('transferred-content').textContent).to.include(
+          'This is a previous record of your medication',
+        );
+      });
+
+      it('hides status label, prescription number, refills, and last filled date', () => {
+        const rx = {
+          ...transferredRx,
+          prescriptionNumber: '12345',
+        };
+        const { queryByTestId } = setup(rx, managementImprovementsState);
+        expect(queryByTestId('rxStatus')).to.be.null;
+        expect(queryByTestId('rx-number')).to.be.null;
+        expect(queryByTestId('rx-refill-remaining')).to.be.null;
+        expect(queryByTestId('rx-last-filled-date')).to.be.null;
+      });
+
+      it('shows medication name link', () => {
+        const { getByTestId } = setup(
+          transferredRx,
+          managementImprovementsState,
+        );
+        expect(getByTestId('medications-history-details-link')).to.exist;
+      });
+
+      it('renders with gray background card', () => {
+        const { container } = setup(transferredRx, managementImprovementsState);
+        expect(container.querySelector('va-card[background]')).to.exist;
+      });
+    });
 
     it('does not show fill-in-progress alert for Active status', () => {
       const rx = {
@@ -336,6 +431,275 @@ describe('Medication card component', () => {
       };
       const { queryByTestId } = setup(rx, managementImprovementsState);
       expect(queryByTestId('fill-in-progress-alert')).to.be.null;
+    });
+
+    it('shows shipped alert with external tracking link for known carrier', () => {
+      const { getByTestId, getByText } = setup(
+        shippedRx,
+        managementImprovementsState,
+      );
+      expect(getByTestId('shipped-alert')).to.exist;
+      const link = getByText('Get tracking info');
+      expect(link).to.have.attribute(
+        'href',
+        `https://tools.usps.com/go/TrackConfirmAction_input?qtc_tLabels1=12345678901234`,
+      );
+    });
+
+    it('shows shipped alert with tracking number fallback for unknown carrier', () => {
+      const rx = {
+        ...shippedRx,
+        trackingList: [
+          {
+            completeDateTime: new Date().toISOString(),
+            carrier: 'OTHER',
+            trackingNumber: 'ABC123',
+          },
+        ],
+      };
+      const { getByTestId, getByText } = setup(rx, managementImprovementsState);
+      expect(getByTestId('shipped-alert')).to.exist;
+      const link = getByText('Get tracking info');
+      expect(link).to.have.attribute('href', 'ABC123');
+    });
+
+    it('shows "Refills left" for recently shipped prescription', () => {
+      const rx = { ...shippedRx, refillRemaining: 3 };
+      const { getByTestId } = setup(rx, managementImprovementsState);
+      expect(getByTestId('rx-refill-remaining')).to.have.text(
+        'Refills left: 3',
+      );
+    });
+
+    it('hides old "Shipped on" block for recently shipped prescription', () => {
+      const { queryByTestId } = setup(shippedRx, managementImprovementsState);
+      expect(queryByTestId('rx-card-details--shipped-on')).to.be.null;
+    });
+
+    it('hides ExtraDetails for recently shipped prescription', () => {
+      const { container } = setup(shippedRx, managementImprovementsState);
+      expect(container.querySelector('.shipping-info')).to.be.null;
+    });
+
+    it('does not show shipped alert when isTrackable is false', () => {
+      const rx = { ...shippedRx, isRefillable: true, isTrackable: false };
+      const { queryByTestId } = setup(rx, managementImprovementsState);
+      expect(queryByTestId('shipped-alert')).to.be.null;
+    });
+
+    it('shows "Fill has shipped" for initial fill with no rxRfRecords', () => {
+      const rx = { ...shippedRx, rxRfRecords: [] };
+      const { getByText } = setup(rx, managementImprovementsState);
+      expect(getByText(/Fill has shipped/)).to.exist;
+    });
+
+    it('shows "Refill has shipped" when rxRfRecords has entries', () => {
+      const rx = shippedRx;
+      const { getByText } = setup(rx, managementImprovementsState);
+      expect(getByText(/Refill has shipped/)).to.exist;
+    });
+
+    it('shows no-refills-left alert, renew link, "Refills left: 0", and hides ExtraDetails for Active with 0 refills', () => {
+      const { getByTestId, container } = setup(
+        activeNoRefillsRx,
+        managementImprovementsState,
+      );
+      expect(getByTestId('no-refills-left-alert')).to.exist;
+      expect(getByTestId('no-refills-left-alert').textContent).to.include(
+        'You have no refills left. If you need more, request a renewal.',
+      );
+      const link = getByTestId('learn-to-renew-prescriptions-link');
+      expect(link).to.exist;
+      expect(link).to.have.attribute(
+        'href',
+        medicationsUrls.RENEW_PRESCRIPTIONS_URL,
+      );
+      expect(link.textContent).to.equal('Learn how to renew prescriptions');
+      expect(getByTestId('rx-refill-remaining')).to.have.text(
+        'Refills left: 0',
+      );
+      expect(container.querySelector('.shipping-info')).to.be.null;
+    });
+
+    it('does not show no-refills-left alert when refills remain', () => {
+      const rx = {
+        ...prescriptionsListItem,
+        dispStatus: 'Active',
+        isRefillable: true,
+        refillRemaining: 3,
+      };
+      const { queryByTestId } = setup(rx, managementImprovementsState);
+      expect(queryByTestId('no-refills-left-alert')).to.be.null;
+    });
+
+    it('does not show no-refills-left alert for non-Active status with 0 refills', () => {
+      const rx = {
+        ...prescriptionsListItem,
+        dispStatus: 'Expired',
+        isRefillable: false,
+        refillRemaining: 0,
+      };
+      const { queryByTestId } = setup(rx, managementImprovementsState);
+      expect(queryByTestId('no-refills-left-alert')).to.be.null;
+    });
+
+    it('does not show no-refills-left alert for Expired status with 0 refills when isRenewable is false', () => {
+      const rx = {
+        ...prescriptionsListItem,
+        dispStatus: 'Expired',
+        isRefillable: false,
+        isRenewable: false,
+        refillRemaining: 0,
+      };
+      const { queryByTestId } = setup(rx, managementImprovementsState);
+      expect(queryByTestId('no-refills-left-alert')).to.be.null;
+    });
+
+    describe('Scenario 10 — Expired ≤120 days, renewable', () => {
+      const expiredRenewableRx = {
+        ...prescriptionsListItem,
+        dispStatus: 'Expired',
+        isRefillable: false,
+        isRenewable: true,
+        refillRemaining: 0,
+      };
+
+      it('shows no-refills-left alert, "Refills left: 0", and hides ExtraDetails for Expired renewable prescription', () => {
+        const { getByTestId, container } = setup(
+          expiredRenewableRx,
+          managementImprovementsState,
+        );
+        expect(getByTestId('no-refills-left-alert')).to.exist;
+        expect(getByTestId('no-refills-left-alert').textContent).to.include(
+          'You have no refills left. If you need more, request a renewal.',
+        );
+        expect(getByTestId('rx-refill-remaining')).to.have.text(
+          'Refills left: 0',
+        );
+        expect(container.querySelector('.shipping-info')).to.be.null;
+      });
+
+      it('shows "Learn how to renew" fallback for non-Oracle Health Expired renewable prescription', () => {
+        const rx = {
+          ...expiredRenewableRx,
+          stationNumber: '001',
+          sourceEhr: 'VA',
+        };
+        const { getByTestId, queryByTestId } = setup(rx, {
+          featureToggles: {
+            [FEATURE_FLAG_NAMES.mhvMedicationsManagementImprovements]: true,
+            [FEATURE_FLAG_NAMES.mhvSecureMessagingMedicationsRenewalRequest]: true,
+            [FEATURE_FLAG_NAMES.mhvMedicationsCernerPilot]: true,
+          },
+        });
+        expect(getByTestId('no-refills-left-alert')).to.exist;
+        expect(getByTestId('learn-to-renew-prescriptions-link')).to.exist;
+        expect(queryByTestId('send-renewal-request-message-link')).to.be.null;
+      });
+
+      it('shows "Send a renewal request message" for Oracle Health Expired renewable prescription without duplicate expired text', () => {
+        const rx = {
+          ...expiredRenewableRx,
+          stationNumber: '668',
+          sourceEhr: 'OH',
+          expirationDate: new Date(
+            Date.now() - 60 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+        };
+        const { getByTestId, queryByTestId } = setup(rx, {
+          featureToggles: {
+            [FEATURE_FLAG_NAMES.mhvMedicationsManagementImprovements]: true,
+            [FEATURE_FLAG_NAMES.mhvSecureMessagingMedicationsRenewalRequest]: true,
+            [FEATURE_FLAG_NAMES.mhvMedicationsCernerPilot]: true,
+          },
+        });
+        expect(getByTestId('no-refills-left-alert')).to.exist;
+        expect(getByTestId('send-renewal-request-message-link')).to.exist;
+        expect(queryByTestId('learn-to-renew-prescriptions-link')).to.be.null;
+        expect(queryByTestId('expired-less-than-120-days')).to.be.null;
+      });
+    });
+
+    it('shows "Send a renewal request message" for Oracle Health Active with 0 refills', () => {
+      const rx = {
+        ...activeNoRefillsRx,
+        isRenewable: true,
+        stationNumber: '668',
+        sourceEhr: 'OH',
+      };
+      const { getByTestId, queryByTestId } = setup(rx, {
+        featureToggles: {
+          [FEATURE_FLAG_NAMES.mhvMedicationsManagementImprovements]: true,
+          [FEATURE_FLAG_NAMES.mhvSecureMessagingMedicationsRenewalRequest]: true,
+          [FEATURE_FLAG_NAMES.mhvMedicationsCernerPilot]: true,
+        },
+      });
+      expect(getByTestId('no-refills-left-alert')).to.exist;
+      expect(getByTestId('send-renewal-request-message-link')).to.exist;
+      expect(queryByTestId('learn-to-renew-prescriptions-link')).to.be.null;
+    });
+
+    it('shows "Learn how to renew" fallback for non-Oracle Health Active with 0 refills', () => {
+      const rx = {
+        ...activeNoRefillsRx,
+        isRenewable: true,
+        stationNumber: '001',
+        sourceEhr: 'VA',
+      };
+      const { getByTestId, queryByTestId } = setup(rx, {
+        featureToggles: {
+          [FEATURE_FLAG_NAMES.mhvMedicationsManagementImprovements]: true,
+          [FEATURE_FLAG_NAMES.mhvSecureMessagingMedicationsRenewalRequest]: true,
+          [FEATURE_FLAG_NAMES.mhvMedicationsCernerPilot]: true,
+        },
+      });
+      expect(getByTestId('no-refills-left-alert')).to.exist;
+      expect(getByTestId('learn-to-renew-prescriptions-link')).to.exist;
+      expect(queryByTestId('send-renewal-request-message-link')).to.be.null;
+    });
+
+    describe('Non-VA medication card', () => {
+      const nonVaRx = {
+        ...prescriptionsListItem,
+        prescriptionSource: 'NV',
+        dispStatus: 'Active: Non-VA',
+        orderedDate: '2024-06-16T20:00:00Z',
+      };
+
+      it('renders "Non-VA medication" label', () => {
+        const screen = setup(nonVaRx, managementImprovementsState);
+        expect(screen.getByTestId('non-va-medication-label')).to.exist;
+        expect(screen.getByTestId('non-va-medication-label')).to.have.text(
+          'Non-VA medication',
+        );
+      });
+
+      it('renders "can’t manage" message', () => {
+        const screen = setup(nonVaRx, managementImprovementsState);
+        expect(screen.getByTestId('non-VA-prescription')).to.have.text(
+          NON_VA_MEDICATION_MESSAGE,
+        );
+      });
+
+      it('does not render documented date', () => {
+        const screen = setup(nonVaRx, managementImprovementsState);
+        expect(screen.queryByTestId('rx-last-filled-info')).to.not.exist;
+      });
+
+      it('does not render "Active: Non-VA" status text', () => {
+        const screen = setup(nonVaRx, managementImprovementsState);
+        expect(screen.queryByTestId('rxStatus')).to.not.exist;
+      });
+
+      it('does not render prescription number', () => {
+        const screen = setup(nonVaRx, managementImprovementsState);
+        expect(screen.queryByTestId('rx-number')).to.not.exist;
+      });
+
+      it('still renders medication name link', () => {
+        const screen = setup(nonVaRx, managementImprovementsState);
+        expect(screen.getByTestId('medications-history-details-link')).to.exist;
+      });
     });
   });
 
@@ -351,6 +715,19 @@ describe('Medication card component', () => {
       expect(queryByTestId('fill-in-progress-alert')).to.be.null;
       expect(getByTestId('rx-number')).to.exist;
       expect(getByTestId('rxStatus')).to.exist;
+    });
+
+    it('falls back to legacy Non-VA card layout', () => {
+      const nonVaRx = {
+        ...prescriptionsListItem,
+        prescriptionSource: 'NV',
+        dispStatus: 'Active: Non-VA',
+        orderedDate: '2024-06-16T20:00:00Z',
+      };
+      const screen = setup(nonVaRx);
+      expect(screen.queryByTestId('non-va-medication-label')).to.not.exist;
+      expect(screen.getByTestId('rxStatus')).to.have.text('Active: Non-VA');
+      expect(screen.getByTestId('rx-last-filled-info')).to.exist;
     });
   });
 
@@ -423,15 +800,13 @@ describe('Medication card component', () => {
       orderedDate: '2024-06-16T20:00:00Z',
     };
     const { getByTestId } = setup(rx);
-    /* eslint-disable prettier/prettier */
     expect(getByTestId('rx-last-filled-info')).to.have.text(
       'Documented on June 16, 2024',
     );
     expect(getByTestId('rxStatus')).to.have.text('Active: Non-VA');
     expect(getByTestId('non-VA-prescription')).to.have.text(
-      'You can’t manage this medication in this online tool.',
+      NON_VA_MEDICATION_MESSAGE,
     );
-    /* eslint-enable prettier/prettier */
   });
 
   it('renders a Non-VA Prescription without an orderedDate', () => {
@@ -442,15 +817,13 @@ describe('Medication card component', () => {
       orderedDate: '',
     };
     const { getByTestId } = setup(rx);
-    /* eslint-disable prettier/prettier */
     expect(getByTestId('rx-last-filled-info')).to.have.text(
       'Documented on: Date not available',
     );
     expect(getByTestId('rxStatus')).to.have.text('Active: Non-VA');
     expect(getByTestId('non-VA-prescription')).to.have.text(
-      'You can’t manage this medication in this online tool.',
+      NON_VA_MEDICATION_MESSAGE,
     );
-    /* eslint-enable prettier/prettier */
   });
 
   it('renders a Non-VA Prescription when dispStatus is null', () => {
@@ -461,15 +834,13 @@ describe('Medication card component', () => {
       orderedDate: '',
     };
     const { getByTestId } = setup(rx);
-    /* eslint-disable prettier/prettier */
     expect(getByTestId('rx-last-filled-info')).to.have.text(
       'Documented on: Date not available',
     );
     expect(getByTestId('rxStatus')).to.have.text('Active: Non-VA');
     expect(getByTestId('non-VA-prescription')).to.have.text(
-      'You can’t manage this medication in this online tool.',
+      NON_VA_MEDICATION_MESSAGE,
     );
-    /* eslint-enable prettier/prettier */
   });
 
   describe('CernerPilot and V2StatusMapping flag requirement validation', () => {
