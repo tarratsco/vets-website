@@ -5,6 +5,10 @@
       {
         "name": "form_4192_enabled",
         "value": true
+      },
+      {
+        "name": "aquia_bio_auth_required",
+        "value": true
       }
     ]
   }
