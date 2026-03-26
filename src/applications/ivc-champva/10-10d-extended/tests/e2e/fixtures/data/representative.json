@@ -38,8 +38,12 @@
         "applicantSsn": "345345345",
         "applicantPhone": "5555551234",
         "applicantGender": "male",
-        "applicantRelationshipToSponsor": "child",
-        "applicantRelationshipOrigin": "blood",
+        "applicantRelationshipToSponsor": {
+          "relationshipToVeteran": "child"
+        },
+        "applicantRelationshipOrigin": {
+          "relationshipToVeteran": "blood"
+        },
         "applicantDependentStatus": {
           "status": "over18HelplessChild"
         }

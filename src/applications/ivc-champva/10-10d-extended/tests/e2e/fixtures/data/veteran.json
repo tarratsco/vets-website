@@ -35,8 +35,12 @@
         },
         "applicantPhone": "5555551234",
         "applicantGender": "male",
-        "applicantRelationshipToSponsor": "child",
-        "applicantRelationshipOrigin": "step",
+        "applicantRelationshipToSponsor": {
+          "relationshipToVeteran": "child"
+        },
+        "applicantRelationshipOrigin": {
+          "relationshipToVeteran": "step"
+        },
         "applicantBirthCertOrSocialSecCard": [
           {
             "attachmentId": "Birth certificate",

@@ -135,7 +135,7 @@ const formConfig = {
   footerContent: FormFooter,
   getHelp: GetFormHelp,
   errorText: ErrorText,
-  showReviewErrors: !environment.isProduction() && !environment.isStaging(),
+  showReviewErrors: !environment.isProduction(),
   chapters: {
     // TODO: Update chapter numbers
     // Chapter 0 - Required Documents
@@ -336,7 +336,8 @@ const formConfig = {
           path: 'household/marriage-to-veteran-end-info',
           title: 'Marriage to Veteran Details',
           depends: formData =>
-            formData.claimantRelationship === 'SURVIVING_SPOUSE',
+            formData.claimantRelationship === 'SURVIVING_SPOUSE' &&
+            !formData.marriedToVeteranAtTimeOfDeath,
           uiSchema: marriageToVeteranEndInfo.uiSchema,
           schema: marriageToVeteranEndInfo.schema,
         },

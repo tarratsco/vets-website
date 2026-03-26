@@ -105,6 +105,7 @@ import {
   secondaryFinalIncident,
   separationHealthAssessment,
   separationHealthAssessmentUpload,
+  separationHealthAssessmentUploadV1,
   separationLocation,
   separationPay,
   serviceTreatmentRecords,
@@ -156,6 +157,7 @@ import ConfirmationAncillaryFormsWizard from '../components/confirmationFields/C
 import { EvidenceRequestPage } from '../components/EvidenceRequestPage';
 import { MedicalRecordsPage } from '../components/MedicalRecordsPage';
 import { AdditionalEvidenceIntroPage } from '../components/AdditionalEvidenceIntroPage';
+import { SeparationHealthAssessment } from '../components/SeparationHealthAssessment';
 
 /** @type {FormConfig} */
 const formConfig = {
@@ -620,18 +622,32 @@ const formConfig = {
           schema: { type: 'object', properties: {} },
         },
         separationHealthAssessment: {
-          title: 'Separation health assessment',
+          title:
+            'Separation Health Asessment that supports your disability claim',
           path: 'supporting-evidence/separation-health-assessment',
           depends: isBddShaWorkflowActive,
+          CustomPage: SeparationHealthAssessment,
+          CustomPageReview: null,
           uiSchema: separationHealthAssessment.uiSchema,
           schema: separationHealthAssessment.schema,
         },
         separationHealthAssessmentUpload: {
-          title: 'Separation health assessment upload',
+          title: 'Separation Health Assessment',
           path: 'supporting-evidence/separation-health-assessment-upload',
-          depends: isUploadingBddSha,
+          depends: formData =>
+            formData.disability526SupportingEvidenceFileInputV3 &&
+            isUploadingBddSha(formData),
           uiSchema: separationHealthAssessmentUpload.uiSchema,
           schema: separationHealthAssessmentUpload.schema,
+        },
+        separationHealthAssessmentUploadV1: {
+          title: 'Separation Health Assessment',
+          path: 'supporting-evidence/separation-health-assessment-upload-v1',
+          depends: formData =>
+            !formData.disability526SupportingEvidenceFileInputV3 &&
+            isUploadingBddSha(formData),
+          uiSchema: separationHealthAssessmentUploadV1.uiSchema,
+          schema: separationHealthAssessmentUploadV1.schema,
         },
         serviceTreatmentRecords: {
           title: 'Service treatment records',
