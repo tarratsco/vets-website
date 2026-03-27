@@ -19,13 +19,14 @@ import {
 import { blankSchema } from 'platform/forms-system/src/js/utilities/data/profile';
 import { applicantWording } from '../../shared/utilities';
 
-import { ApplicantGenderPage } from './ApplicantGenderPage';
 import { validateApplicant, validateApplicantSsn } from '../utils/validations';
 import { isOfCollegeAge, requireBirthCertificate } from '../utils/helpers';
 import { attachmentSchema, attachmentUI } from '../definitions';
 import { APPLICANTS_MAX } from '../utils/constants';
 
-import AddressSelectionPage from '../components/FormPages/AddressSelectionPage';
+import AddressSelectionPage, {
+  NOT_SHARED,
+} from '../components/FormPages/AddressSelectionPage';
 import sectionOverview from './applicantInformation/sectionOverview';
 import personalInformation from './applicantInformation/personalInformation';
 import remarriageProof from './applicantInformation/remarriageProof';
@@ -33,6 +34,7 @@ import dependentStatus from './applicantInformation/dependentStatus';
 import schoolEnrollmentProof from './applicantInformation/schoolEnrollmentProof';
 import marriageDate from './applicantInformation/marriageDate';
 import stepchildMarriageProof from './applicantInformation/stepchildMarriageProof';
+import birthSex from './applicantInformation/birthSex';
 import birthCertificate from './applicantInformation/birthCertificate';
 import relationshipToVeteran from './applicantInformation/relationshipToVeteran';
 import relationshipOrigin from './applicantInformation/relationshipOrigin';
@@ -126,24 +128,6 @@ const applicantContactInfoPage = {
       applicantEmailAddress: emailSchema,
     },
     required: ['applicantPhone'],
-  },
-};
-
-const applicantGenderPage = {
-  uiSchema: {
-    applicantGender: {},
-  },
-  schema: {
-    type: 'object',
-    properties: {
-      applicantGender: {
-        type: 'object',
-        properties: {
-          gender: { type: 'string' },
-          _unused: { type: 'string' },
-        },
-      },
-    },
   },
 };
 
@@ -247,8 +231,10 @@ export const applicantPages = arrayBuilderPages(
     page15: pageBuilder.itemPage({
       path: 'applicant-mailing-address/:index',
       title: 'Mailing address',
-      depends: (formData, index) =>
-        !get('view:sharesAddressWith', formData.applicants?.[index]),
+      depends: (formData, index) => {
+        const val = get('view:sharesAddressWith', formData.applicants?.[index]);
+        return !val || val === NOT_SHARED;
+      },
       ...applicantMailingAddressPage,
     }),
     page16: pageBuilder.itemPage({
@@ -258,9 +244,8 @@ export const applicantPages = arrayBuilderPages(
     }),
     page17: pageBuilder.itemPage({
       path: 'applicant-birth-sex/:index',
-      title: 'Applicant sex listed at birth',
-      ...applicantGenderPage,
-      CustomPage: ApplicantGenderPage,
+      title: 'Birth sex',
+      ...birthSex,
     }),
     page18: pageBuilder.itemPage({
       path: 'applicant-relationship-to-veteran/:index',
