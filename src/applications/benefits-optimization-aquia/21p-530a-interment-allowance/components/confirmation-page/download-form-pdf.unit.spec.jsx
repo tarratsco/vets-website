@@ -117,7 +117,7 @@ describe('DownloadFormPDF', () => {
     it('should render download link', () => {
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -136,7 +136,7 @@ describe('DownloadFormPDF', () => {
     it('should not show loading indicator initially', () => {
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -149,7 +149,7 @@ describe('DownloadFormPDF', () => {
     it('should not show error message initially', () => {
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -165,7 +165,7 @@ describe('DownloadFormPDF', () => {
       const veteranName = { first: 'Jane', last: 'Smith' };
       renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={veteranName}
         />,
@@ -178,7 +178,7 @@ describe('DownloadFormPDF', () => {
 
     it('should use default name when veteranName is undefined', () => {
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -188,7 +188,7 @@ describe('DownloadFormPDF', () => {
     it('should use default values when veteranName properties are missing', () => {
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{}}
         />,
@@ -201,7 +201,7 @@ describe('DownloadFormPDF', () => {
     it('should use default first name when only last name provided', () => {
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ last: 'Doe' }}
         />,
@@ -214,7 +214,7 @@ describe('DownloadFormPDF', () => {
     it('should use default last name when only first name provided', () => {
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John' }}
         />,
@@ -236,7 +236,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -260,7 +260,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -326,7 +326,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData={formData}
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -361,7 +361,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -387,7 +387,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.resolves(mockResponse);
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -408,7 +408,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -434,7 +434,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -458,7 +458,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -483,7 +483,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -512,7 +512,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -532,7 +532,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -556,7 +556,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -578,7 +578,7 @@ describe('DownloadFormPDF', () => {
 
       const { container } = renderComponent(
         <DownloadFormPDF
-          confirmationNumber="abc-123"
+          downloadGuid="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,

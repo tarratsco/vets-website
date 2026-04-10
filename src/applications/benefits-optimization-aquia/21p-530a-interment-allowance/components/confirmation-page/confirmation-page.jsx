@@ -43,7 +43,7 @@ export const ConfirmationPage = ({ route }) => {
     [submissionGuid],
   );
 
-  const downloadGuid = submissionGuid || persistedGuid || confirmationNumber;
+  const downloadGuid = submissionGuid || persistedGuid;
 
   const submissionAlertContent = (
     <p>
@@ -76,7 +76,7 @@ export const ConfirmationPage = ({ route }) => {
           If you’d like a PDF copy of your completed form, you can download it.{' '}
         </p>
         <DownloadFormPDF
-          confirmationNumber={downloadGuid}
+          downloadGuid={downloadGuid}
           formData={transformedData}
           veteranName={veteranName}
         />

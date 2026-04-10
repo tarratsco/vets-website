@@ -101,7 +101,7 @@ describe('DownloadFormPDF', () => {
   describe('Initial Rendering', () => {
     it('should render download link', () => {
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -116,7 +116,7 @@ describe('DownloadFormPDF', () => {
 
     it('should not show loading indicator initially', () => {
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const loadingIndicator = container.querySelector('va-loading-indicator');
@@ -125,7 +125,7 @@ describe('DownloadFormPDF', () => {
 
     it('should not show error message initially', () => {
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const errorAlert = container.querySelector('.form-download-error');
@@ -143,7 +143,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.resolves(mockResponse);
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -163,7 +163,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.resolves(mockResponse);
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -222,7 +222,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.onSecondCall().resolves(mockResponse);
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData={formData} />,
+        <DownloadFormPDF downloadGuid="abc-123" formData={formData} />,
       );
 
       const link = container.querySelector('va-link');
@@ -253,7 +253,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.resolves(mockResponse);
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -276,7 +276,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.resolves(mockResponse);
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -298,7 +298,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.resolves(mockResponse);
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -318,7 +318,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.resolves(mockResponse);
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -339,7 +339,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.rejects(new Error('Network error'));
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -364,7 +364,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.resolves(mockResponse);
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -380,7 +380,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.rejects(new Error('Network error'));
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');
@@ -399,7 +399,7 @@ describe('DownloadFormPDF', () => {
       apiRequestStub.rejects(new Error('Network error'));
 
       const { container } = renderComponent(
-        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+        <DownloadFormPDF downloadGuid="abc-123" formData="{}" />,
       );
 
       const link = container.querySelector('va-link');

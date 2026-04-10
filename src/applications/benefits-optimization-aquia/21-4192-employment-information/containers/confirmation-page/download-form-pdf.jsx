@@ -6,7 +6,7 @@ import recordEvent from 'platform/monitoring/record-event';
 import { API_ENDPOINTS } from '../../constants/constants';
 import { ensureValidCSRFToken } from '../../utils/actions/ensure-valid-csrf-token';
 
-const DownloadFormPDF = ({ confirmationNumber, formData }) => {
+const DownloadFormPDF = ({ downloadGuid, formData }) => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -40,10 +40,10 @@ const DownloadFormPDF = ({ confirmationNumber, formData }) => {
           });
 
         let response;
-        if (confirmationNumber) {
+        if (downloadGuid) {
           try {
             response = await apiRequest(
-              API_ENDPOINTS.downloadPdfByGuid(confirmationNumber),
+              API_ENDPOINTS.downloadPdfByGuid(downloadGuid),
               {
                 method: 'GET',
               },
@@ -75,7 +75,7 @@ const DownloadFormPDF = ({ confirmationNumber, formData }) => {
         setLoading(false);
       }
     },
-    [confirmationNumber, formData, handlePdfDownload],
+    [downloadGuid, formData, handlePdfDownload],
   );
 
   // apply focus to the error alert if we have errors set
@@ -115,7 +115,7 @@ const DownloadFormPDF = ({ confirmationNumber, formData }) => {
 };
 
 DownloadFormPDF.propTypes = {
-  confirmationNumber: PropTypes.string,
+  downloadGuid: PropTypes.string,
   formData: PropTypes.string,
 };
 

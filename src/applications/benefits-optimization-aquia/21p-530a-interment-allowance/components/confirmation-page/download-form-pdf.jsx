@@ -7,7 +7,7 @@ import * as Sentry from '@sentry/browser';
 import { API_ENDPOINTS } from '../../constants/constants';
 import { ensureValidCSRFToken } from '../../utils/actions/ensure-valid-csrf-token';
 
-const DownloadFormPDF = ({ confirmationNumber, formData, veteranName }) => {
+const DownloadFormPDF = ({ downloadGuid, formData, veteranName }) => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -52,10 +52,10 @@ const DownloadFormPDF = ({ confirmationNumber, formData, veteranName }) => {
           });
 
         let response;
-        if (confirmationNumber) {
+        if (downloadGuid) {
           try {
             response = await apiRequest(
-              API_ENDPOINTS.downloadPdfByGuid(confirmationNumber),
+              API_ENDPOINTS.downloadPdfByGuid(downloadGuid),
               {
                 method: 'GET',
               },
@@ -91,7 +91,7 @@ const DownloadFormPDF = ({ confirmationNumber, formData, veteranName }) => {
         setLoading(false);
       }
     },
-    [confirmationNumber, formData, handlePdfDownload],
+    [downloadGuid, formData, handlePdfDownload],
   );
 
   // apply focus to the error alert if we have errors set
@@ -131,7 +131,7 @@ const DownloadFormPDF = ({ confirmationNumber, formData, veteranName }) => {
 };
 
 DownloadFormPDF.propTypes = {
-  confirmationNumber: PropTypes.string,
+  downloadGuid: PropTypes.string,
   formData: PropTypes.string,
   veteranName: PropTypes.shape({
     first: PropTypes.string,
