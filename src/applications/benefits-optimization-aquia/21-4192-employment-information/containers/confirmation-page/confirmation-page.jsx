@@ -3,7 +3,7 @@
  * @description Confirmation page displayed after successful form submission
  */
 
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { formatDateLong } from 'platform/utilities/date';
@@ -23,6 +23,7 @@ import DownloadFormPDF from './download-form-pdf';
  * @returns {React.ReactElement} Confirmation page view
  */
 export const ConfirmationPage = ({ route }) => {
+  const GUID_STORAGE_KEY = 'form214192_download_guid';
   const form = useSelector(state => state.form || {});
   const submission = form?.submission || {};
   const { formConfig } = route || {};
@@ -30,7 +31,26 @@ export const ConfirmationPage = ({ route }) => {
 
   const submitDate = submission?.timestamp || '';
   const formattedSubmitDate = submitDate ? formatDateLong(submitDate) : '';
-  const confirmationNumber = submission?.response?.confirmationNumber || '';
+  const confirmationNumber =
+    submission?.response?.attributes?.confirmationNumber ||
+    submission?.response?.confirmationNumber ||
+    '';
+  const submissionGuid = submission?.response?.attributes?.guid || '';
+
+  const persistedGuid = useMemo(() => {
+    if (typeof window === 'undefined') return '';
+    return window.sessionStorage.getItem(GUID_STORAGE_KEY) || '';
+  }, []);
+
+  useEffect(
+    () => {
+      if (typeof window === 'undefined' || !submissionGuid) return;
+      window.sessionStorage.setItem(GUID_STORAGE_KEY, submissionGuid);
+    },
+    [submissionGuid],
+  );
+
+  const downloadGuid = submissionGuid || persistedGuid || confirmationNumber;
   const ConfirmationHowToContact = () => (
     <>
       <p>
@@ -76,7 +96,10 @@ export const ConfirmationPage = ({ route }) => {
         <p>
           If you’d like a PDF copy of your completed form, you can download it.{' '}
         </p>
-        <DownloadFormPDF formData={transformedData} />
+        <DownloadFormPDF
+          confirmationNumber={downloadGuid}
+          formData={transformedData}
+        />
       </div>
       <div data-dd-privacy="mask" data-dd-action-name="confirmation summary">
         <ConfirmationView.ChapterSectionCollection />

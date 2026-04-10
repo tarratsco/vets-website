@@ -78,4 +78,6 @@ export const TIME_LOST_UNITS = {
 export const API_ENDPOINTS = {
   csrfCheck: '/csrf_token',
   downloadPdf: '/form214192/download_pdf',
+  downloadPdfByGuid: guid =>
+    `/form214192/download_pdf/${encodeURIComponent(guid)}`,
 };

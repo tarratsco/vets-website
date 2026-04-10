@@ -19,4 +19,6 @@ export const TRACKING_PREFIX = '21p-530a-interment-allowance-';
 export const API_ENDPOINTS = {
   csrfCheck: '/csrf_token',
   downloadPdf: '/form21p530a/download_pdf',
+  downloadPdfByGuid: guid =>
+    `/form21p530a/download_pdf/${encodeURIComponent(guid)}`,
 };

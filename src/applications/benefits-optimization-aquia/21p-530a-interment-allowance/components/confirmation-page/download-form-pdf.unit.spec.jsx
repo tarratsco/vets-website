@@ -23,6 +23,8 @@ describe('DownloadFormPDF', () => {
   let removeChildStub;
   let mockLink;
 
+  const renderComponent = ui => render(ui);
+
   beforeEach(() => {
     // Mock DOM element
     mockLink = {
@@ -113,8 +115,9 @@ describe('DownloadFormPDF', () => {
 
   describe('Initial Rendering', () => {
     it('should render download link', () => {
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -131,8 +134,9 @@ describe('DownloadFormPDF', () => {
     });
 
     it('should not show loading indicator initially', () => {
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -143,8 +147,9 @@ describe('DownloadFormPDF', () => {
     });
 
     it('should not show error message initially', () => {
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -158,7 +163,13 @@ describe('DownloadFormPDF', () => {
   describe('Name Formatting', () => {
     it('should use provided veteran name', () => {
       const veteranName = { first: 'Jane', last: 'Smith' };
-      render(<DownloadFormPDF formData="{}" veteranName={veteranName} />);
+      renderComponent(
+        <DownloadFormPDF
+          confirmationNumber="abc-123"
+          formData="{}"
+          veteranName={veteranName}
+        />,
+      );
 
       // Name is used internally; we verify through download behavior in later tests
       // Check that no 'a' element was created (no download triggered)
@@ -166,15 +177,21 @@ describe('DownloadFormPDF', () => {
     });
 
     it('should use default name when veteranName is undefined', () => {
-      const { container } = render(<DownloadFormPDF formData="{}" />);
+      const { container } = renderComponent(
+        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+      );
 
       const link = container.querySelector('va-link');
       expect(link).to.exist;
     });
 
     it('should use default values when veteranName properties are missing', () => {
-      const { container } = render(
-        <DownloadFormPDF formData="{}" veteranName={{}} />,
+      const { container } = renderComponent(
+        <DownloadFormPDF
+          confirmationNumber="abc-123"
+          formData="{}"
+          veteranName={{}}
+        />,
       );
 
       const link = container.querySelector('va-link');
@@ -182,8 +199,12 @@ describe('DownloadFormPDF', () => {
     });
 
     it('should use default first name when only last name provided', () => {
-      const { container } = render(
-        <DownloadFormPDF formData="{}" veteranName={{ last: 'Doe' }} />,
+      const { container } = renderComponent(
+        <DownloadFormPDF
+          confirmationNumber="abc-123"
+          formData="{}"
+          veteranName={{ last: 'Doe' }}
+        />,
       );
 
       const link = container.querySelector('va-link');
@@ -191,8 +212,12 @@ describe('DownloadFormPDF', () => {
     });
 
     it('should use default last name when only first name provided', () => {
-      const { container } = render(
-        <DownloadFormPDF formData="{}" veteranName={{ first: 'John' }} />,
+      const { container } = renderComponent(
+        <DownloadFormPDF
+          confirmationNumber="abc-123"
+          formData="{}"
+          veteranName={{ first: 'John' }}
+        />,
       );
 
       const link = container.querySelector('va-link');
@@ -209,8 +234,9 @@ describe('DownloadFormPDF', () => {
       };
       apiRequestStub.resolves(mockResponse);
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -225,7 +251,6 @@ describe('DownloadFormPDF', () => {
     });
 
     it('should make API request with correct parameters', async () => {
-      const formData = '{"veteran":"data"}';
       const mockBlob = new Blob(['pdf content'], { type: 'application/pdf' });
       const mockResponse = {
         ok: true,
@@ -233,9 +258,10 @@ describe('DownloadFormPDF', () => {
       };
       apiRequestStub.resolves(mockResponse);
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
-          formData={formData}
+          confirmationNumber="abc-123"
+          formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
       );
@@ -246,11 +272,82 @@ describe('DownloadFormPDF', () => {
       await waitFor(() => {
         expect(apiRequestStub.called).to.be.true;
         const callArgs = apiRequestStub.firstCall.args;
+        expect(callArgs[0]).to.equal('/form21p530a/download_pdf/abc-123');
         expect(callArgs[1]).to.deep.include({
-          method: 'POST',
-          body: formData,
-          headers: { 'Content-Type': 'application/json' },
+          method: 'GET',
         });
+      });
+    });
+
+    it('should use legacy POST endpoint when confirmation number is missing', async () => {
+      const formData = '{"veteran":"data"}';
+      const mockBlob = new Blob(['pdf content'], { type: 'application/pdf' });
+      const mockResponse = {
+        ok: true,
+        blob: sinon.stub().resolves(mockBlob),
+      };
+      apiRequestStub.resolves(mockResponse);
+
+      const { container } = renderComponent(
+        <DownloadFormPDF
+          formData={formData}
+          veteranName={{ first: 'John', last: 'Doe' }}
+        />,
+      );
+
+      const link = container.querySelector('va-link');
+      link.click();
+
+      await waitFor(() => {
+        expect(apiRequestStub.calledOnce).to.be.true;
+      });
+
+      const callArgs = apiRequestStub.firstCall.args;
+      expect(callArgs[0]).to.equal('/form21p530a/download_pdf');
+      expect(callArgs[1]).to.deep.include({
+        method: 'POST',
+        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    });
+
+    it('should fall back to POST endpoint when GET endpoint fails', async () => {
+      const formData = '{"veteran":"fallback"}';
+      const mockBlob = new Blob(['pdf content'], { type: 'application/pdf' });
+      const mockResponse = {
+        ok: true,
+        blob: sinon.stub().resolves(mockBlob),
+      };
+
+      apiRequestStub
+        .onFirstCall()
+        .resolves({ ok: false, blob: sinon.stub().resolves(mockBlob) });
+      apiRequestStub.onSecondCall().resolves(mockResponse);
+
+      const { container } = renderComponent(
+        <DownloadFormPDF
+          confirmationNumber="abc-123"
+          formData={formData}
+          veteranName={{ first: 'John', last: 'Doe' }}
+        />,
+      );
+
+      const link = container.querySelector('va-link');
+      link.click();
+
+      await waitFor(() => {
+        expect(apiRequestStub.callCount).to.equal(2);
+      });
+
+      const firstCallArgs = apiRequestStub.firstCall.args;
+      const secondCallArgs = apiRequestStub.secondCall.args;
+      expect(firstCallArgs[0]).to.equal('/form21p530a/download_pdf/abc-123');
+      expect(firstCallArgs[1]).to.deep.include({ method: 'GET' });
+      expect(secondCallArgs[0]).to.equal('/form21p530a/download_pdf');
+      expect(secondCallArgs[1]).to.deep.include({
+        method: 'POST',
+        body: formData,
+        headers: { 'Content-Type': 'application/json' },
       });
     });
 
@@ -262,8 +359,9 @@ describe('DownloadFormPDF', () => {
       };
       apiRequestStub.resolves(mockResponse);
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -288,7 +386,9 @@ describe('DownloadFormPDF', () => {
       };
       apiRequestStub.resolves(mockResponse);
 
-      const { container } = render(<DownloadFormPDF formData="{}" />);
+      const { container } = renderComponent(
+        <DownloadFormPDF confirmationNumber="abc-123" formData="{}" />,
+      );
 
       const link = container.querySelector('va-link');
       link.click();
@@ -306,8 +406,9 @@ describe('DownloadFormPDF', () => {
       };
       apiRequestStub.resolves(mockResponse);
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -331,8 +432,9 @@ describe('DownloadFormPDF', () => {
       };
       apiRequestStub.resolves(mockResponse);
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -354,8 +456,9 @@ describe('DownloadFormPDF', () => {
       };
       apiRequestStub.resolves(mockResponse);
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -378,8 +481,9 @@ describe('DownloadFormPDF', () => {
     it('should show error message when API request fails', async () => {
       apiRequestStub.rejects(new Error('Network error'));
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -406,8 +510,9 @@ describe('DownloadFormPDF', () => {
       };
       apiRequestStub.resolves(mockResponse);
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -425,8 +530,9 @@ describe('DownloadFormPDF', () => {
     it('should record failure event on error', async () => {
       apiRequestStub.rejects(new Error('Network error'));
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -448,8 +554,9 @@ describe('DownloadFormPDF', () => {
       const error = new Error('Network error');
       apiRequestStub.rejects(error);
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,
@@ -469,8 +576,9 @@ describe('DownloadFormPDF', () => {
     it('should attempt to focus error element when error occurs', async () => {
       apiRequestStub.rejects(new Error('Network error'));
 
-      const { container } = render(
+      const { container } = renderComponent(
         <DownloadFormPDF
+          confirmationNumber="abc-123"
           formData="{}"
           veteranName={{ first: 'John', last: 'Doe' }}
         />,

@@ -6,7 +6,7 @@ import recordEvent from 'platform/monitoring/record-event';
 import { API_ENDPOINTS } from '../../constants/constants';
 import { ensureValidCSRFToken } from '../../utils/actions/ensure-valid-csrf-token';
 
-const DownloadFormPDF = ({ formData }) => {
+const DownloadFormPDF = ({ confirmationNumber, formData }) => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -31,13 +31,35 @@ const DownloadFormPDF = ({ formData }) => {
 
       try {
         await ensureValidCSRFToken('fetchPdf');
-        const response = await apiRequest(API_ENDPOINTS.downloadPdf, {
-          method: 'POST',
-          body: formData,
-          headers: { 'Content-Type': 'application/json' },
-        });
 
-        if (!response.ok) {
+        const fetchPdfByPost = () =>
+          apiRequest(API_ENDPOINTS.downloadPdf, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+        let response;
+        if (confirmationNumber) {
+          try {
+            response = await apiRequest(
+              API_ENDPOINTS.downloadPdfByGuid(confirmationNumber),
+              {
+                method: 'GET',
+              },
+            );
+
+            if (!response?.ok) {
+              throw new Error('GET PDF download failed');
+            }
+          } catch (error) {
+            response = await fetchPdfByPost();
+          }
+        } else {
+          response = await fetchPdfByPost();
+        }
+
+        if (!response?.ok) {
           throw new Error();
         }
 
@@ -53,7 +75,7 @@ const DownloadFormPDF = ({ formData }) => {
         setLoading(false);
       }
     },
-    [formData, handlePdfDownload],
+    [confirmationNumber, formData, handlePdfDownload],
   );
 
   // apply focus to the error alert if we have errors set
@@ -93,6 +115,7 @@ const DownloadFormPDF = ({ formData }) => {
 };
 
 DownloadFormPDF.propTypes = {
+  confirmationNumber: PropTypes.string,
   formData: PropTypes.string,
 };
 
