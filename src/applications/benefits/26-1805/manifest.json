@@ -1,0 +1,12 @@
+{
+  "appName": "Request a VA Appraisal (26-1805)",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "26-1805-request-appraisal",
+  "rootUrl": "/housing-assistance/home-loans/request-appraisal-form-26-1805",
+  "productId": "a3f7c821-d4b2-4e89-b3c1-9f2e847a1c05",
+  "template": {
+    "vagovprod": false,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
