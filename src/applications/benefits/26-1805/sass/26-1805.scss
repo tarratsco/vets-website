@@ -1,0 +1,10 @@
+// VA Form 26-1805 — Request a VA Appraisal
+// Application-specific styles.
+// Prefer VADS utility classes in JSX; add overrides here only when necessary.
+
+@import '~@department-of-veterans-affairs/formation/sass/shared-variables';
+
+// The form uses standard VADS utility classes and components.
+// No custom overrides are required at this time.
+// This file is intentionally minimal; add form-specific rules here
+// if they cannot be expressed through VADS utility classes in JSX.
