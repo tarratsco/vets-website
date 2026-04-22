@@ -1,0 +1,15 @@
+// src/applications/education/22-1999/manifest.json
+{
+  "appName": "Enrollment Certification 22-1999",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "enrollment-certification-22-1999",
+  "rootUrl": "/education/enrollment-certification-22-1999",
+  "productId": "enrollment-certification-22-1999",
+  "teamName": "VBA Education Service",
+  "description": "VA Form 22-1999 — Enrollment Certification for School Certifying Officials (paper-fallback population)",
+  "featureToggles": [
+    {
+      "featureToggleName": "enrollment_certification_22_1999_enabled"
+    }
+  ]
+}
