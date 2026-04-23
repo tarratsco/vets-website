@@ -1,0 +1,14 @@
+{
+  "appName": "Request for and Authorization to Release Medical Records or Health Information",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "10-5345-release-medical-records",
+  "rootUrl": "/health-records/release-information",
+  "productId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "template": {
+    "vagovprod": false,
+    "vagovstaging": true,
+    "vagovdev": true,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
