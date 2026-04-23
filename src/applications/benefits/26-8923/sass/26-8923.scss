@@ -1,0 +1,32 @@
+@import "~@department-of-veterans-affairs/css-library/dist/stylesheets/modules/m-form-process";
+@import "../../../../platform/forms/sass/m-schemaform";
+@import "../../../../platform/forms/sass/m-form-confirmation";
+
+// IRRRL Worksheet — computed line display styles
+
+.irrrl-computed-line {
+  border-bottom: 1px solid var(--vads-color-gray-light, #d6d7d9);
+
+  &__label {
+    flex: 1;
+    padding-right: 1rem;
+  }
+
+  &__value {
+    font-family: var(--vads-font-family-mono, monospace);
+    min-width: 10rem;
+    text-align: right;
+
+    &--missing {
+      color: var(--vads-color-gray-medium, #757575);
+      font-style: italic;
+    }
+  }
+
+  &--total {
+    border-top: 2px solid var(--vads-color-base, #1b1b1b);
+    border-bottom: 2px solid var(--vads-color-base, #1b1b1b);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+  }
+}
