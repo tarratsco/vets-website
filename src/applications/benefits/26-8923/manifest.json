@@ -1,0 +1,12 @@
+{
+  "appName": "IRRRL Worksheet — VA Form 26-8923",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "irrrl-worksheet-26-8923",
+  "rootUrl": "/housing-assistance/home-loans/irrrl-worksheet",
+  "productId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "template": {
+    "vagovprod": false,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
