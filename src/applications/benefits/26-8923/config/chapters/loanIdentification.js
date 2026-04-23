@@ -1,7 +1,10 @@
 /**
  * Loan Identification — VA Loan Number and lender identifying information
  * Screen 2 of VA Form 26-8923
+ * NOTE: This is the canonical version — the file was shown above in the chapters section.
+ * Re-emitting here for completeness of the chapters directory.
  */
+import React from 'react';
 import {
   textUI,
   textSchema,
@@ -18,12 +21,14 @@ export const loanIdentificationUiSchema = {
       autocomplete: 'off',
       errorMessages: {
         required: 'VA Loan Number is required.',
-        pattern: 'Enter a valid VA loan number (letters, numbers, and hyphens only, up to 14 characters).',
+        pattern:
+          'Enter a valid VA loan number (letters, numbers, and hyphens only, up to 14 characters).',
       },
     }),
     nameOfLender: textUI({
       title: 'Name of lender',
-      hint: 'Enter the full legal name of the VA-approved lending institution.',
+      hint:
+        'Enter the full legal name of the VA-approved lending institution.',
       autocomplete: 'organization',
       errorMessages: {
         required: 'Name of lender is required.',
@@ -41,7 +46,7 @@ export const loanIdentificationUiSchema = {
     officerTitle: textUI({
       title: 'Officer title',
       hint:
-        'Enter the officer\'s title (for example, Vice President, Loan Officer).',
+        "Enter the officer's title (for example, Vice President, Loan Officer).",
       autocomplete: 'organization-title',
       errorMessages: {
         required: 'Officer title is required.',
