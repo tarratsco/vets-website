@@ -1,0 +1,12 @@
+{
+  "appName": "VA Advance Directive",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "10-0137-advance-directive",
+  "rootUrl": "/health-care/advance-directive",
+  "productId": "a3f2c1d4-8e5b-4f7a-9c2e-1d6b8a4f3e7c",
+  "template": {
+    "vagovprod": false,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
