@@ -1,10 +1,12 @@
 // VA Form 26-1805 — Request a VA Appraisal
-// Application-specific styles.
-// Prefer VADS utility classes in JSX; add overrides here only when necessary.
+// Canonical three imports copied from aquia-team reference forms.
+// The `formation` package referenced here originally does NOT exist
+// in current vets-website; the correct package is `css-library`.
 
-@import '~@department-of-veterans-affairs/formation/sass/shared-variables';
+@import "~@department-of-veterans-affairs/css-library/dist/stylesheets/modules/m-form-process";
+@import "../../../../platform/forms/sass/m-schemaform";
+@import "../../../../platform/forms/sass/m-form-confirmation";
 
-// The form uses standard VADS utility classes and components.
-// No custom overrides are required at this time.
-// This file is intentionally minimal; add form-specific rules here
-// if they cannot be expressed through VADS utility classes in JSX.
+// No form-specific overrides at this time. Prefer VADS utility
+// classes in JSX; add rules here only when they can't be expressed
+// via utility classes.
