@@ -1,0 +1,12 @@
+{
+  "appName": "22-1999b Enrollment Change Certification",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "22-1999b-enrollment-change",
+  "rootUrl": "/school-administrators/enrollment-change-certification",
+  "productId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "template": {
+    "vagovprod": false,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
