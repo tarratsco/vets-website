@@ -1,0 +1,20 @@
+[
+  {
+    "id": "21-2680-platform-import-path",
+    "text": "Platform form pattern imports must use the path `platform/forms-system/src/js/web-component-patterns` (not the full node_modules path or any other variation).",
+    "category": "style",
+    "project": "vets-website",
+    "created_at": "2026-02-12T00:00:00.000Z",
+    "active": true,
+    "violations": []
+  },
+  {
+    "id": "21-2680-local-webpack-alias",
+    "text": "All local imports within (non-test source files) must use the `@bio-aquia/21-2680-house-bound-status-secondary/` webpack alias instead of relative paths (e.g., `../utils` or `./pages`). This applies to all source files under `src/applications/benefits-optimization-aquia/21-2680-house-bound-status-secondary/` except test files.",
+    "category": "style",
+    "project": "vets-website",
+    "created_at": "2026-02-12T23:30:00.000Z",
+    "active": true,
+    "violations": []
+  }
+]
