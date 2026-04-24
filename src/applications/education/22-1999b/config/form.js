@@ -8,35 +8,62 @@ import ConfirmationPage from '../containers/ConfirmationPage';
 import {
   institutionInformationUiSchema,
   institutionInformationSchema,
+} from './chapters/institutionInformation';
+
+import {
   scoContactInformationUiSchema,
   scoContactInformationSchema,
-} from './chapters/institutionAndSco';
+} from './chapters/scoContactInformation';
 
 import {
   studentIdentificationUiSchema,
   studentIdentificationSchema,
+} from './chapters/studentIdentification';
+
+import {
   priorCertificationReferenceUiSchema,
   priorCertificationReferenceSchema,
-} from './chapters/studentAndPriorCertification';
+} from './chapters/priorCertificationReference';
 
 import {
   typeOfChangeUiSchema,
   typeOfChangeSchema,
+} from './chapters/typeOfChange';
+
+import {
   effectiveDateOfChangeUiSchema,
   effectiveDateOfChangeSchema,
+} from './chapters/effectiveDateOfChange';
+
+import {
   lastDateOfAttendanceUiSchema,
   lastDateOfAttendanceSchema,
+} from './chapters/lastDateOfAttendance';
+
+import {
   updatedEnrollmentDetailsUiSchema,
   updatedEnrollmentDetailsSchema,
+} from './chapters/updatedEnrollmentDetails';
+
+import {
   reasonForChangeUiSchema,
   reasonForChangeSchema,
+} from './chapters/reasonForChange';
+
+import {
   mitigatingCircumstancesUiSchema,
   mitigatingCircumstancesSchema,
+} from './chapters/mitigatingCircumstances';
+
+import {
   correctionDetailsUiSchema,
   correctionDetailsSchema,
+} from './chapters/correctionDetails';
+
+import {
   timelinessAcknowledgmentUiSchema,
   timelinessAcknowledgmentSchema,
-} from './chapters/enrollmentChangeDetails';
+} from './chapters/timelinessAcknowledgment';
 
 import {
   supportingDocumentationUiSchema,
@@ -51,19 +78,10 @@ import {
 import {
   isTerminationOrWithdrawal,
   isReductionOrPartialWithdrawal,
-  requiresMitigatingCircumstances,
-  requiresLateSubmissionExplanation,
-  requiresSupportingDocumentation,
+  isLateSubmission,
+  hasMitigatingReasonCode,
+  showSupportingDocumentation,
 } from '../utils/conditionalPageLogic';
-
-const isLateSubmissionDepends = formData =>
-  requiresLateSubmissionExplanation(formData);
-
-const isMitigatingCircumstancesDepends = formData =>
-  requiresMitigatingCircumstances(formData);
-
-const isSupportingDocumentationDepends = formData =>
-  requiresSupportingDocumentation(formData);
 
 /** @type {FormConfig} */
 const formConfig = {
@@ -80,7 +98,7 @@ const formConfig = {
       inProgress:
         'Your enrollment change certification (22-1999b) is in progress.',
       expired:
-        'Your saved enrollment change certification (22-1999b) has expired. If you want to submit your form, please start a new certification.',
+        'Your saved enrollment change certification (22-1999b) has expired. If you want to submit a change certification, please start a new request.',
       saved: 'Your enrollment change certification has been saved.',
     },
   },
@@ -92,11 +110,11 @@ const formConfig = {
     noAuth:
       'Please sign in again to continue your enrollment change certification.',
   },
-  title: 'Report an enrollment change',
+  title: 'Report an enrollment change or termination',
   subTitle: 'VA Form 22-1999b',
   defaultDefinitions: {},
   chapters: {
-    institutionAndSCOChapter: {
+    institutionAndSCO: {
       title: 'Institution and certifying official information',
       pages: {
         institutionInformation: {
@@ -113,7 +131,7 @@ const formConfig = {
         },
       },
     },
-    studentAndCertificationChapter: {
+    studentAndCertification: {
       title: 'Student and prior certification information',
       pages: {
         studentIdentification: {
@@ -130,7 +148,7 @@ const formConfig = {
         },
       },
     },
-    enrollmentChangeDetailsChapter: {
+    enrollmentChangeDetails: {
       title: 'Enrollment change details',
       pages: {
         typeOfChange: {
@@ -141,7 +159,7 @@ const formConfig = {
         },
         effectiveDateOfChange: {
           path: 'effective-date-of-change',
-          title: 'Effective date of change',
+          title: 'Effective date of enrollment change',
           uiSchema: effectiveDateOfChangeUiSchema,
           schema: effectiveDateOfChangeSchema,
         },
@@ -149,9 +167,7 @@ const formConfig = {
           path: 'last-date-of-attendance',
           title: 'Last date of attendance',
           depends: formData =>
-            isTerminationOrWithdrawal(
-              formData?.enrollmentChangeDetails?.typeOfChange,
-            ),
+            isTerminationOrWithdrawal(formData.typeOfChange),
           uiSchema: lastDateOfAttendanceUiSchema,
           schema: lastDateOfAttendanceSchema,
         },
@@ -159,60 +175,60 @@ const formConfig = {
           path: 'updated-enrollment-details',
           title: 'Updated enrollment details',
           depends: formData =>
-            isReductionOrPartialWithdrawal(
-              formData?.enrollmentChangeDetails?.typeOfChange,
-            ),
+            isReductionOrPartialWithdrawal(formData.typeOfChange),
           uiSchema: updatedEnrollmentDetailsUiSchema,
           schema: updatedEnrollmentDetailsSchema,
         },
         reasonForChange: {
           path: 'reason-for-change',
-          title: 'Reason for change',
-          depends: formData =>
-            formData?.enrollmentChangeDetails?.typeOfChange !== 'correction',
+          title: 'Reason for enrollment change',
+          depends: formData => formData.typeOfChange !== 'correction',
           uiSchema: reasonForChangeUiSchema,
           schema: reasonForChangeSchema,
         },
         mitigatingCircumstances: {
           path: 'mitigating-circumstances',
           title: 'Mitigating circumstances',
-          depends: isMitigatingCircumstancesDepends,
+          depends: formData =>
+            formData.typeOfChange !== 'correction' &&
+            hasMitigatingReasonCode(formData.reasonForChange),
           uiSchema: mitigatingCircumstancesUiSchema,
           schema: mitigatingCircumstancesSchema,
         },
         correctionDetails: {
           path: 'correction-details',
           title: 'Correction details',
-          depends: formData =>
-            formData?.enrollmentChangeDetails?.typeOfChange === 'correction',
+          depends: formData => formData.typeOfChange === 'correction',
           uiSchema: correctionDetailsUiSchema,
           schema: correctionDetailsSchema,
         },
         timelinessAcknowledgment: {
           path: 'timeliness-acknowledgment',
-          title: 'Late submission explanation',
-          depends: isLateSubmissionDepends,
+          title: 'Timeliness acknowledgment',
+          depends: formData =>
+            formData.typeOfChange !== 'correction' &&
+            isLateSubmission(formData.effectiveDateOfChange),
           uiSchema: timelinessAcknowledgmentUiSchema,
           schema: timelinessAcknowledgmentSchema,
         },
       },
     },
-    supportingDocumentationChapter: {
+    supportingDocumentation: {
       title: 'Supporting documentation',
       pages: {
-        supportingDocumentation: {
+        documentUpload: {
           path: 'supporting-documentation',
           title: 'Supporting documentation',
-          depends: isSupportingDocumentationDepends,
+          depends: formData => showSupportingDocumentation(formData),
           uiSchema: supportingDocumentationUiSchema,
           schema: supportingDocumentationSchema,
         },
       },
     },
-    certificationAttestationChapter: {
+    certificationAttestation: {
       title: 'Certification',
       pages: {
-        certificationAttestation: {
+        attestation: {
           path: 'certification',
           title: 'Certification attestation',
           uiSchema: certificationAttestationUiSchema,

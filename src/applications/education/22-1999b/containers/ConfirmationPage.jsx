@@ -1,29 +1,43 @@
-import React from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import React from 'react';
+import { connect, useSelector } from 'react-redux';
 
 import { ConfirmationView } from 'platform/forms-system/src/js/components/ConfirmationView';
 
 export const ConfirmationPage = ({ route }) => {
   const form = useSelector(state => state.form || {});
   const { submission, data } = form;
-  const submitDate = submission?.timestamp;
-  const confirmationNumber = submission?.response?.confirmationNumber || '';
+  const submitDate = submission?.timestamp || '';
+  const confirmationNumber =
+    submission?.response?.confirmationNumber ||
+    submission?.response?.attributes?.confirmationNumber ||
+    '';
 
   const studentName = {
-    first:
-      data?.studentAndPriorCertification?.studentFirstName || '',
-    last:
-      data?.studentAndPriorCertification?.studentLastName || '',
+    first: data?.studentFirstName || '',
+    last: data?.studentLastName || '',
   };
 
-  const submissionAlertContent = (
-    <p>
-      Thank you for submitting your enrollment change certification. We will
-      review your submission and make any necessary adjustments to your
-      student's benefits. If we need more information, we will contact you at
-      the email address you provided.
-    </p>
+  const typeOfChange = data?.typeOfChange || '';
+  const effectiveDate = data?.effectiveDateOfChange || '';
+
+  const alertContent = (
+    <>
+      <p>
+        We&apos;ve received your enrollment change certification for{' '}
+        {studentName.first} {studentName.last}.
+      </p>
+      <p>
+        VA will review the change and update the student&apos;s benefit
+        payments as appropriate. If we need more information, we will contact
+        you.
+      </p>
+      {confirmationNumber && (
+        <p>
+          <strong>Confirmation number:</strong> {confirmationNumber}
+        </p>
+      )}
+    </>
   );
 
   return (
@@ -31,25 +45,49 @@ export const ConfirmationPage = ({ route }) => {
       formConfig={route?.formConfig}
       submitDate={submitDate}
       confirmationNumber={confirmationNumber}
-      submitterName={studentName}
       devOnly={{ showButtons: true }}
     >
       <ConfirmationView.SubmissionAlert
         title="You've submitted your enrollment change certification"
-        content={submissionAlertContent}
+        content={alertContent}
         actions={<p />}
       />
+
+      <va-summary-box>
+        <h3 slot="headline">Submission summary</h3>
+        <ul>
+          {studentName.first && (
+            <li>
+              <strong>Student:</strong> {studentName.first} {studentName.last}
+            </li>
+          )}
+          {typeOfChange && (
+            <li>
+              <strong>Type of change:</strong> {typeOfChange.replace(/_/g, ' ')}
+            </li>
+          )}
+          {effectiveDate && (
+            <li>
+              <strong>Effective date:</strong> {effectiveDate}
+            </li>
+          )}
+        </ul>
+      </va-summary-box>
+
       <div data-dd-privacy="mask" data-dd-action-name="confirmation summary">
         <ConfirmationView.ChapterSectionCollection />
       </div>
+
       <ConfirmationView.PrintThisPage />
+
       <ConfirmationView.WhatsNextProcessList
-        item1Header="We'll review your enrollment change"
-        item1Content="We'll review the change you reported and update the student's benefit payments accordingly."
+        item1Header="VA reviews your submission"
+        item1Content="VA will review the enrollment change and update the student's GI Bill benefit payments. This typically takes 30 days."
         item1Actions={<p />}
-        item2Header="We'll notify the student"
-        item2Content="If there's an overpayment or adjustment to their benefits, we'll contact the student directly."
+        item2Header="Student receives notification"
+        item2Content="If an overpayment or underpayment is identified, VA will notify the student directly by mail."
       />
+
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />
       <ConfirmationView.NeedHelp />
@@ -63,4 +101,10 @@ ConfirmationPage.propTypes = {
   }),
 };
 
-export default ConfirmationPage;
+function mapStateToProps(state) {
+  return {
+    form: state.form,
+  };
+}
+
+export default connect(mapStateToProps)(ConfirmationPage);

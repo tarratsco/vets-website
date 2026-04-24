@@ -3,13 +3,14 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createInitialState } from '@department-of-veterans-affairs/platform-forms-system/state/helpers';
-import { ConfirmationPage } from './ConfirmationPage';
+
 import formConfig from '../config/form';
+import { ConfirmationPage } from '../containers/ConfirmationPage';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
     user: {
-      login: { currentlyLoggedIn: true },
+      login: { currentlyLoggedIn: false },
       profile: {
         savedForms: [],
         prefillsAvailable: [],
@@ -27,10 +28,10 @@ const createMockStore = (overrides = {}) => ({
       savedStatus: '',
       loadedData: { metadata: {} },
       data: {
-        studentAndPriorCertification: {
-          studentFirstName: 'James',
-          studentLastName: 'Nguyen',
-        },
+        studentFirstName: 'James',
+        studentLastName: 'Nguyen',
+        typeOfChange: 'full_termination',
+        effectiveDateOfChange: '2025-01-15',
       },
       submission: {
         response: { confirmationNumber: '1234567890' },
@@ -51,37 +52,39 @@ const createMockStore = (overrides = {}) => ({
   dispatch: () => {},
 });
 
-const mockRoute = { formConfig };
+describe('ConfirmationPage', () => {
+  const defaultRoute = { formConfig };
 
-describe('containers/ConfirmationPage', () => {
   it('renders without crashing', () => {
-    const store = createMockStore();
+    const mockStore = createMockStore();
     const { container } = render(
-      <Provider store={store}>
-        <ConfirmationPage route={mockRoute} />
+      <Provider store={mockStore}>
+        <ConfirmationPage route={defaultRoute} />
       </Provider>,
     );
     expect(container).to.exist;
   });
 
-  it('renders a va-button for print', () => {
-    const store = createMockStore();
+  it('renders a va-alert with success status', () => {
+    const mockStore = createMockStore();
     const { container } = render(
-      <Provider store={store}>
-        <ConfirmationPage route={mockRoute} />
+      <Provider store={mockStore}>
+        <ConfirmationPage route={defaultRoute} />
       </Provider>,
     );
-    // ConfirmationView.PrintThisPage renders a print button
-    expect(container.innerHTML).to.not.be.empty;
+    const alerts = container.querySelectorAll('va-alert');
+    expect(alerts.length).to.be.greaterThan(0);
   });
 
-  it('renders submission alert content', () => {
-    const store = createMockStore();
+  it('renders a print button or similar action element', () => {
+    const mockStore = createMockStore();
     const { container } = render(
-      <Provider store={store}>
-        <ConfirmationPage route={mockRoute} />
+      <Provider store={mockStore}>
+        <ConfirmationPage route={defaultRoute} />
       </Provider>,
     );
-    expect(container.innerHTML).to.include('enrollment change certification');
+    // va-button or button should exist from PrintThisPage
+    const buttons = container.querySelectorAll('va-button, button');
+    expect(buttons.length).to.be.greaterThan(0);
   });
 });

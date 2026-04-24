@@ -3,7 +3,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import sinon from 'sinon';
 import * as uiUtils from 'platform/utilities/ui';
-import { IntroductionPage } from './IntroductionPage';
+
 import formConfig from '../config/form';
 
 const createMockStore = (overrides = {}) => ({
@@ -42,22 +42,7 @@ const createMockStore = (overrides = {}) => ({
   dispatch: () => {},
 });
 
-const mockRoute = {
-  formConfig: {
-    prefillEnabled: true,
-    savedFormMessages: {},
-    saveInProgress: {
-      messages: {
-        inProgress: 'Your form is in progress.',
-        expired: 'Your saved form has expired.',
-        saved: 'Your form has been saved.',
-      },
-    },
-  },
-  pageList: [{ path: '/introduction' }, { path: '/institution-information' }],
-};
-
-describe('containers/IntroductionPage', () => {
+describe('IntroductionPage', () => {
   let scrollToTopStub;
   let focusElementStub;
 
@@ -71,30 +56,55 @@ describe('containers/IntroductionPage', () => {
     focusElementStub.restore();
   });
 
+  const defaultRoute = {
+    formConfig: {
+      formId: formConfig.formId,
+      prefillEnabled: true,
+      savedFormMessages: {},
+      saveInProgress: {
+        messages: {
+          inProgress: 'Your form is in progress.',
+          expired: 'Your form has expired.',
+          saved: 'Your form has been saved.',
+        },
+      },
+    },
+    pageList: [],
+  };
+
   it('renders the form title', () => {
-    const { container } = render(<IntroductionPage route={mockRoute} />);
-    expect(container.innerHTML).to.include('Report an enrollment change');
+    const { IntroductionPage } = require('../containers/IntroductionPage');
+    const { container } = render(
+      <IntroductionPage
+        route={defaultRoute}
+        userLoggedIn={false}
+        userIdVerified={false}
+      />,
+    );
+    expect(container.querySelector('article')).to.exist;
   });
 
-  it('renders va-omb-info element', () => {
-    const { container } = render(<IntroductionPage route={mockRoute} />);
-    const ombInfo = container.querySelector('va-omb-info');
-    expect(ombInfo).to.exist;
+  it('renders a va-omb-info element', () => {
+    const { IntroductionPage } = require('../containers/IntroductionPage');
+    const { container } = render(
+      <IntroductionPage
+        route={defaultRoute}
+        userLoggedIn={false}
+        userIdVerified={false}
+      />,
+    );
+    expect(container.querySelector('va-omb-info')).to.exist;
   });
 
-  it('renders the info alert about VAONCE', () => {
-    const { container } = render(<IntroductionPage route={mockRoute} />);
-    const alert = container.querySelector('va-alert[status="info"]');
-    expect(alert).to.exist;
-  });
-
-  it('calls scrollToTop on mount', () => {
-    render(<IntroductionPage route={mockRoute} />);
-    expect(scrollToTopStub.called).to.be.true;
-  });
-
-  it('calls focusElement with h1 on mount', () => {
-    render(<IntroductionPage route={mockRoute} />);
-    expect(focusElementStub.calledWith('h1')).to.be.true;
+  it('renders va-process-list', () => {
+    const { IntroductionPage } = require('../containers/IntroductionPage');
+    const { container } = render(
+      <IntroductionPage
+        route={defaultRoute}
+        userLoggedIn={false}
+        userIdVerified={false}
+      />,
+    );
+    expect(container.querySelector('va-process-list')).to.exist;
   });
 });

@@ -1,47 +1,55 @@
 import { expect } from 'chai';
+
 import {
   certificationAttestationUiSchema,
   certificationAttestationSchema,
-} from './certificationAttestation';
+  ATTESTATION_KEYS,
+} from '../chapters/certificationAttestation';
 
-describe('chapters/certificationAttestation', () => {
-  describe('certificationAttestationUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(certificationAttestationUiSchema).to.be.an('object');
-    });
-
-    it('has certificationAttestation field', () => {
-      expect(certificationAttestationUiSchema.certificationAttestation).to.exist;
-    });
-
-    it('has a ui:title', () => {
-      const field = certificationAttestationUiSchema.certificationAttestation;
-      expect(field['ui:title']).to.equal('Certification');
-    });
-
-    it('has ui:required set', () => {
-      const field = certificationAttestationUiSchema.certificationAttestation;
+describe('certificationAttestation page', () => {
+  describe('uiSchema', () => {
+    it('has scoCertificationAttested field', () => {
       expect(
-        field['ui:required'],
+        certificationAttestationUiSchema.scoCertificationAttested,
+      ).to.exist;
+    });
+
+    it('scoCertificationAttested has title "Certification"', () => {
+      expect(
+        certificationAttestationUiSchema.scoCertificationAttested['ui:title'],
+      ).to.equal('Certification');
+    });
+
+    it('has top-level required option', () => {
+      expect(
+        certificationAttestationUiSchema.scoCertificationAttested[
+          'ui:required'
+        ],
       ).to.not.be.undefined;
+    });
+
+    it('has required error message', () => {
+      expect(
+        certificationAttestationUiSchema.scoCertificationAttested[
+          'ui:errorMessages'
+        ].required,
+      ).to.be.a('string');
     });
   });
 
-  describe('certificationAttestationSchema', () => {
-    it('exports a schema object', () => {
-      expect(certificationAttestationSchema).to.be.an('object');
+  describe('schema', () => {
+    it('has type object', () => {
+      expect(certificationAttestationSchema.type).to.equal('object');
     });
 
-    it('requires certificationAttestation', () => {
+    it('requires scoCertificationAttested', () => {
       expect(certificationAttestationSchema.required).to.include(
-        'certificationAttestation',
+        'scoCertificationAttested',
       );
     });
 
-    it('certificationAttestation properties exist', () => {
-      expect(
-        certificationAttestationSchema.properties.certificationAttestation,
-      ).to.exist;
+    it('ATTESTATION_KEYS has at least one value', () => {
+      expect(ATTESTATION_KEYS).to.have.length.greaterThan(0);
     });
   });
 });

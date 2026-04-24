@@ -1,7 +1,8 @@
 import { expect } from 'chai';
 import React from 'react';
 import { render } from '@testing-library/react';
-import App from './App';
+
+import formConfig from '../config/form';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -19,7 +20,7 @@ const createMockStore = (overrides = {}) => ({
       ...overrides.user,
     },
     form: {
-      formId: '22-1999b',
+      formId: formConfig.formId,
       loadedStatus: 'success',
       savedStatus: '',
       loadedData: { metadata: {} },
@@ -39,19 +40,18 @@ const createMockStore = (overrides = {}) => ({
   dispatch: () => {},
 });
 
-describe('containers/App', () => {
+describe('App container', () => {
   it('renders without crashing', () => {
-    const store = createMockStore();
-    const location = { pathname: '/introduction' };
-
-    // RoutedSavableApp requires a redux store context; we just verify
-    // that App is a renderable component that accepts the right props
+    const mockStore = createMockStore();
+    // App is a simple wrapper; verify it can be imported and is a function
+    const App = require('../containers/App').default;
     expect(App).to.be.a('function');
-    expect(App.propTypes).to.have.property('children');
-    expect(App.propTypes).to.have.property('location');
   });
 
-  it('has the expected propTypes', () => {
+  it('exports a default function component', () => {
+    const App = require('../containers/App').default;
+    expect(App).to.be.a('function');
+    expect(App.propTypes).to.exist;
     expect(App.propTypes.children).to.exist;
     expect(App.propTypes.location).to.exist;
   });
