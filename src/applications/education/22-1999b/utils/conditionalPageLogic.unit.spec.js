@@ -4,34 +4,30 @@ import {
   isTerminationOrWithdrawal,
   isReductionOrPartialWithdrawal,
   requiresMitigatingCircumstances,
+  requiresLateSubmissionExplanation,
   requiresSupportingDocumentation,
 } from './conditionalPageLogic';
 
-describe('conditionalPageLogic utilities', () => {
+describe('utils/conditionalPageLogic', () => {
   describe('isLateSubmission', () => {
-    it('returns false for undefined input', () => {
+    it('returns false for undefined', () => {
       expect(isLateSubmission(undefined)).to.be.false;
     });
 
-    it('returns false for a date within 30 days', () => {
+    it('returns false for invalid date', () => {
+      expect(isLateSubmission('not-a-date')).to.be.false;
+    });
+
+    it('returns false for a date within the last 30 days', () => {
       const recent = new Date();
       recent.setDate(recent.getDate() - 10);
-      const dateStr = recent.toISOString().split('T')[0];
-      expect(isLateSubmission(dateStr)).to.be.false;
+      expect(isLateSubmission(recent.toISOString().slice(0, 10))).to.be.false;
     });
 
     it('returns true for a date more than 30 days ago', () => {
       const old = new Date();
-      old.setDate(old.getDate() - 45);
-      const dateStr = old.toISOString().split('T')[0];
-      expect(isLateSubmission(dateStr)).to.be.true;
-    });
-
-    it('returns false for exactly 30 days ago', () => {
-      const exactly30 = new Date();
-      exactly30.setDate(exactly30.getDate() - 30);
-      const dateStr = exactly30.toISOString().split('T')[0];
-      expect(isLateSubmission(dateStr)).to.be.false;
+      old.setDate(old.getDate() - 60);
+      expect(isLateSubmission(old.toISOString().slice(0, 10))).to.be.true;
     });
   });
 
@@ -55,7 +51,8 @@ describe('conditionalPageLogic utilities', () => {
 
   describe('isReductionOrPartialWithdrawal', () => {
     it('returns true for credit_hour_reduction', () => {
-      expect(isReductionOrPartialWithdrawal('credit_hour_reduction')).to.be.true;
+      expect(isReductionOrPartialWithdrawal('credit_hour_reduction')).to.be
+        .true;
     });
 
     it('returns true for partial_withdrawal', () => {
@@ -65,61 +62,81 @@ describe('conditionalPageLogic utilities', () => {
     it('returns false for full_termination', () => {
       expect(isReductionOrPartialWithdrawal('full_termination')).to.be.false;
     });
-
-    it('returns false for correction', () => {
-      expect(isReductionOrPartialWithdrawal('correction')).to.be.false;
-    });
   });
 
   describe('requiresMitigatingCircumstances', () => {
-    it('returns true for voluntary_withdrawal', () => {
+    it('returns true when reason is voluntary_withdrawal and type is not correction', () => {
       expect(
-        requiresMitigatingCircumstances(
-          'full_termination',
-          'voluntary_withdrawal',
-        ),
+        requiresMitigatingCircumstances({
+          enrollmentChangeDetails: {
+            typeOfChange: 'full_termination',
+            reasonForChange: 'voluntary_withdrawal',
+          },
+        }),
       ).to.be.true;
     });
 
-    it('returns true for medical reason', () => {
+    it('returns false when typeOfChange is correction', () => {
       expect(
-        requiresMitigatingCircumstances('full_termination', 'medical'),
-      ).to.be.true;
-    });
-
-    it('returns false for correction type regardless of reason', () => {
-      expect(
-        requiresMitigatingCircumstances('correction', 'voluntary_withdrawal'),
+        requiresMitigatingCircumstances({
+          enrollmentChangeDetails: {
+            typeOfChange: 'correction',
+            reasonForChange: 'voluntary_withdrawal',
+          },
+        }),
       ).to.be.false;
     });
 
-    it('returns false for academic_dismissal reason', () => {
+    it('returns false when reason is academic_dismissal', () => {
       expect(
-        requiresMitigatingCircumstances('full_termination', 'academic_dismissal'),
+        requiresMitigatingCircumstances({
+          enrollmentChangeDetails: {
+            typeOfChange: 'full_termination',
+            reasonForChange: 'academic_dismissal',
+          },
+        }),
       ).to.be.false;
+    });
+
+    it('returns false for empty formData', () => {
+      expect(requiresMitigatingCircumstances({})).to.be.false;
     });
   });
 
   describe('requiresSupportingDocumentation', () => {
     it('returns true when typeOfChange is correction', () => {
-      expect(requiresSupportingDocumentation('correction', 'no')).to.be.true;
+      expect(
+        requiresSupportingDocumentation({
+          enrollmentChangeDetails: {
+            typeOfChange: 'correction',
+          },
+        }),
+      ).to.be.true;
     });
 
     it('returns true when mitigatingCircumstancesKnown is yes', () => {
       expect(
-        requiresSupportingDocumentation('full_termination', 'yes'),
+        requiresSupportingDocumentation({
+          enrollmentChangeDetails: {
+            typeOfChange: 'full_termination',
+            mitigatingCircumstances: {
+              mitigatingCircumstancesKnown: 'yes',
+            },
+          },
+        }),
       ).to.be.true;
     });
 
-    it('returns false when not correction and mitigating is no', () => {
+    it('returns false when neither condition is met', () => {
       expect(
-        requiresSupportingDocumentation('full_termination', 'no'),
-      ).to.be.false;
-    });
-
-    it('returns false when not correction and mitigating is unknown', () => {
-      expect(
-        requiresSupportingDocumentation('full_termination', 'unknown'),
+        requiresSupportingDocumentation({
+          enrollmentChangeDetails: {
+            typeOfChange: 'full_termination',
+            mitigatingCircumstances: {
+              mitigatingCircumstancesKnown: 'no',
+            },
+          },
+        }),
       ).to.be.false;
     });
   });

@@ -4,34 +4,40 @@ import {
   supportingDocumentationSchema,
 } from './supportingDocumentation';
 
-describe('supportingDocumentation chapter', () => {
-  describe('supportingDocumentationSchema', () => {
-    it('has supportingDocumentIds property', () => {
-      expect(supportingDocumentationSchema.properties).to.have.property(
-        'supportingDocumentIds',
-      );
+describe('chapters/supportingDocumentation', () => {
+  describe('supportingDocumentationUiSchema', () => {
+    it('exports a uiSchema object', () => {
+      expect(supportingDocumentationUiSchema).to.be.an('object');
     });
 
-    it('supportingDocumentIds is an object schema', () => {
-      expect(supportingDocumentationSchema.type).to.equal('object');
+    it('has supportingDocumentIds field', () => {
+      expect(
+        supportingDocumentationUiSchema.supportingDocumentation
+          .supportingDocumentIds,
+      ).to.exist;
     });
 
-    it('does not require supportingDocumentIds', () => {
-      expect(supportingDocumentationSchema.required).to.be.undefined;
+    it('supportingDocumentIds has a ui:title', () => {
+      const field =
+        supportingDocumentationUiSchema.supportingDocumentation
+          .supportingDocumentIds;
+      expect(field['ui:title']).to.equal('Upload supporting documentation');
     });
   });
 
-  describe('supportingDocumentationUiSchema', () => {
-    it('has supportingDocumentIds ui config', () => {
-      expect(supportingDocumentationUiSchema.supportingDocumentIds).to.be.an(
-        'object',
+  describe('supportingDocumentationSchema', () => {
+    it('exports a schema object', () => {
+      expect(supportingDocumentationSchema).to.be.an('object');
+    });
+
+    it('has supportingDocumentation property', () => {
+      expect(supportingDocumentationSchema.properties).to.have.property(
+        'supportingDocumentation',
       );
     });
 
-    it('has ui:title', () => {
-      expect(supportingDocumentationUiSchema['ui:title']).to.equal(
-        'Supporting documentation',
-      );
+    it('supportingDocumentation is not in required', () => {
+      expect(supportingDocumentationSchema.required).to.not.exist;
     });
   });
 });

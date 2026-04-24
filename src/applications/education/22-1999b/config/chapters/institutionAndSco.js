@@ -1,30 +1,30 @@
 import {
   textUI,
   textSchema,
+  phoneUI,
+  phoneSchema,
+  emailUI,
+  emailSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-// ─── Chapter 1, Page 1: Institution Information ───────────────────────────────
-
 export const institutionInformationUiSchema = {
-  'ui:title': 'Institution information',
   institutionAndScoInformation: {
+    'ui:title': 'Institution information',
     facilityCode: textUI({
       title: 'VA Facility Code',
-      hint:
-        'Your 8-character facility code is assigned by VA and identifies your school location. Example: 31000123.',
+      hint: 'Your 8-character facility code is assigned by VA and identifies your school location. Example: 31000123.',
       autocomplete: 'off',
       errorMessages: {
         required: 'Please enter your 8-digit VA Facility Code.',
         pattern:
-          "We couldn't find that VA Facility Code. Please check the code and try again.",
+          "We couldn't find that VA Facility Code. Please enter a valid 8-digit code.",
       },
     }),
     institutionName: textUI({
       title: 'Institution name',
-      hint:
-        'This is the name of your school as registered with VA. If this name is incorrect, contact your VA Education Liaison Representative.',
+      hint: 'This is the name of your school as registered with VA. If this name is incorrect, contact your VA Education Liaison Representative.',
       errorMessages: {
-        required: 'Please enter your institution name.',
+        required: 'Please enter the institution name.',
       },
     }),
     institutionAddress: {
@@ -39,13 +39,13 @@ export const institutionInformationUiSchema = {
       }),
       state: textUI({
         title: 'State',
-        hint: 'Enter 2-letter state abbreviation. Example: VA',
+        hint: 'Enter the 2-letter state abbreviation. Example: VA',
         autocomplete: 'address-level1',
       }),
       zip: textUI({
         title: 'ZIP code',
+        hint: 'Enter your 5-digit ZIP code. Example: 20190',
         autocomplete: 'postal-code',
-        hint: 'Enter 5-digit ZIP code. Example: 20190',
       }),
     },
   },
@@ -74,12 +74,7 @@ export const institutionInformationSchema = {
           properties: {
             street: { type: 'string', maxLength: 100 },
             city: { type: 'string', maxLength: 60 },
-            state: {
-              type: 'string',
-              pattern: '^[A-Z]{2}$',
-              minLength: 2,
-              maxLength: 2,
-            },
+            state: { type: 'string', pattern: '^[A-Z]{2}$', maxLength: 2 },
             zip: {
               type: 'string',
               pattern: '^\\d{5}(-\\d{4})?$',
@@ -91,52 +86,41 @@ export const institutionInformationSchema = {
   },
 };
 
-// ─── Chapter 1, Page 2: SCO Contact Information ──────────────────────────────
-
 export const scoContactInformationUiSchema = {
-  'ui:title': 'School Certifying Official contact information',
   institutionAndScoInformation: {
+    'ui:title': 'School Certifying Official contact information',
     scoFirstName: textUI({
-      title: 'Your first name',
+      title: 'First name',
       autocomplete: 'given-name',
       errorMessages: {
         required: 'Please enter your first name.',
       },
     }),
     scoLastName: textUI({
-      title: 'Your last name',
+      title: 'Last name',
       autocomplete: 'family-name',
       errorMessages: {
         required: 'Please enter your last name.',
       },
     }),
     scoTitle: textUI({
-      title: 'Your title or role',
+      title: 'Title or role (optional)',
       hint: 'Example: Associate Registrar, School Certifying Official',
-      autocomplete: 'organization-title',
     }),
-    scoPhone: textUI({
-      title: 'Your phone number',
-      hint:
-        'Enter a 10-digit U.S. phone number including area code. Example: 555-867-5309',
-      inputType: 'tel',
-      autocomplete: 'tel',
+    scoPhone: phoneUI({
+      title: 'Phone number',
+      hint: 'Enter a 10-digit U.S. phone number. Example: 555-867-5309',
       errorMessages: {
         required: 'Please enter a valid 10-digit U.S. phone number.',
         pattern: 'Please enter a valid 10-digit U.S. phone number.',
       },
     }),
-    scoEmail: textUI({
-      title: 'Your email address',
-      hint:
-        'Enter the email address where VA should send your submission confirmation.',
-      inputType: 'email',
-      autocomplete: 'email',
+    scoEmail: emailUI({
+      title: 'Email address',
+      hint: 'Enter the email address where VA should send your submission confirmation.',
       errorMessages: {
-        required:
-          'Please enter a valid email address in the format name@example.com.',
-        format:
-          'Please enter a valid email address in the format name@example.com.',
+        required: 'Please enter a valid email address.',
+        format: 'Please enter a valid email address in the format name@example.com.',
       },
     }),
   },
@@ -153,17 +137,8 @@ export const scoContactInformationSchema = {
         scoFirstName: { type: 'string', maxLength: 50 },
         scoLastName: { type: 'string', maxLength: 60 },
         scoTitle: { type: 'string', maxLength: 80 },
-        scoPhone: {
-          type: 'string',
-          pattern: '^\\d{10}$',
-          minLength: 10,
-          maxLength: 10,
-        },
-        scoEmail: {
-          type: 'string',
-          format: 'email',
-          maxLength: 255,
-        },
+        scoPhone: phoneSchema,
+        scoEmail: emailSchema,
       },
     },
   },

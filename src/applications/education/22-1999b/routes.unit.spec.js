@@ -3,31 +3,21 @@ import route from './routes';
 import App from './containers/App';
 
 describe('routes', () => {
-  it('is a single route object, not an array', () => {
+  it('exports a route object with path "/"', () => {
     expect(route).to.be.an('object');
-    expect(Array.isArray(route)).to.be.false;
-  });
-
-  it('has path "/"', () => {
     expect(route.path).to.equal('/');
   });
 
-  it('has component set to App', () => {
+  it('uses App as the component', () => {
     expect(route.component).to.equal(App);
   });
 
-  it('has an indexRoute with onEnter function', () => {
+  it('has an indexRoute that redirects to /introduction', () => {
     expect(route.indexRoute).to.be.an('object');
     expect(route.indexRoute.onEnter).to.be.a('function');
-  });
-
-  it('indexRoute onEnter calls replace with /introduction', () => {
-    let replaced = null;
-    const mockReplace = path => {
-      replaced = path;
-    };
-    route.indexRoute.onEnter({}, mockReplace);
-    expect(replaced).to.equal('/introduction');
+    const replace = url => { replace.called = url; };
+    route.indexRoute.onEnter({}, replace);
+    expect(replace.called).to.equal('/introduction');
   });
 
   it('has childRoutes array', () => {

@@ -1,8 +1,7 @@
-import React from 'react';
 import { expect } from 'chai';
+import React from 'react';
 import { render } from '@testing-library/react';
-
-import formConfig from '../config/form';
+import App from './App';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -20,7 +19,7 @@ const createMockStore = (overrides = {}) => ({
       ...overrides.user,
     },
     form: {
-      formId: formConfig.formId,
+      formId: '22-1999b',
       loadedStatus: 'success',
       savedStatus: '',
       loadedData: { metadata: {} },
@@ -40,18 +39,20 @@ const createMockStore = (overrides = {}) => ({
   dispatch: () => {},
 });
 
-describe('App container', () => {
+describe('containers/App', () => {
   it('renders without crashing', () => {
     const store = createMockStore();
-    // Verify the store can be constructed without error
-    expect(store.getState()).to.be.an('object');
-    expect(store.getState().form.formId).to.equal('22-1999b');
+    const location = { pathname: '/introduction' };
+
+    // RoutedSavableApp requires a redux store context; we just verify
+    // that App is a renderable component that accepts the right props
+    expect(App).to.be.a('function');
+    expect(App.propTypes).to.have.property('children');
+    expect(App.propTypes).to.have.property('location');
   });
 
-  it('has expected form slice keys', () => {
-    const state = createMockStore().getState();
-    expect(state.form).to.have.property('formId');
-    expect(state.form).to.have.property('data');
-    expect(state.form).to.have.property('loadedStatus');
+  it('has the expected propTypes', () => {
+    expect(App.propTypes.children).to.exist;
+    expect(App.propTypes.location).to.exist;
   });
 });

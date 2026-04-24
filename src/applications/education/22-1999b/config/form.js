@@ -17,7 +17,7 @@ import {
   studentIdentificationSchema,
   priorCertificationReferenceUiSchema,
   priorCertificationReferenceSchema,
-} from './chapters/studentAndCertification';
+} from './chapters/studentAndPriorCertification';
 
 import {
   typeOfChangeUiSchema,
@@ -52,11 +52,18 @@ import {
   isTerminationOrWithdrawal,
   isReductionOrPartialWithdrawal,
   requiresMitigatingCircumstances,
+  requiresLateSubmissionExplanation,
   requiresSupportingDocumentation,
-  isLateSubmission,
 } from '../utils/conditionalPageLogic';
 
-import { FORM_TITLE, FORM_SUBTITLE } from '../constants';
+const isLateSubmissionDepends = formData =>
+  requiresLateSubmissionExplanation(formData);
+
+const isMitigatingCircumstancesDepends = formData =>
+  requiresMitigatingCircumstances(formData);
+
+const isSupportingDocumentationDepends = formData =>
+  requiresSupportingDocumentation(formData);
 
 /** @type {FormConfig} */
 const formConfig = {
@@ -64,7 +71,19 @@ const formConfig = {
   urlPrefix: '/',
   submitUrl: `${environment.API_URL}/v0/edu_22_1999b_forms`,
   trackingPrefix: '22-1999b-enrollment-change-',
+  introduction: IntroductionPage,
+  confirmation: ConfirmationPage,
+  footerContent,
   formId: '22-1999b',
+  saveInProgress: {
+    messages: {
+      inProgress:
+        'Your enrollment change certification (22-1999b) is in progress.',
+      expired:
+        'Your saved enrollment change certification (22-1999b) has expired. If you want to submit your form, please start a new certification.',
+      saved: 'Your enrollment change certification has been saved.',
+    },
+  },
   version: 0,
   prefillEnabled: true,
   savedFormMessages: {
@@ -73,25 +92,9 @@ const formConfig = {
     noAuth:
       'Please sign in again to continue your enrollment change certification.',
   },
-  saveInProgress: {
-    messages: {
-      inProgress:
-        'Your enrollment change certification (22-1999b) is in progress.',
-      expired:
-        'Your saved enrollment change certification (22-1999b) has expired. If you want to submit your information, please start a new certification.',
-      saved: 'Your enrollment change certification has been saved.',
-    },
-  },
-  title: FORM_TITLE,
-  subTitle: FORM_SUBTITLE,
-  introduction: IntroductionPage,
-  confirmation: ConfirmationPage,
-  footerContent,
+  title: 'Report an enrollment change',
+  subTitle: 'VA Form 22-1999b',
   defaultDefinitions: {},
-  dev: {
-    showNavLinks: true,
-    collapsibleNavLinks: true,
-  },
   chapters: {
     institutionAndSCOChapter: {
       title: 'Institution and certifying official information',
@@ -146,7 +149,9 @@ const formConfig = {
           path: 'last-date-of-attendance',
           title: 'Last date of attendance',
           depends: formData =>
-            isTerminationOrWithdrawal(formData.typeOfChange),
+            isTerminationOrWithdrawal(
+              formData?.enrollmentChangeDetails?.typeOfChange,
+            ),
           uiSchema: lastDateOfAttendanceUiSchema,
           schema: lastDateOfAttendanceSchema,
         },
@@ -154,41 +159,39 @@ const formConfig = {
           path: 'updated-enrollment-details',
           title: 'Updated enrollment details',
           depends: formData =>
-            isReductionOrPartialWithdrawal(formData.typeOfChange),
+            isReductionOrPartialWithdrawal(
+              formData?.enrollmentChangeDetails?.typeOfChange,
+            ),
           uiSchema: updatedEnrollmentDetailsUiSchema,
           schema: updatedEnrollmentDetailsSchema,
         },
         reasonForChange: {
           path: 'reason-for-change',
-          title: 'Reason for enrollment change',
-          depends: formData => formData.typeOfChange !== 'correction',
+          title: 'Reason for change',
+          depends: formData =>
+            formData?.enrollmentChangeDetails?.typeOfChange !== 'correction',
           uiSchema: reasonForChangeUiSchema,
           schema: reasonForChangeSchema,
         },
         mitigatingCircumstances: {
           path: 'mitigating-circumstances',
           title: 'Mitigating circumstances',
-          depends: formData =>
-            requiresMitigatingCircumstances(
-              formData.typeOfChange,
-              formData.reasonForChange,
-            ),
+          depends: isMitigatingCircumstancesDepends,
           uiSchema: mitigatingCircumstancesUiSchema,
           schema: mitigatingCircumstancesSchema,
         },
         correctionDetails: {
           path: 'correction-details',
           title: 'Correction details',
-          depends: formData => formData.typeOfChange === 'correction',
+          depends: formData =>
+            formData?.enrollmentChangeDetails?.typeOfChange === 'correction',
           uiSchema: correctionDetailsUiSchema,
           schema: correctionDetailsSchema,
         },
         timelinessAcknowledgment: {
           path: 'timeliness-acknowledgment',
           title: 'Late submission explanation',
-          depends: formData =>
-            formData.typeOfChange !== 'correction' &&
-            isLateSubmission(formData.effectiveDateOfChange),
+          depends: isLateSubmissionDepends,
           uiSchema: timelinessAcknowledgmentUiSchema,
           schema: timelinessAcknowledgmentSchema,
         },
@@ -200,22 +203,18 @@ const formConfig = {
         supportingDocumentation: {
           path: 'supporting-documentation',
           title: 'Supporting documentation',
-          depends: formData =>
-            requiresSupportingDocumentation(
-              formData.typeOfChange,
-              formData.mitigatingCircumstancesKnown,
-            ),
+          depends: isSupportingDocumentationDepends,
           uiSchema: supportingDocumentationUiSchema,
           schema: supportingDocumentationSchema,
         },
       },
     },
-    certificationChapter: {
+    certificationAttestationChapter: {
       title: 'Certification',
       pages: {
         certificationAttestation: {
-          path: 'certification-attestation',
-          title: 'Certification',
+          path: 'certification',
+          title: 'Certification attestation',
           uiSchema: certificationAttestationUiSchema,
           schema: certificationAttestationSchema,
         },

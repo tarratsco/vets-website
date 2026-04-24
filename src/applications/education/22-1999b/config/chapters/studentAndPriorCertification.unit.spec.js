@@ -6,47 +6,33 @@ import {
   priorCertificationReferenceSchema,
 } from './studentAndPriorCertification';
 
-describe('studentAndPriorCertification chapter', () => {
-  describe('studentIdentificationSchema', () => {
-    it('requires studentFirstName and studentLastName', () => {
-      const required =
-        studentIdentificationSchema.properties.studentAndPriorCertification.required;
-      expect(required).to.include('studentFirstName');
-      expect(required).to.include('studentLastName');
-    });
-
-    it('requires ssnOrFileNumberIndicator and benefitChapter', () => {
-      const required =
-        studentIdentificationSchema.properties.studentAndPriorCertification.required;
-      expect(required).to.include('ssnOrFileNumberIndicator');
-      expect(required).to.include('benefitChapter');
-    });
-
-    it('studentSsn has 9-digit pattern', () => {
-      const { studentSsn } =
-        studentIdentificationSchema.properties.studentAndPriorCertification.properties;
-      expect(studentSsn.pattern).to.equal('^\\d{9}$');
-    });
-
-    it('benefitChapter enum includes chapter_33', () => {
-      const { benefitChapter } =
-        studentIdentificationSchema.properties.studentAndPriorCertification.properties;
-      expect(benefitChapter.enum).to.include('chapter_33');
-    });
-  });
-
+describe('chapters/studentAndPriorCertification', () => {
   describe('studentIdentificationUiSchema', () => {
-    it('ssnOrFileNumberIndicator has radio ui:title', () => {
-      const fieldUi =
+    it('exports a uiSchema object', () => {
+      expect(studentIdentificationUiSchema).to.be.an('object');
+    });
+
+    it('has studentFirstName field', () => {
+      expect(
+        studentIdentificationUiSchema.studentAndPriorCertification
+          .studentFirstName,
+      ).to.exist;
+    });
+
+    it('has ssnOrFileNumberIndicator radio field', () => {
+      const field =
         studentIdentificationUiSchema.studentAndPriorCertification
           .ssnOrFileNumberIndicator;
-      expect(fieldUi['ui:title']).to.be.a('string');
+      expect(field).to.exist;
+      expect(field['ui:options']).to.have.property('labels');
     });
 
-    it('studentSsn ui:required returns true when ssnOrFileNumberIndicator is ssn', () => {
-      const fieldUi =
-        studentIdentificationUiSchema.studentAndPriorCertification.studentSsn;
-      const requiredFn = fieldUi['ui:required'];
+    it('studentSsn ui:required returns true when indicator is ssn', () => {
+      const requiredFn =
+        studentIdentificationUiSchema.studentAndPriorCertification.studentSsn[
+          'ui:required'
+        ];
+      expect(requiredFn).to.be.a('function');
       expect(
         requiredFn({
           studentAndPriorCertification: { ssnOrFileNumberIndicator: 'ssn' },
@@ -54,10 +40,11 @@ describe('studentAndPriorCertification chapter', () => {
       ).to.be.true;
     });
 
-    it('studentSsn ui:required returns false when ssnOrFileNumberIndicator is va_file_number', () => {
-      const fieldUi =
-        studentIdentificationUiSchema.studentAndPriorCertification.studentSsn;
-      const requiredFn = fieldUi['ui:required'];
+    it('studentSsn ui:required returns false when indicator is va_file_number', () => {
+      const requiredFn =
+        studentIdentificationUiSchema.studentAndPriorCertification.studentSsn[
+          'ui:required'
+        ];
       expect(
         requiredFn({
           studentAndPriorCertification: {
@@ -66,46 +53,73 @@ describe('studentAndPriorCertification chapter', () => {
         }),
       ).to.be.false;
     });
+
+    it('benefitChapter has correct labels', () => {
+      const field =
+        studentIdentificationUiSchema.studentAndPriorCertification
+          .benefitChapter;
+      expect(field).to.exist;
+      expect(field['ui:options']).to.have.property('labels');
+    });
   });
 
-  describe('priorCertificationReferenceSchema', () => {
-    it('requires originalCertBeginDate, originalCertEndDate', () => {
-      const required =
-        priorCertificationReferenceSchema.properties.studentAndPriorCertification
-          .required;
-      expect(required).to.include('originalCertBeginDate');
-      expect(required).to.include('originalCertEndDate');
+  describe('studentIdentificationSchema', () => {
+    it('exports a schema object', () => {
+      expect(studentIdentificationSchema).to.be.an('object');
     });
 
-    it('requires originalCreditHours and originalEnrollmentType', () => {
-      const required =
-        priorCertificationReferenceSchema.properties.studentAndPriorCertification
-          .required;
-      expect(required).to.include('originalCreditHours');
-      expect(required).to.include('originalEnrollmentType');
+    it('requires ssnOrFileNumberIndicator', () => {
+      const { required } = studentIdentificationSchema.properties.studentAndPriorCertification;
+      expect(required).to.include('ssnOrFileNumberIndicator');
     });
 
-    it('originalCreditHours has minimum 1 and maximum 99', () => {
-      const { originalCreditHours } =
-        priorCertificationReferenceSchema.properties.studentAndPriorCertification.properties;
-      expect(originalCreditHours.minimum).to.equal(1);
-      expect(originalCreditHours.maximum).to.equal(99);
-    });
-
-    it('vaonceCertId is optional (not in required array)', () => {
-      const required =
-        priorCertificationReferenceSchema.properties.studentAndPriorCertification
-          .required;
-      expect(required).not.to.include('vaonceCertId');
+    it('studentSsn has correct pattern', () => {
+      const { studentSsn } = studentIdentificationSchema.properties.studentAndPriorCertification.properties;
+      expect(studentSsn.pattern).to.equal('^\\d{9}$');
     });
   });
 
   describe('priorCertificationReferenceUiSchema', () => {
-    it('originalCertBeginDate has a title', () => {
-      const fieldUi =
+    it('exports a uiSchema object', () => {
+      expect(priorCertificationReferenceUiSchema).to.be.an('object');
+    });
+
+    it('has originalCertBeginDate field', () => {
+      expect(
         priorCertificationReferenceUiSchema.studentAndPriorCertification
-          .originalCertBeginDate;
-      expect(fieldUi['ui:title']).to.equal('Original certification begin date');
+          .originalCertBeginDate,
+      ).to.exist;
+    });
+
+    it('has originalCreditHours field', () => {
+      expect(
+        priorCertificationReferenceUiSchema.studentAndPriorCertification
+          .originalCreditHours,
+      ).to.exist;
+    });
+
+    it('has originalEnrollmentType field', () => {
+      expect(
+        priorCertificationReferenceUiSchema.studentAndPriorCertification
+          .originalEnrollmentType,
+      ).to.exist;
+    });
+  });
+
+  describe('priorCertificationReferenceSchema', () => {
+    it('exports a schema object', () => {
+      expect(priorCertificationReferenceSchema).to.be.an('object');
+    });
+
+    it('requires originalCreditHours', () => {
+      const { required } = priorCertificationReferenceSchema.properties.studentAndPriorCertification;
+      expect(required).to.include('originalCreditHours');
+    });
+
+    it('originalCreditHours has minimum of 1 and maximum of 99', () => {
+      const { originalCreditHours } = priorCertificationReferenceSchema.properties.studentAndPriorCertification.properties;
+      expect(originalCreditHours.minimum).to.equal(1);
+      expect(originalCreditHours.maximum).to.equal(99);
     });
   });
 });

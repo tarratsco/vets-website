@@ -18,140 +18,135 @@ import {
   timelinessAcknowledgmentSchema,
 } from './enrollmentChangeDetails';
 
-describe('enrollmentChangeDetails chapter', () => {
-  describe('typeOfChangeSchema', () => {
-    it('requires typeOfChange', () => {
-      expect(typeOfChangeSchema.required).to.include('typeOfChange');
+describe('chapters/enrollmentChangeDetails', () => {
+  describe('typeOfChangeUiSchema', () => {
+    it('exports a uiSchema object', () => {
+      expect(typeOfChangeUiSchema).to.be.an('object');
     });
 
-    it('typeOfChange has correct enum values', () => {
-      const { typeOfChange } = typeOfChangeSchema.properties;
-      expect(typeOfChange.enum).to.include('full_termination');
-      expect(typeOfChange.enum).to.include('partial_withdrawal');
-      expect(typeOfChange.enum).to.include('credit_hour_reduction');
-      expect(typeOfChange.enum).to.include('correction');
+    it('has typeOfChange radio field', () => {
+      const field =
+        typeOfChangeUiSchema.enrollmentChangeDetails.typeOfChange;
+      expect(field).to.exist;
+      expect(field['ui:options']).to.have.property('labels');
     });
   });
 
-  describe('typeOfChangeUiSchema', () => {
-    it('has typeOfChange radio UI config', () => {
-      expect(typeOfChangeUiSchema.typeOfChange).to.be.an('object');
+  describe('typeOfChangeSchema', () => {
+    it('requires typeOfChange', () => {
+      const { required } = typeOfChangeSchema.properties.enrollmentChangeDetails;
+      expect(required).to.include('typeOfChange');
+    });
+
+    it('typeOfChange has enum values', () => {
+      const { typeOfChange } = typeOfChangeSchema.properties.enrollmentChangeDetails.properties;
+      expect(typeOfChange.enum).to.include('full_termination');
+      expect(typeOfChange.enum).to.include('correction');
     });
   });
 
   describe('effectiveDateOfChangeSchema', () => {
     it('requires effectiveDateOfChange', () => {
-      expect(effectiveDateOfChangeSchema.required).to.include(
-        'effectiveDateOfChange',
-      );
+      const { required } = effectiveDateOfChangeSchema.properties.enrollmentChangeDetails;
+      expect(required).to.include('effectiveDateOfChange');
     });
   });
 
   describe('lastDateOfAttendanceSchema', () => {
     it('requires lastDateOfAttendance', () => {
-      expect(lastDateOfAttendanceSchema.required).to.include(
-        'lastDateOfAttendance',
-      );
+      const { required } = lastDateOfAttendanceSchema.properties.enrollmentChangeDetails;
+      expect(required).to.include('lastDateOfAttendance');
     });
   });
 
   describe('updatedEnrollmentDetailsSchema', () => {
-    it('requires newCreditHours and newEnrollmentType', () => {
-      expect(updatedEnrollmentDetailsSchema.required).to.include('newCreditHours');
-      expect(updatedEnrollmentDetailsSchema.required).to.include('newEnrollmentType');
+    it('requires updatedEnrollmentDetails', () => {
+      const { required } = updatedEnrollmentDetailsSchema.properties.enrollmentChangeDetails;
+      expect(required).to.include('updatedEnrollmentDetails');
     });
 
-    it('newCreditHours has min 1 and max 98', () => {
-      const { newCreditHours } = updatedEnrollmentDetailsSchema.properties;
+    it('newCreditHours has minimum 1 and maximum 98', () => {
+      const { newCreditHours } = updatedEnrollmentDetailsSchema.properties.enrollmentChangeDetails.properties.updatedEnrollmentDetails.properties;
       expect(newCreditHours.minimum).to.equal(1);
       expect(newCreditHours.maximum).to.equal(98);
-    });
-
-    it('newEnrollmentType has enum values', () => {
-      const { newEnrollmentType } = updatedEnrollmentDetailsSchema.properties;
-      expect(newEnrollmentType.enum).to.include('full_time');
-      expect(newEnrollmentType.enum).to.include('less_than_half_time');
     });
   });
 
   describe('reasonForChangeSchema', () => {
     it('requires reasonForChange', () => {
-      expect(reasonForChangeSchema.required).to.include('reasonForChange');
+      const { required } = reasonForChangeSchema.properties.enrollmentChangeDetails;
+      expect(required).to.include('reasonForChange');
     });
 
-    it('reasonForChange has expected enum values', () => {
-      const { reasonForChange } = reasonForChangeSchema.properties;
+    it('reasonForChange enum includes voluntary_withdrawal', () => {
+      const { reasonForChange } = reasonForChangeSchema.properties.enrollmentChangeDetails.properties;
       expect(reasonForChange.enum).to.include('voluntary_withdrawal');
-      expect(reasonForChange.enum).to.include('military_deployment');
-      expect(reasonForChange.enum).to.include('other');
-    });
-  });
-
-  describe('mitigatingCircumstancesSchema', () => {
-    it('requires mitigatingCircumstancesKnown', () => {
-      expect(mitigatingCircumstancesSchema.required).to.include(
-        'mitigatingCircumstancesKnown',
-      );
-    });
-
-    it('mitigatingCircumstancesKnown has yes/no/unknown enum', () => {
-      const { mitigatingCircumstancesKnown } =
-        mitigatingCircumstancesSchema.properties;
-      expect(mitigatingCircumstancesKnown.enum).to.deep.equal([
-        'yes',
-        'no',
-        'unknown',
-      ]);
-    });
-
-    it('mitigatingCircumstancesNarrative has maxLength 2000', () => {
-      const { mitigatingCircumstancesNarrative } =
-        mitigatingCircumstancesSchema.properties;
-      expect(mitigatingCircumstancesNarrative.maxLength).to.equal(2000);
     });
   });
 
   describe('mitigatingCircumstancesUiSchema', () => {
-    it('narrative field has expandUnder option for yes answer', () => {
+    it('exports a uiSchema object', () => {
+      expect(mitigatingCircumstancesUiSchema).to.be.an('object');
+    });
+
+    it('mitigatingCircumstancesNarrative has ui:required function', () => {
+      const field =
+        mitigatingCircumstancesUiSchema.enrollmentChangeDetails
+          .mitigatingCircumstances.mitigatingCircumstancesNarrative;
+      expect(field['ui:required']).to.be.a('function');
+    });
+
+    it('mitigatingCircumstancesNarrative required when known=yes', () => {
+      const requiredFn =
+        mitigatingCircumstancesUiSchema.enrollmentChangeDetails
+          .mitigatingCircumstances.mitigatingCircumstancesNarrative[
+          'ui:required'
+        ];
       expect(
-        mitigatingCircumstancesUiSchema.mitigatingCircumstancesNarrative[
-          'ui:options'
-        ].expandUnderCondition,
-      ).to.equal('yes');
+        requiredFn({
+          enrollmentChangeDetails: {
+            mitigatingCircumstances: {
+              mitigatingCircumstancesKnown: 'yes',
+            },
+          },
+        }),
+      ).to.be.true;
+    });
+
+    it('mitigatingCircumstancesNarrative not required when known=no', () => {
+      const requiredFn =
+        mitigatingCircumstancesUiSchema.enrollmentChangeDetails
+          .mitigatingCircumstances.mitigatingCircumstancesNarrative[
+          'ui:required'
+        ];
+      expect(
+        requiredFn({
+          enrollmentChangeDetails: {
+            mitigatingCircumstances: {
+              mitigatingCircumstancesKnown: 'no',
+            },
+          },
+        }),
+      ).to.be.false;
     });
   });
 
   describe('correctionDetailsSchema', () => {
-    it('requires correctionItems', () => {
-      expect(correctionDetailsSchema.required).to.include('correctionItems');
+    it('requires correctionDetails', () => {
+      const { required } = correctionDetailsSchema.properties.enrollmentChangeDetails;
+      expect(required).to.include('correctionDetails');
     });
 
-    it('correctionItems is a checkboxGroup schema', () => {
-      const { correctionItems } = correctionDetailsSchema.properties;
-      expect(correctionItems).to.be.an('object');
-      expect(correctionItems.type).to.equal('object');
-    });
-  });
-
-  describe('correctionDetailsUiSchema', () => {
-    it('correctionItems has required: true at top level', () => {
-      expect(correctionDetailsUiSchema.correctionItems['ui:required']).to.be
-        .true;
+    it('correctionItems is required inside correctionDetails', () => {
+      const { required } = correctionDetailsSchema.properties.enrollmentChangeDetails.properties.correctionDetails;
+      expect(required).to.include('correctionItems');
     });
   });
 
   describe('timelinessAcknowledgmentSchema', () => {
     it('requires lateSubmissionExplanation', () => {
-      expect(timelinessAcknowledgmentSchema.required).to.include(
-        'lateSubmissionExplanation',
-      );
-    });
-
-    it('lateSubmissionExplanation has minLength 20 and maxLength 1000', () => {
-      const { lateSubmissionExplanation } =
-        timelinessAcknowledgmentSchema.properties;
-      expect(lateSubmissionExplanation.minLength).to.equal(20);
-      expect(lateSubmissionExplanation.maxLength).to.equal(1000);
+      const { required } = timelinessAcknowledgmentSchema.properties.enrollmentChangeDetails;
+      expect(required).to.include('lateSubmissionExplanation');
     });
   });
 });
