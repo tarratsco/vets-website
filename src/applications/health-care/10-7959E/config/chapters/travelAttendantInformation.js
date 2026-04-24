@@ -2,11 +2,10 @@ import {
   radioUI,
   radioSchema,
   textUI,
-  textSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 export const travelAttendantInformationUiSchema = {
-  'travel.attendant': {
+  attendant: {
     traveled: radioUI({
       title: 'Did an attendant travel with the patient?',
       hint:
@@ -29,7 +28,7 @@ export const travelAttendantInformationUiSchema = {
         },
       }),
       'ui:options': {
-        expandUnder: 'travel.attendant.traveled',
+        expandUnder: 'attendant.traveled',
         expandUnderCondition: 'yes',
       },
     },
@@ -41,7 +40,7 @@ export const travelAttendantInformationUiSchema = {
         },
       }),
       'ui:options': {
-        expandUnder: 'travel.attendant.traveled',
+        expandUnder: 'attendant.traveled',
         expandUnderCondition: 'yes',
       },
     },
@@ -50,7 +49,7 @@ export const travelAttendantInformationUiSchema = {
         title: "Attendant's middle initial",
       }),
       'ui:options': {
-        expandUnder: 'travel.attendant.traveled',
+        expandUnder: 'attendant.traveled',
         expandUnderCondition: 'yes',
       },
     },
@@ -63,7 +62,7 @@ export const travelAttendantInformationUiSchema = {
         },
       }),
       'ui:options': {
-        expandUnder: 'travel.attendant.traveled',
+        expandUnder: 'attendant.traveled',
         expandUnderCondition: 'yes',
       },
     },
@@ -73,7 +72,7 @@ export const travelAttendantInformationUiSchema = {
 export const travelAttendantInformationSchema = {
   type: 'object',
   properties: {
-    'travel.attendant': {
+    attendant: {
       type: 'object',
       required: ['traveled'],
       properties: {

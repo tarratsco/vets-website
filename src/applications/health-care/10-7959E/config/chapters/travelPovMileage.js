@@ -1,16 +1,61 @@
-import {
-  textUI,
-  textSchema,
-} from 'platform/forms-system/src/js/web-component-patterns';
+import { textUI } from 'platform/forms-system/src/js/web-component-patterns';
 import VaSelectField from 'platform/forms-system/src/js/web-component-fields/VaSelectField';
 
 const STATE_LABELS = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
-  'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA',
-  'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV',
-  'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA',
-  'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA',
-  'WA', 'WV', 'WI', 'WY',
+  'AL',
+  'AK',
+  'AZ',
+  'AR',
+  'CA',
+  'CO',
+  'CT',
+  'DE',
+  'DC',
+  'FL',
+  'GA',
+  'GU',
+  'HI',
+  'ID',
+  'IL',
+  'IN',
+  'IA',
+  'KS',
+  'KY',
+  'LA',
+  'ME',
+  'MD',
+  'MA',
+  'MI',
+  'MN',
+  'MS',
+  'MO',
+  'MT',
+  'NE',
+  'NV',
+  'NH',
+  'NJ',
+  'NM',
+  'NY',
+  'NC',
+  'ND',
+  'OH',
+  'OK',
+  'OR',
+  'PA',
+  'PR',
+  'RI',
+  'SC',
+  'SD',
+  'TN',
+  'TX',
+  'UT',
+  'VT',
+  'VI',
+  'VA',
+  'WA',
+  'WV',
+  'WI',
+  'WY',
 ];
 
 const stateOptions = STATE_LABELS.reduce((acc, s) => {
@@ -21,7 +66,7 @@ const stateOptions = STATE_LABELS.reduce((acc, s) => {
 export const travelPovMileageUiSchema = {
   'ui:description':
     'Receipts are not required for privately owned vehicle (POV) mileage. Enter your departure and arrival city and state. Reimbursement will be calculated at the applicable round-trip mileage rate. Contact OIVC at 1-833-930-0816 to confirm the current rate.',
-  'travel.pov': {
+  pov: {
     'ui:title': 'POV Mileage Details (Section III)',
     departureCity: textUI({
       title: 'Departure city (for POV mileage)',
@@ -63,9 +108,14 @@ export const travelPovMileageUiSchema = {
 export const travelPovMileageSchema = {
   type: 'object',
   properties: {
-    'travel.pov': {
+    pov: {
       type: 'object',
-      required: ['departureCity', 'departureState', 'arrivalCity', 'arrivalState'],
+      required: [
+        'departureCity',
+        'departureState',
+        'arrivalCity',
+        'arrivalState',
+      ],
       properties: {
         departureCity: { type: 'string', minLength: 1, maxLength: 30 },
         departureState: { type: 'string', enum: STATE_LABELS },

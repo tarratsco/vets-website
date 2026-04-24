@@ -1,6 +1,6 @@
+import React from 'react';
 import {
   textUI,
-  textSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
@@ -20,12 +20,12 @@ const federalWarningDescription = (
 const releaseStatement = (
   <p>
     <strong>Release of Medical Information:</strong> Signature in this section
-    authorizes the patient&apos;s providers to release medical record
-    documentation related to the services associated with this claim. This
-    consent pertains to all medical records, including records related to
-    treatment for psychological and psychiatric conditions, drug and alcohol
-    abuse, acquired immune deficiency syndrome, human immunodeficiency virus
-    infection, and sickle cell disease.
+    authorizes the patient’s providers to release medical record documentation
+    related to the services associated with this claim. This consent pertains to
+    all medical records, including records related to treatment for
+    psychological and psychiatric conditions, drug and alcohol abuse, acquired
+    immune deficiency syndrome, human immunodeficiency virus infection, and
+    sickle cell disease.
   </p>
 );
 
@@ -54,7 +54,7 @@ export const certificationSignatureUiSchema = {
     }),
     date: currentOrPastDateUI({
       title: 'Date',
-      hint: 'Format: MM/DD/YYYY. Enter today\'s date.',
+      hint: "Format: MM/DD/YYYY. Enter today's date.",
       errorMessages: {
         required: 'Please enter the date you are signing.',
         pattern: 'Please enter a valid date.',

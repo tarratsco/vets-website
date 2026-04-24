@@ -8,55 +8,52 @@ import ConfirmationPage from '../containers/ConfirmationPage';
 import {
   programSelectionUiSchema,
   programSelectionSchema,
-} from '../config/chapters/programSelection';
+} from './chapters/programSelection';
 import {
   patientInformationUiSchema,
   patientInformationSchema,
-} from '../config/chapters/patientInformation';
+} from './chapters/patientInformation';
 import {
   sponsorInformationUiSchema,
   sponsorInformationSchema,
-} from '../config/chapters/sponsorInformation';
-import {
-  claimTypeUiSchema,
-  claimTypeSchema,
-} from '../config/chapters/claimType';
+} from './chapters/sponsorInformation';
+import { claimTypeUiSchema, claimTypeSchema } from './chapters/claimType';
 import {
   travelProviderCertificationUiSchema,
   travelProviderCertificationSchema,
-} from '../config/chapters/travelProviderCertification';
+} from './chapters/travelProviderCertification';
 import {
   travelModeAndDatesUiSchema,
   travelModeAndDatesSchema,
-} from '../config/chapters/travelModeAndDates';
+} from './chapters/travelModeAndDates';
 import {
   travelAdditionalSegmentUiSchema,
   travelAdditionalSegmentSchema,
-} from '../config/chapters/travelAdditionalSegment';
+} from './chapters/travelAdditionalSegment';
 import {
   travelPovMileageUiSchema,
   travelPovMileageSchema,
-} from '../config/chapters/travelPovMileage';
+} from './chapters/travelPovMileage';
 import {
   travelAttendantInformationUiSchema,
   travelAttendantInformationSchema,
-} from '../config/chapters/travelAttendantInformation';
+} from './chapters/travelAttendantInformation';
 import {
   travelMiscellaneousExpensesUiSchema,
   travelMiscellaneousExpensesSchema,
-} from '../config/chapters/travelMiscellaneousExpenses';
+} from './chapters/travelMiscellaneousExpenses';
 import {
   certificationSignerUiSchema,
   certificationSignerSchema,
-} from '../config/chapters/certificationSigner';
+} from './chapters/certificationSigner';
 import {
   certificationRepresentativeInformationUiSchema,
   certificationRepresentativeInformationSchema,
-} from '../config/chapters/certificationRepresentativeInformation';
+} from './chapters/certificationRepresentativeInformation';
 import {
   certificationSignatureUiSchema,
   certificationSignatureSchema,
-} from '../config/chapters/certificationSignature';
+} from './chapters/certificationSignature';
 
 /** @type {FormConfig} */
 const formConfig = {
@@ -80,8 +77,7 @@ const formConfig = {
   prefillEnabled: true,
   savedFormMessages: {
     notFound: 'Please start over to file your claim.',
-    noAuth:
-      'Please sign in again to continue your VA Form 10-7959E claim.',
+    noAuth: 'Please sign in again to continue your VA Form 10-7959E claim.',
   },
   hideUnauthedStartLink: true,
   title: 'Claim for Miscellaneous Expenses',
@@ -137,21 +133,27 @@ const formConfig = {
         travelProviderCertification: {
           path: 'travel-provider-certification',
           title: 'Provider Certification (Section III)',
-          depends: formData => Array.isArray(formData.claimType) && formData.claimType.includes('travel'),
+          depends: formData =>
+            Array.isArray(formData.claimType) &&
+            formData.claimType.includes('travel'),
           uiSchema: travelProviderCertificationUiSchema,
           schema: travelProviderCertificationSchema,
         },
         travelModeAndDates: {
           path: 'travel-mode-and-dates',
           title: 'Travel Mode and Dates (Section III)',
-          depends: formData => Array.isArray(formData.claimType) && formData.claimType.includes('travel'),
+          depends: formData =>
+            Array.isArray(formData.claimType) &&
+            formData.claimType.includes('travel'),
           uiSchema: travelModeAndDatesUiSchema,
           schema: travelModeAndDatesSchema,
         },
         travelAdditionalSegment: {
           path: 'travel-additional-segment',
           title: 'Add Another Travel Segment?',
-          depends: formData => Array.isArray(formData.claimType) && formData.claimType.includes('travel'),
+          depends: formData =>
+            Array.isArray(formData.claimType) &&
+            formData.claimType.includes('travel'),
           uiSchema: travelAdditionalSegmentUiSchema,
           schema: travelAdditionalSegmentSchema,
         },
@@ -161,15 +163,17 @@ const formConfig = {
           depends: formData =>
             Array.isArray(formData.claimType) &&
             formData.claimType.includes('travel') &&
-            Array.isArray(formData['travel.modeOfTravel']) &&
-            formData['travel.modeOfTravel'].includes('pov'),
+            Array.isArray(formData.modeOfTravel) &&
+            formData.modeOfTravel.includes('pov'),
           uiSchema: travelPovMileageUiSchema,
           schema: travelPovMileageSchema,
         },
         travelAttendantInformation: {
           path: 'travel-attendant-information',
           title: 'Attendant Information (Section III)',
-          depends: formData => Array.isArray(formData.claimType) && formData.claimType.includes('travel'),
+          depends: formData =>
+            Array.isArray(formData.claimType) &&
+            formData.claimType.includes('travel'),
           uiSchema: travelAttendantInformationUiSchema,
           schema: travelAttendantInformationSchema,
         },
@@ -193,7 +197,8 @@ const formConfig = {
         certificationRepresentativeInformation: {
           path: 'certification-representative-information',
           title: 'Representative Information (Section IV)',
-          depends: formData => formData.certificationSigner === 'representative',
+          depends: formData =>
+            formData.certificationSigner === 'representative',
           uiSchema: certificationRepresentativeInformationUiSchema,
           schema: certificationRepresentativeInformationSchema,
         },

@@ -1,6 +1,5 @@
 import {
   textUI,
-  textSchema,
   checkboxGroupUI,
   checkboxGroupSchema,
   currentOrPastDateUI,
@@ -10,12 +9,60 @@ import VaSelectField from 'platform/forms-system/src/js/web-component-fields/VaS
 import VaTextInputField from 'platform/forms-system/src/js/web-component-fields/VaTextInputField';
 
 const STATE_LABELS = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
-  'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA',
-  'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV',
-  'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA',
-  'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA',
-  'WA', 'WV', 'WI', 'WY',
+  'AL',
+  'AK',
+  'AZ',
+  'AR',
+  'CA',
+  'CO',
+  'CT',
+  'DE',
+  'DC',
+  'FL',
+  'GA',
+  'GU',
+  'HI',
+  'ID',
+  'IL',
+  'IN',
+  'IA',
+  'KS',
+  'KY',
+  'LA',
+  'ME',
+  'MD',
+  'MA',
+  'MI',
+  'MN',
+  'MS',
+  'MO',
+  'MT',
+  'NE',
+  'NV',
+  'NH',
+  'NJ',
+  'NM',
+  'NY',
+  'NC',
+  'ND',
+  'OH',
+  'OK',
+  'OR',
+  'PA',
+  'PR',
+  'RI',
+  'SC',
+  'SD',
+  'TN',
+  'TX',
+  'UT',
+  'VT',
+  'VI',
+  'VA',
+  'WA',
+  'WV',
+  'WI',
+  'WY',
 ];
 
 const stateOptions = STATE_LABELS.reduce((acc, s) => {
@@ -35,7 +82,7 @@ const MODE_LABELS = {
 const MODE_KEYS = Object.keys(MODE_LABELS);
 
 export const travelModeAndDatesUiSchema = {
-  'travel.modeOfTravel': checkboxGroupUI({
+  modeOfTravel: checkboxGroupUI({
     title: 'Mode of travel',
     hint:
       'Select all modes of travel used for this trip. Attach receipts for all modes except privately owned vehicle (POV) mileage.',
@@ -45,22 +92,22 @@ export const travelModeAndDatesUiSchema = {
       required: 'Please select at least one mode of travel.',
     },
   }),
-  'travel.modeOfTravelOther': {
+  modeOfTravelOther: {
     'ui:title': 'Please specify other mode of travel',
     'ui:webComponentField': VaTextInputField,
     'ui:options': {
-      expandUnder: 'travel.modeOfTravel',
+      expandUnder: 'modeOfTravel',
       expandUnderCondition: data =>
         data &&
         typeof data === 'object' &&
-        data['travel.modeOfTravel'] &&
-        data['travel.modeOfTravel'].other,
+        data.modeOfTravel &&
+        data.modeOfTravel.other,
     },
     'ui:errorMessages': {
       required: 'Please describe the other mode of travel.',
     },
   },
-  'travel.segment1': {
+  segment1: {
     'ui:title': 'Travel Segment 1',
     dateOfTravel: currentOrPastDateUI({
       title: 'Date of travel',
@@ -70,13 +117,13 @@ export const travelModeAndDatesUiSchema = {
         pattern: 'Please enter a valid date of travel.',
       },
     }),
-    'departure.city': textUI({
+    departureCity: textUI({
       title: 'Departure city',
       errorMessages: {
         required: 'Please enter the departure city.',
       },
     }),
-    'departure.state': {
+    departureState: {
       'ui:title': 'Departure state',
       'ui:webComponentField': VaSelectField,
       'ui:options': {
@@ -86,7 +133,7 @@ export const travelModeAndDatesUiSchema = {
         required: 'Please select the departure state.',
       },
     },
-    'departure.time': {
+    departureTime: {
       'ui:title': 'Departure time',
       'ui:webComponentField': VaTextInputField,
       'ui:options': {
@@ -99,13 +146,13 @@ export const travelModeAndDatesUiSchema = {
         pattern: 'Please enter the time in 24-hour format, e.g., 0815.',
       },
     },
-    'arrival.city': textUI({
+    arrivalCity: textUI({
       title: 'Arrival city',
       errorMessages: {
         required: 'Please enter the arrival city.',
       },
     }),
-    'arrival.state': {
+    arrivalState: {
       'ui:title': 'Arrival state',
       'ui:webComponentField': VaSelectField,
       'ui:options': {
@@ -115,7 +162,7 @@ export const travelModeAndDatesUiSchema = {
         required: 'Please select the arrival state.',
       },
     },
-    'arrival.time': {
+    arrivalTime: {
       'ui:title': 'Arrival time',
       'ui:webComponentField': VaTextInputField,
       'ui:options': {
@@ -134,35 +181,35 @@ export const travelModeAndDatesUiSchema = {
 export const travelModeAndDatesSchema = {
   type: 'object',
   properties: {
-    'travel.modeOfTravel': checkboxGroupSchema(MODE_KEYS),
-    'travel.modeOfTravelOther': {
+    modeOfTravel: checkboxGroupSchema(MODE_KEYS),
+    modeOfTravelOther: {
       type: 'string',
       maxLength: 60,
     },
-    'travel.segment1': {
+    segment1: {
       type: 'object',
       required: [
         'dateOfTravel',
-        'departure.city',
-        'departure.state',
-        'departure.time',
-        'arrival.city',
-        'arrival.state',
-        'arrival.time',
+        'departureCity',
+        'departureState',
+        'departureTime',
+        'arrivalCity',
+        'arrivalState',
+        'arrivalTime',
       ],
       properties: {
         dateOfTravel: currentOrPastDateSchema,
-        'departure.city': { type: 'string', minLength: 1, maxLength: 30 },
-        'departure.state': { type: 'string', enum: STATE_LABELS },
-        'departure.time': {
+        departureCity: { type: 'string', minLength: 1, maxLength: 30 },
+        departureState: { type: 'string', enum: STATE_LABELS },
+        departureTime: {
           type: 'string',
           pattern: '^([01]\\d|2[0-3])[0-5]\\d$',
           minLength: 4,
           maxLength: 4,
         },
-        'arrival.city': { type: 'string', minLength: 1, maxLength: 30 },
-        'arrival.state': { type: 'string', enum: STATE_LABELS },
-        'arrival.time': {
+        arrivalCity: { type: 'string', minLength: 1, maxLength: 30 },
+        arrivalState: { type: 'string', enum: STATE_LABELS },
+        arrivalTime: {
           type: 'string',
           pattern: '^([01]\\d|2[0-3])[0-5]\\d$',
           minLength: 4,

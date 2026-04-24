@@ -2,7 +2,6 @@ import {
   radioUI,
   radioSchema,
   textUI,
-  textSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
@@ -10,12 +9,60 @@ import VaSelectField from 'platform/forms-system/src/js/web-component-fields/VaS
 import VaTextInputField from 'platform/forms-system/src/js/web-component-fields/VaTextInputField';
 
 const STATE_LABELS = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
-  'GA', 'GU', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA',
-  'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV',
-  'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA',
-  'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VI', 'VA',
-  'WA', 'WV', 'WI', 'WY',
+  'AL',
+  'AK',
+  'AZ',
+  'AR',
+  'CA',
+  'CO',
+  'CT',
+  'DE',
+  'DC',
+  'FL',
+  'GA',
+  'GU',
+  'HI',
+  'ID',
+  'IL',
+  'IN',
+  'IA',
+  'KS',
+  'KY',
+  'LA',
+  'ME',
+  'MD',
+  'MA',
+  'MI',
+  'MN',
+  'MS',
+  'MO',
+  'MT',
+  'NE',
+  'NV',
+  'NH',
+  'NJ',
+  'NM',
+  'NY',
+  'NC',
+  'ND',
+  'OH',
+  'OK',
+  'OR',
+  'PA',
+  'PR',
+  'RI',
+  'SC',
+  'SD',
+  'TN',
+  'TX',
+  'UT',
+  'VT',
+  'VI',
+  'VA',
+  'WA',
+  'WV',
+  'WI',
+  'WY',
 ];
 
 const stateOptions = STATE_LABELS.reduce((acc, s) => {
@@ -24,7 +71,7 @@ const stateOptions = STATE_LABELS.reduce((acc, s) => {
 }, {});
 
 export const travelAdditionalSegmentUiSchema = {
-  'travel.addSecondSegment': radioUI({
+  addSecondSegment: radioUI({
     title: 'Do you have a second travel segment to add?',
     hint:
       'For example, a return trip on a different date. The form provides space for two travel segments.',
@@ -37,10 +84,10 @@ export const travelAdditionalSegmentUiSchema = {
       required: 'Please indicate whether you have a second travel segment.',
     },
   }),
-  'travel.segment2': {
+  segment2: {
     'ui:title': 'Travel Segment 2',
     'ui:options': {
-      expandUnder: 'travel.addSecondSegment',
+      expandUnder: 'addSecondSegment',
       expandUnderCondition: 'yes',
     },
     dateOfTravel: currentOrPastDateUI({
@@ -51,13 +98,13 @@ export const travelAdditionalSegmentUiSchema = {
         pattern: 'Please enter a valid date of travel.',
       },
     }),
-    'departure.city': textUI({
+    departureCity: textUI({
       title: 'Departure city (Segment 2)',
       errorMessages: {
         required: 'Please enter the departure city for the second segment.',
       },
     }),
-    'departure.state': {
+    departureState: {
       'ui:title': 'Departure state (Segment 2)',
       'ui:webComponentField': VaSelectField,
       'ui:options': {
@@ -67,7 +114,7 @@ export const travelAdditionalSegmentUiSchema = {
         required: 'Please select the departure state for the second segment.',
       },
     },
-    'departure.time': {
+    departureTime: {
       'ui:title': 'Departure time (Segment 2)',
       'ui:webComponentField': VaTextInputField,
       'ui:options': {
@@ -80,13 +127,13 @@ export const travelAdditionalSegmentUiSchema = {
         pattern: 'Please enter the time in 24-hour format, e.g., 0815.',
       },
     },
-    'arrival.city': textUI({
+    arrivalCity: textUI({
       title: 'Arrival city (Segment 2)',
       errorMessages: {
         required: 'Please enter the arrival city for the second segment.',
       },
     }),
-    'arrival.state': {
+    arrivalState: {
       'ui:title': 'Arrival state (Segment 2)',
       'ui:webComponentField': VaSelectField,
       'ui:options': {
@@ -96,7 +143,7 @@ export const travelAdditionalSegmentUiSchema = {
         required: 'Please select the arrival state for the second segment.',
       },
     },
-    'arrival.time': {
+    arrivalTime: {
       'ui:title': 'Arrival time (Segment 2)',
       'ui:webComponentField': VaTextInputField,
       'ui:options': {
@@ -114,24 +161,24 @@ export const travelAdditionalSegmentUiSchema = {
 
 export const travelAdditionalSegmentSchema = {
   type: 'object',
-  required: ['travel.addSecondSegment'],
+  required: ['addSecondSegment'],
   properties: {
-    'travel.addSecondSegment': radioSchema(['yes', 'no']),
-    'travel.segment2': {
+    addSecondSegment: radioSchema(['yes', 'no']),
+    segment2: {
       type: 'object',
       properties: {
         dateOfTravel: currentOrPastDateSchema,
-        'departure.city': { type: 'string', minLength: 1, maxLength: 30 },
-        'departure.state': { type: 'string', enum: STATE_LABELS },
-        'departure.time': {
+        departureCity: { type: 'string', minLength: 1, maxLength: 30 },
+        departureState: { type: 'string', enum: STATE_LABELS },
+        departureTime: {
           type: 'string',
           pattern: '^([01]\\d|2[0-3])[0-5]\\d$',
           minLength: 4,
           maxLength: 4,
         },
-        'arrival.city': { type: 'string', minLength: 1, maxLength: 30 },
-        'arrival.state': { type: 'string', enum: STATE_LABELS },
-        'arrival.time': {
+        arrivalCity: { type: 'string', minLength: 1, maxLength: 30 },
+        arrivalState: { type: 'string', enum: STATE_LABELS },
+        arrivalTime: {
           type: 'string',
           pattern: '^([01]\\d|2[0-3])[0-5]\\d$',
           minLength: 4,
