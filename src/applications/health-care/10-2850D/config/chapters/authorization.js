@@ -40,7 +40,7 @@ export const authorizationSchema = {
       type: 'object',
       required: ['authorizationClauses'],
       properties: {
-        authorizationClauses: checkboxGroupSchema(AUTH_LABELS),
+        authorizationClauses: checkboxGroupSchema(Object.keys(AUTH_LABELS)),
       },
     },
   },

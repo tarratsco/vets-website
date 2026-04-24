@@ -32,7 +32,7 @@ export const certificationSchema = {
       type: 'object',
       required: ['traineeCertification'],
       properties: {
-        traineeCertification: checkboxGroupSchema(CERT_LABELS),
+        traineeCertification: checkboxGroupSchema(Object.keys(CERT_LABELS)),
       },
     },
   },
