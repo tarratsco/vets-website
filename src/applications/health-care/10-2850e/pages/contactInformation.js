@@ -1,73 +1,28 @@
 import {
   textUI,
   textSchema,
-  yesNoUI,
-  yesNoSchema,
   selectUI,
   selectSchema,
-  phoneUI,
-  phoneSchema,
+  yesNoUI,
+  yesNoSchema,
   emailUI,
   emailSchema,
+  phoneUI,
+  phoneSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const STATE_OPTIONS = {
-  AL: 'Alabama',
-  AK: 'Alaska',
-  AZ: 'Arizona',
-  AR: 'Arkansas',
-  CA: 'California',
-  CO: 'Colorado',
-  CT: 'Connecticut',
-  DE: 'Delaware',
-  DC: 'District of Columbia',
-  FL: 'Florida',
-  GA: 'Georgia',
-  HI: 'Hawaii',
-  ID: 'Idaho',
-  IL: 'Illinois',
-  IN: 'Indiana',
-  IA: 'Iowa',
-  KS: 'Kansas',
-  KY: 'Kentucky',
-  LA: 'Louisiana',
-  ME: 'Maine',
-  MD: 'Maryland',
-  MA: 'Massachusetts',
-  MI: 'Michigan',
-  MN: 'Minnesota',
-  MS: 'Mississippi',
-  MO: 'Missouri',
-  MT: 'Montana',
-  NE: 'Nebraska',
-  NV: 'Nevada',
-  NH: 'New Hampshire',
-  NJ: 'New Jersey',
-  NM: 'New Mexico',
-  NY: 'New York',
-  NC: 'North Carolina',
-  ND: 'North Dakota',
-  OH: 'Ohio',
-  OK: 'Oklahoma',
-  OR: 'Oregon',
-  PA: 'Pennsylvania',
-  RI: 'Rhode Island',
-  SC: 'South Carolina',
-  SD: 'South Dakota',
-  TN: 'Tennessee',
-  TX: 'Texas',
-  UT: 'Utah',
-  VT: 'Vermont',
-  VA: 'Virginia',
-  WA: 'Washington',
-  WV: 'West Virginia',
-  WI: 'Wisconsin',
-  WY: 'Wyoming',
-};
+const stateOptions = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+  'DC', 'PR', 'GU', 'VI', 'AS', 'MP',
+];
 
 export const contactInformationUiSchema = {
   contactInformation: {
-    'ui:title': 'Contact information',
+    'ui:title': 'Contact Information',
     homeAddress: {
       'ui:title': 'Home address',
       street: textUI({
@@ -86,14 +41,13 @@ export const contactInformationUiSchema = {
       }),
       state: selectUI({
         title: 'State',
-        labels: STATE_OPTIONS,
         autocomplete: 'address-level1',
         errorMessages: { required: 'Please select your state.' },
       }),
       zipCode: textUI({
         title: 'ZIP code',
-        autocomplete: 'postal-code',
         inputType: 'text',
+        autocomplete: 'postal-code',
         errorMessages: {
           required: 'Please enter your ZIP code.',
           pattern: 'Please enter a valid 5-digit ZIP code.',
@@ -103,8 +57,8 @@ export const contactInformationUiSchema = {
     mailingAddressSameAsHome: yesNoUI({
       title: 'Is your mailing address the same as your home address?',
       labels: {
-        Y: 'Yes, my mailing address is the same as my home address.',
-        N: 'No, my mailing address is different.',
+        Y: 'Yes, my mailing address is the same as my home address',
+        N: 'No, my mailing address is different',
       },
     }),
     mailingAddress: {
@@ -115,26 +69,42 @@ export const contactInformationUiSchema = {
       },
       street: textUI({
         title: 'Street address',
-        autocomplete: 'street-address',
+        errorMessages: { required: 'Please enter your mailing street address.' },
       }),
-      street2: textUI({
-        title: 'Apartment or unit number',
-      }),
+      street2: textUI({ title: 'Apartment or unit number' }),
       city: textUI({
         title: 'City',
+        errorMessages: { required: 'Please enter your mailing city.' },
       }),
       state: selectUI({
         title: 'State',
-        labels: STATE_OPTIONS,
+        errorMessages: { required: 'Please select your mailing state.' },
       }),
       zipCode: textUI({
         title: 'ZIP code',
-        inputType: 'text',
+        errorMessages: {
+          required: 'Please enter your mailing ZIP code.',
+          pattern: 'Please enter a valid 5-digit ZIP code.',
+        },
       }),
     },
-    primaryPhone: phoneUI('Primary phone number'),
-    alternatePhone: phoneUI('Alternate phone number'),
-    professionalEmail: emailUI(),
+    primaryPhone: phoneUI({
+      title: 'Primary phone number',
+      errorMessages: {
+        required: 'Please enter your primary phone number.',
+        pattern: 'Please enter a valid 10-digit U.S. phone number.',
+      },
+    }),
+    alternatePhone: phoneUI('Alternate phone number (optional)'),
+    professionalEmail: emailUI({
+      title: 'Professional email address',
+      hint:
+        'Use an email address you check regularly. VA will send status updates about your application here.',
+      errorMessages: {
+        required: 'Please enter your professional email address.',
+        format: 'Please enter a valid email address.',
+      },
+    }),
   },
 };
 
@@ -153,7 +123,7 @@ export const contactInformationSchema = {
             street: { type: 'string', maxLength: 100 },
             street2: { type: 'string', maxLength: 50 },
             city: { type: 'string', maxLength: 100 },
-            state: selectSchema(Object.keys(STATE_OPTIONS)),
+            state: selectSchema(stateOptions),
             zipCode: {
               type: 'string',
               pattern: '^\\d{5}(-\\d{4})?$',
@@ -167,7 +137,7 @@ export const contactInformationSchema = {
             street: { type: 'string', maxLength: 100 },
             street2: { type: 'string', maxLength: 50 },
             city: { type: 'string', maxLength: 100 },
-            state: selectSchema(Object.keys(STATE_OPTIONS)),
+            state: selectSchema(stateOptions),
             zipCode: {
               type: 'string',
               pattern: '^\\d{5}(-\\d{4})?$',

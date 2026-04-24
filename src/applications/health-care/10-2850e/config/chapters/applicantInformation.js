@@ -28,28 +28,24 @@ export default {
       uiSchema: applicantTypeUiSchema,
       schema: applicantTypeSchema,
     },
-
     personalInformation: {
       path: 'personal-information',
       title: 'Personal information',
       uiSchema: personalInformationUiSchema,
       schema: personalInformationSchema,
     },
-
     contactInformation: {
       path: 'contact-information',
       title: 'Contact information',
       uiSchema: contactInformationUiSchema,
       schema: contactInformationSchema,
     },
-
     citizenshipStatus: {
       path: 'citizenship-status',
       title: 'Citizenship status',
       uiSchema: citizenshipStatusUiSchema,
       schema: citizenshipStatusSchema,
     },
-
     veteranStatus: {
       path: 'veteran-status',
       title: 'Veteran status',

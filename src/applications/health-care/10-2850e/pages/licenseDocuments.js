@@ -7,7 +7,8 @@ export const licenseDocumentsUiSchema = {
   supportingDocuments: {
     licenseDocuments: fileInputMultipleUI({
       title: 'Upload copies of your professional licenses',
-      hint: 'Upload a clear, readable copy of each professional license you listed in the Licensure section. Include both sides of the license if information appears on both sides. Accepted formats: PDF, JPG, PNG. Maximum file size: 20MB per file.',
+      hint:
+        'Upload a clear, readable copy of each professional license you listed in the Licensure section. Include both sides of the license if information appears on both sides. Accepted file types: PDF, JPG, PNG. Maximum file size: 20 MB.',
       required: true,
       errorMessages: {
         required: 'Please upload at least one professional license document.',
@@ -18,11 +19,9 @@ export const licenseDocumentsUiSchema = {
 
 export const licenseDocumentsSchema = {
   type: 'object',
-  required: ['supportingDocuments'],
   properties: {
     supportingDocuments: {
       type: 'object',
-      required: ['licenseDocuments'],
       properties: {
         licenseDocuments: fileInputMultipleSchema(),
       },

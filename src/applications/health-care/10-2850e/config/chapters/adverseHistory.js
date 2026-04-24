@@ -27,43 +27,38 @@ export default {
   title: 'Adverse History Disclosure',
   pages: {
     adverseLicensure: {
-      path: 'adverse-history-licensure',
+      path: 'adverse-history/licensure-actions',
       title: 'Adverse licensure actions',
       uiSchema: adverseLicensureUiSchema,
       schema: adverseLicensureSchema,
     },
-
     malpracticeHistory: {
-      path: 'adverse-history-malpractice',
+      path: 'adverse-history/malpractice',
       title: 'Malpractice history',
       uiSchema: malpracticeHistoryUiSchema,
       schema: malpracticeHistorySchema,
     },
-
     clinicalPrivileges: {
-      path: 'adverse-history-clinical-privileges',
+      path: 'adverse-history/clinical-privileges',
       title: 'Clinical privileges adverse actions',
       uiSchema: clinicalPrivilegesUiSchema,
       schema: clinicalPrivilegesSchema,
     },
-
     deaAdverse: {
-      path: 'adverse-history-dea',
+      path: 'adverse-history/dea-actions',
       title: 'DEA registration adverse actions',
       uiSchema: deaAdverseUiSchema,
       schema: deaAdverseSchema,
     },
-
     criminalHistory: {
-      path: 'adverse-history-criminal',
+      path: 'adverse-history/criminal-history',
       title: 'Criminal history',
       uiSchema: criminalHistoryUiSchema,
       schema: criminalHistorySchema,
     },
-
     federalExclusion: {
-      path: 'adverse-history-federal-exclusion',
-      title: 'Federal exclusion status',
+      path: 'adverse-history/federal-exclusion',
+      title: 'Federal exclusion',
       uiSchema: federalExclusionUiSchema,
       schema: federalExclusionSchema,
     },

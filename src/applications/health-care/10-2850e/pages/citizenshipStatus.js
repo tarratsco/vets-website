@@ -5,52 +5,42 @@ import {
   textSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const CITIZENSHIP_LABELS = {
-  'us-citizen': 'U.S. citizen',
-  'us-national': 'U.S. national',
-  'lawful-permanent-resident': 'Lawful permanent resident',
-  'work-authorized-nonimmigrant':
-    'Non-immigrant authorized to work in the U.S.',
-  other: 'Other',
-};
-
 export const citizenshipStatusUiSchema = {
   citizenshipStatus: {
-    'ui:title': 'Citizenship and work authorization status',
+    'ui:title': 'Citizenship Status',
     citizenshipType: radioUI({
       title: 'What is your citizenship or work authorization status?',
-      labels: CITIZENSHIP_LABELS,
+      labels: {
+        'us-citizen': 'U.S. citizen',
+        'us-national': 'U.S. national',
+        'lawful-permanent-resident': 'Lawful permanent resident',
+        'work-authorized-nonimmigrant': 'Work-authorized nonimmigrant (visa holder)',
+        other: 'Other',
+      },
       errorMessages: {
         required: 'Please select your citizenship status.',
       },
     }),
-    visaType: textUI({
-      title: 'Visa type',
-      hint: 'For example: H-1B, J-1, TN',
+    visaType: {
+      ...textUI({
+        title: 'Visa type',
+        hint: 'For example: H-1B, TN, O-1',
+      }),
       'ui:options': {
         hideIf: formData =>
-          formData?.citizenshipStatus?.citizenshipType !==
-          'work-authorized-nonimmigrant',
+          formData?.citizenshipStatus?.citizenshipType !== 'work-authorized-nonimmigrant',
       },
-    }),
-    visaNumber: textUI({
-      title: 'Visa number',
+    },
+    visaNumber: {
+      ...textUI({
+        title: 'Visa number or work authorization document number',
+      }),
       'ui:options': {
         hideIf: formData =>
-          formData?.citizenshipStatus?.citizenshipType !==
-          'work-authorized-nonimmigrant',
+          formData?.citizenshipStatus?.citizenshipType !== 'work-authorized-nonimmigrant' &&
+          formData?.citizenshipStatus?.citizenshipType !== 'other',
       },
-    }),
-    workAuthorizationDocumentType: textUI({
-      title: 'Work authorization document type',
-      hint: 'For example: Employment Authorization Document (EAD), Green Card',
-      'ui:options': {
-        hideIf: formData =>
-          !formData?.citizenshipStatus?.citizenshipType ||
-          formData?.citizenshipStatus?.citizenshipType === 'us-citizen' ||
-          formData?.citizenshipStatus?.citizenshipType === 'us-national',
-      },
-    }),
+    },
   },
 };
 
@@ -60,10 +50,15 @@ export const citizenshipStatusSchema = {
     citizenshipStatus: {
       type: 'object',
       properties: {
-        citizenshipType: radioSchema(Object.keys(CITIZENSHIP_LABELS)),
+        citizenshipType: radioSchema([
+          'us-citizen',
+          'us-national',
+          'lawful-permanent-resident',
+          'work-authorized-nonimmigrant',
+          'other',
+        ]),
         visaType: { type: 'string', maxLength: 50 },
         visaNumber: { type: 'string', maxLength: 50 },
-        workAuthorizationDocumentType: { type: 'string', maxLength: 100 },
       },
     },
   },

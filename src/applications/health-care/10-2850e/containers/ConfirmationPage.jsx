@@ -20,13 +20,23 @@ export const ConfirmationPage = ({ route }) => {
     form?.data?.personalInformation || {};
 
   const submissionAlertContent = (
-    <p>
-      Thank you for submitting your application for a VA clinical position. We
-      will route your application to the VA Medical Center you selected.
-      {formattedSubmitDate
-        ? ` Your application was submitted on ${formattedSubmitDate}.`
-        : ''}
-    </p>
+    <>
+      <p>
+        Thank you for submitting your VA clinical position application. We have
+        received your credentialing application and it will be reviewed by the
+        VA Medical Center credentialing office.
+      </p>
+      {formattedSubmitDate && (
+        <p>
+          <strong>Date submitted:</strong> {formattedSubmitDate}
+        </p>
+      )}
+      {confirmationNumber && (
+        <p>
+          <strong>Confirmation number:</strong> {confirmationNumber}
+        </p>
+      )}
+    </>
   );
 
   return (
@@ -35,32 +45,28 @@ export const ConfirmationPage = ({ route }) => {
       submitDate={submitDate}
       confirmationNumber={confirmationNumber}
       submitterName={applicantName}
-      devOnly={{ showButtons: true }}
+      devOnly={{
+        showButtons: true,
+      }}
     >
       <ConfirmationView.SubmissionAlert
-        title="Your application has been submitted"
+        title={`Your application has been submitted${
+          formattedSubmitDate ? ` on ${formattedSubmitDate}` : ''
+        }`}
         content={submissionAlertContent}
-        actions={<p />}
       />
-
-      <div
-        data-dd-privacy="mask"
-        data-dd-action-name="confirmation summary"
-      >
+      <div data-dd-privacy="mask" data-dd-action-name="confirmation summary">
         <ConfirmationView.ChapterSectionCollection />
       </div>
-
       <ConfirmationView.PrintThisPage />
-
       <ConfirmationView.WhatsNextProcessList
-        item1Header="We'll route your application to the VA facility"
-        item1Content="Your application will be sent to the credentialing office at the VA Medical Center you selected. They will contact you regarding next steps in the credentialing and privileging process."
-        item1Actions={<p />}
-        item2Header="Primary source verification will begin"
-        item2Content="The VA credentialing office will verify your licenses, certifications, education, and employment history through primary source verification (PSV) as required by VHA Handbook 1100.19."
-        item2Actions={<p />}
+        item1Header="We'll review your application"
+        item1Content="The VA Medical Center credentialing office will review your submitted application and supporting documents. They may contact you if additional information is needed."
+        item2Header="Primary source verification will be conducted"
+        item2Content="VA will verify your professional licenses, board certifications, education, and employment history through primary source verification. The National Practitioner Data Bank (NPDB) will also be queried."
+        item3Header="You'll receive a credentialing decision"
+        item3Content="The VAMC credentialing committee will review your file and make a recommendation. You'll be notified of the outcome through the contact information you provided."
       />
-
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />
       <ConfirmationView.NeedHelp />

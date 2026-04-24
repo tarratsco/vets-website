@@ -1,39 +1,40 @@
 import {
   yesNoUI,
   yesNoSchema,
-  textUI,
-  textSchema,
-  currentOrPastDateUI,
-  currentOrPastDateSchema,
   textareaUI,
   textareaSchema,
+  currentOrPastDateUI,
+  currentOrPastDateSchema,
+  textUI,
+  textSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 export const criminalHistoryUiSchema = {
   adverseHistory: {
     criminalHistory: {
-      'ui:title': 'Criminal history',
+      'ui:title': 'Criminal History',
       'ui:description':
-        'You must answer Yes even if: the conviction was later expunged or sealed; the matter occurred while you were a minor; or the conviction occurred in another state or country. VA is required to conduct a background investigation that will identify all convictions.',
+        "You must answer 'Yes' even if: the conviction was later expunged or sealed; the matter occurred while you were a minor; or the conviction occurred in another state or country. VA is required to conduct a background investigation that will identify all convictions.",
       hasFelonyConviction: yesNoUI({
         title:
           'Have you ever been convicted of, pled guilty to, or pled no contest to a felony?',
-        errorMessages: { required: 'Please answer this question.' },
+        errorMessages: {
+          required: 'Please answer whether you have had any felony convictions.',
+        },
       }),
       felonyDetails: {
-        'ui:title': 'Felony conviction details',
+        'ui:title': 'Felony Conviction Details',
         'ui:options': {
           hideIf: formData =>
-            formData?.adverseHistory?.criminalHistory
-              ?.hasFelonyConviction !== true,
-          itemName: 'Felony conviction',
-          viewField: item => `${item.offenseType || 'Felony'}`,
-          keepInPageOnReview: true,
+            formData?.adverseHistory?.criminalHistory?.hasFelonyConviction !== true,
+          itemName: 'Conviction',
+          viewField: ({ formData }) =>
+            `Felony — ${formData.offenseType || ''} — ${formData.convictionDate || ''}`,
         },
         items: {
           offenseType: textUI({
             title: 'Type of offense',
-            errorMessages: { required: 'Please describe the offense.' },
+            errorMessages: { required: 'Please enter the offense type.' },
           }),
           convictionDate: currentOrPastDateUI({
             title: 'Date of conviction',
@@ -43,36 +44,38 @@ export const criminalHistoryUiSchema = {
             },
           }),
           jurisdiction: textUI({
-            title: 'State or jurisdiction',
+            title: 'Jurisdiction (state or country where the offense occurred)',
           }),
           court: textUI({
-            title: 'Name of court',
+            title: 'Court name',
           }),
           explanation: textareaUI({
-            title: 'Explain the circumstances and current status',
-            errorMessages: { required: 'Please provide an explanation.' },
+            title: 'Explain the circumstances',
+            charcount: true,
           }),
         },
       },
       hasMisdemeanorConviction: yesNoUI({
         title:
           'Have you ever been convicted of, pled guilty to, or pled no contest to a misdemeanor (other than minor traffic violations)?',
-        errorMessages: { required: 'Please answer this question.' },
+        errorMessages: {
+          required:
+            'Please answer whether you have had any misdemeanor convictions.',
+        },
       }),
       misdemeanorDetails: {
-        'ui:title': 'Misdemeanor conviction details',
+        'ui:title': 'Misdemeanor Conviction Details',
         'ui:options': {
           hideIf: formData =>
-            formData?.adverseHistory?.criminalHistory
-              ?.hasMisdemeanorConviction !== true,
-          itemName: 'Misdemeanor conviction',
-          viewField: item => `${item.offenseType || 'Misdemeanor'}`,
-          keepInPageOnReview: true,
+            formData?.adverseHistory?.criminalHistory?.hasMisdemeanorConviction !== true,
+          itemName: 'Conviction',
+          viewField: ({ formData }) =>
+            `Misdemeanor — ${formData.offenseType || ''} — ${formData.convictionDate || ''}`,
         },
         items: {
           offenseType: textUI({
             title: 'Type of offense',
-            errorMessages: { required: 'Please describe the offense.' },
+            errorMessages: { required: 'Please enter the offense type.' },
           }),
           convictionDate: currentOrPastDateUI({
             title: 'Date of conviction',
@@ -82,14 +85,14 @@ export const criminalHistoryUiSchema = {
             },
           }),
           jurisdiction: textUI({
-            title: 'State or jurisdiction',
+            title: 'Jurisdiction (state or country where the offense occurred)',
           }),
           court: textUI({
-            title: 'Name of court',
+            title: 'Court name',
           }),
           explanation: textareaUI({
-            title: 'Explain the circumstances and current status',
-            errorMessages: { required: 'Please provide an explanation.' },
+            title: 'Explain the circumstances',
+            charcount: true,
           }),
         },
       },
@@ -99,11 +102,9 @@ export const criminalHistoryUiSchema = {
 
 export const criminalHistorySchema = {
   type: 'object',
-  required: ['adverseHistory'],
   properties: {
     adverseHistory: {
       type: 'object',
-      required: ['criminalHistory'],
       properties: {
         criminalHistory: {
           type: 'object',

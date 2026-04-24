@@ -1,28 +1,29 @@
 import {
   yesNoUI,
   yesNoSchema,
-  currentOrPastDateUI,
-  currentOrPastDateSchema,
   textareaUI,
   textareaSchema,
+  currentOrPastDateUI,
+  currentOrPastDateSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 export const deaAdverseUiSchema = {
   adverseHistory: {
     deaRegistrationAdverse: {
-      'ui:title': 'DEA registration adverse actions',
+      'ui:title': 'DEA Registration Adverse Actions',
       hasAdverseDeaHistory: yesNoUI({
         title:
           'Has your DEA registration ever been denied, suspended, revoked, or surrendered?',
-        hint: 'Answer Yes even if you do not currently hold or need a DEA registration.',
-        errorMessages: { required: 'Please answer this question.' },
+        hint:
+          "Answer 'Yes' even if you do not currently hold or need a DEA registration.",
+        errorMessages: {
+          required:
+            'Please answer whether you have had any adverse DEA registration actions.',
+        },
       }),
       actionDate: {
         ...currentOrPastDateUI({
-          title: 'Date of the action',
-          errorMessages: {
-            futureDate: 'Action date cannot be in the future.',
-          },
+          title: 'Date of the adverse DEA action',
         }),
         'ui:options': {
           hideIf: formData =>
@@ -32,7 +33,9 @@ export const deaAdverseUiSchema = {
       },
       explanation: {
         ...textareaUI({
-          title: 'Explain the circumstances and current resolution status',
+          title:
+            'Explain the circumstances of the adverse DEA action and the current resolution status',
+          charcount: true,
           errorMessages: { required: 'Please provide an explanation.' },
         }),
         'ui:options': {
@@ -47,11 +50,9 @@ export const deaAdverseUiSchema = {
 
 export const deaAdverseSchema = {
   type: 'object',
-  required: ['adverseHistory'],
   properties: {
     adverseHistory: {
       type: 'object',
-      required: ['deaRegistrationAdverse'],
       properties: {
         deaRegistrationAdverse: {
           type: 'object',

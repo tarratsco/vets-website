@@ -1,27 +1,27 @@
 import {
   yesNoUI,
   yesNoSchema,
-  currentOrPastDateUI,
-  currentOrPastDateSchema,
   textareaUI,
   textareaSchema,
+  currentOrPastDateUI,
+  currentOrPastDateSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 export const clinicalPrivilegesUiSchema = {
   adverseHistory: {
     clinicalPrivilegesAdverse: {
-      'ui:title': 'Clinical privileges adverse actions',
+      'ui:title': 'Clinical Privileges Adverse Actions',
       hasAdversePrivilegesHistory: yesNoUI({
         title:
           'Have your clinical privileges at any healthcare facility ever been denied, suspended, revoked, reduced, or not renewed, or have you ever resigned clinical privileges while under investigation?',
-        errorMessages: { required: 'Please answer this question.' },
+        errorMessages: {
+          required:
+            'Please answer whether you have had any adverse clinical privileges actions.',
+        },
       }),
       actionDate: {
         ...currentOrPastDateUI({
-          title: 'Date of the action',
-          errorMessages: {
-            futureDate: 'Action date cannot be in the future.',
-          },
+          title: 'Date of the adverse privileges action',
         }),
         'ui:options': {
           hideIf: formData =>
@@ -31,7 +31,9 @@ export const clinicalPrivilegesUiSchema = {
       },
       explanation: {
         ...textareaUI({
-          title: 'Explain the circumstances and current resolution status',
+          title:
+            'Explain the circumstances of the adverse privileges action and the current resolution status',
+          charcount: true,
           errorMessages: { required: 'Please provide an explanation.' },
         }),
         'ui:options': {
@@ -46,11 +48,9 @@ export const clinicalPrivilegesUiSchema = {
 
 export const clinicalPrivilegesSchema = {
   type: 'object',
-  required: ['adverseHistory'],
   properties: {
     adverseHistory: {
       type: 'object',
-      required: ['clinicalPrivilegesAdverse'],
       properties: {
         clinicalPrivilegesAdverse: {
           type: 'object',

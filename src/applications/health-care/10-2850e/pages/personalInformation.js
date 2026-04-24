@@ -3,33 +3,19 @@ import {
   textSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
-  ssnUI,
-  ssnSchema,
   selectUI,
   selectSchema,
+  ssnUI,
+  ssnSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const SUFFIX_OPTIONS = {
-  'Jr.': 'Jr.',
-  'Sr.': 'Sr.',
-  II: 'II',
-  III: 'III',
-  IV: 'IV',
-  MD: 'MD',
-  DO: 'DO',
-  PhD: 'PhD',
-  NP: 'NP',
-  CRNA: 'CRNA',
-  RN: 'RN',
-  DNP: 'DNP',
-};
+const suffixOptions = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'MD', 'DO', 'PhD', 'NP', 'CRNA', 'RN', 'DNP'];
 
 export const personalInformationUiSchema = {
   personalInformation: {
-    'ui:title': 'Personal information',
+    'ui:title': 'Personal Information',
     lastName: textUI({
       title: 'Last name',
-      hint: 'Enter your legal last name as it appears on your government-issued ID.',
       autocomplete: 'family-name',
       errorMessages: {
         required: 'Please enter your last name.',
@@ -50,7 +36,6 @@ export const personalInformationUiSchema = {
     suffix: selectUI({
       title: 'Suffix',
       hint: 'Select a suffix only if it appears on your professional license or government-issued ID.',
-      labels: SUFFIX_OPTIONS,
     }),
     dateOfBirth: currentOrPastDateUI({
       title: 'Date of birth',
@@ -92,7 +77,7 @@ export const personalInformationSchema = {
           type: 'string',
           maxLength: 50,
         },
-        suffix: selectSchema(Object.keys(SUFFIX_OPTIONS)),
+        suffix: selectSchema(suffixOptions),
         dateOfBirth: currentOrPastDateSchema,
         ssn: ssnSchema,
         cityOfBirth: {

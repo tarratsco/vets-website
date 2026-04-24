@@ -1,11 +1,7 @@
 import {
   employmentHistoryUiSchema,
   employmentHistorySchema,
-} from '../../pages/employmentHistory';
-import {
-  employmentGapsUiSchema,
-  employmentGapsSchema,
-} from '../../pages/employmentGaps';
+} from '../../pages/employmentHistoryPage';
 import {
   professionalReferencesUiSchema,
   professionalReferencesSchema,
@@ -20,14 +16,6 @@ export default {
       uiSchema: employmentHistoryUiSchema,
       schema: employmentHistorySchema,
     },
-
-    employmentGaps: {
-      path: 'employment-gaps',
-      title: 'Employment gaps',
-      uiSchema: employmentGapsUiSchema,
-      schema: employmentGapsSchema,
-    },
-
     professionalReferences: {
       path: 'professional-references',
       title: 'Professional references',

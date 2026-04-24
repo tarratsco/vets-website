@@ -27,23 +27,21 @@ export default {
   title: 'Supporting Documents',
   pages: {
     licenseDocuments: {
-      path: 'document-upload-licenses',
+      path: 'document-upload/licenses',
       title: 'Professional license documents',
       uiSchema: licenseDocumentsUiSchema,
       schema: licenseDocumentsSchema,
     },
-
     deaCertificate: {
-      path: 'document-upload-dea',
+      path: 'document-upload/dea-certificate',
       title: 'DEA certificate',
       depends: formData =>
         formData?.deaRegistration?.deaApplicable === 'yes-current',
       uiSchema: deaCertificateUiSchema,
       schema: deaCertificateSchema,
     },
-
     boardCertDocuments: {
-      path: 'document-upload-board-certifications',
+      path: 'document-upload/board-certifications',
       title: 'Board certification documents',
       depends: formData =>
         Array.isArray(formData?.boardCertifications) &&
@@ -51,16 +49,14 @@ export default {
       uiSchema: boardCertDocumentsUiSchema,
       schema: boardCertDocumentsSchema,
     },
-
     malpracticeInsurance: {
-      path: 'document-upload-malpractice-insurance',
+      path: 'document-upload/malpractice-insurance',
       title: 'Malpractice insurance certificate',
       uiSchema: malpracticeInsuranceUiSchema,
       schema: malpracticeInsuranceSchema,
     },
-
     adverseHistoryDocs: {
-      path: 'document-upload-adverse-history',
+      path: 'document-upload/adverse-history-docs',
       title: 'Adverse history documents',
       depends: formData =>
         formData?.adverseHistory?.adverseLicensureActions
@@ -71,17 +67,16 @@ export default {
           ?.hasAdversePrivilegesHistory === true ||
         formData?.adverseHistory?.deaRegistrationAdverse
           ?.hasAdverseDeaHistory === true ||
-        formData?.adverseHistory?.criminalHistory
-          ?.hasFelonyConviction === true ||
+        formData?.adverseHistory?.criminalHistory?.hasFelonyConviction ===
+          true ||
         formData?.adverseHistory?.criminalHistory
           ?.hasMisdemeanorConviction === true,
       uiSchema: adverseHistoryDocsUiSchema,
       schema: adverseHistoryDocsSchema,
     },
-
     otherDocuments: {
-      path: 'document-upload-other',
-      title: 'Other supporting documents',
+      path: 'document-upload/other',
+      title: 'Other documents',
       uiSchema: otherDocumentsUiSchema,
       schema: otherDocumentsSchema,
     },
