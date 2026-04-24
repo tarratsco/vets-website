@@ -4,27 +4,21 @@ import {
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 export const adverseHistoryDocsUiSchema = {
-  supportingDocuments: {
-    adverseHistoryDocuments: fileInputMultipleUI({
-      title: 'Upload supporting documentation for adverse history disclosures',
-      hint:
-        'Upload any documentation that supports or explains the adverse history items you disclosed. This may include court documents, licensing board correspondence, or letters of explanation. Accepted file types: PDF, JPG, PNG. Maximum file size: 20 MB.',
-      required: false,
-      errorMessages: {
-        required: 'Please upload at least one adverse history document.',
-      },
-    }),
-  },
+  adverseHistoryDocuments: fileInputMultipleUI({
+    title: 'Upload supporting documentation for adverse history disclosures',
+    hint:
+      'Upload any documentation that supports or explains the adverse history items you disclosed. This may include court documents, licensing board correspondence, or letters of explanation. Accepted file types: PDF, JPG, PNG. Maximum file size: 20MB per file.',
+    required: true,
+    errorMessages: {
+      required: 'Please upload at least one supporting document for your adverse history disclosure.',
+    },
+  }),
 };
 
 export const adverseHistoryDocsSchema = {
   type: 'object',
+  required: ['adverseHistoryDocuments'],
   properties: {
-    supportingDocuments: {
-      type: 'object',
-      properties: {
-        adverseHistoryDocuments: fileInputMultipleSchema(),
-      },
-    },
+    adverseHistoryDocuments: fileInputMultipleSchema(),
   },
 };

@@ -3,37 +3,36 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 
 import { ConfirmationView } from 'platform/forms-system/src/js/components/ConfirmationView';
-import { formatDateLong } from 'platform/utilities/date';
 
 export const ConfirmationPage = ({ route }) => {
   const form = useSelector(state => state.form || {});
-  const submission = form?.submission || {};
+  const { submission, data } = form;
   const submitDate = submission?.timestamp || '';
-  const formattedSubmitDate = submitDate ? formatDateLong(submitDate) : '';
-
   const confirmationNumber =
     submission?.response?.confirmationNumber ||
     submission?.response?.attributes?.confirmationNumber ||
     '';
 
-  const applicantName =
-    form?.data?.personalInformation || {};
+  const applicantName = {
+    first: data?.personalInformation?.firstName || '',
+    last: data?.personalInformation?.lastName || '',
+  };
 
   const submissionAlertContent = (
     <>
       <p>
-        Thank you for submitting your VA clinical position application. We have
-        received your credentialing application and it will be reviewed by the
-        VA Medical Center credentialing office.
+        Thank you for submitting your application for a VA clinical position. We
+        have received your application and will review it.
       </p>
-      {formattedSubmitDate && (
-        <p>
-          <strong>Date submitted:</strong> {formattedSubmitDate}
-        </p>
-      )}
+      <p>
+        The VA Medical Center credentialing office will contact you regarding
+        next steps, including primary source verification of your credentials and
+        scheduling a credentials committee review.
+      </p>
       {confirmationNumber && (
         <p>
-          <strong>Confirmation number:</strong> {confirmationNumber}
+          Your confirmation number is{' '}
+          <strong>{confirmationNumber}</strong>.
         </p>
       )}
     </>
@@ -50,10 +49,9 @@ export const ConfirmationPage = ({ route }) => {
       }}
     >
       <ConfirmationView.SubmissionAlert
-        title={`Your application has been submitted${
-          formattedSubmitDate ? ` on ${formattedSubmitDate}` : ''
-        }`}
+        title="You've submitted your VA clinical position application"
         content={submissionAlertContent}
+        actions={<p />}
       />
       <div data-dd-privacy="mask" data-dd-action-name="confirmation summary">
         <ConfirmationView.ChapterSectionCollection />
@@ -61,11 +59,10 @@ export const ConfirmationPage = ({ route }) => {
       <ConfirmationView.PrintThisPage />
       <ConfirmationView.WhatsNextProcessList
         item1Header="We'll review your application"
-        item1Content="The VA Medical Center credentialing office will review your submitted application and supporting documents. They may contact you if additional information is needed."
-        item2Header="Primary source verification will be conducted"
-        item2Content="VA will verify your professional licenses, board certifications, education, and employment history through primary source verification. The National Practitioner Data Bank (NPDB) will also be queried."
-        item3Header="You'll receive a credentialing decision"
-        item3Content="The VAMC credentialing committee will review your file and make a recommendation. You'll be notified of the outcome through the contact information you provided."
+        item1Content="The VA Medical Center credentialing office will review your submitted application and supporting documents. Primary source verification of your licenses, certifications, and credentials will be conducted."
+        item1Actions={<p />}
+        item2Header="You'll be contacted for next steps"
+        item2Content="A credentialing coordinator will contact you with information about the credentials committee review process and any additional documentation needed."
       />
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />

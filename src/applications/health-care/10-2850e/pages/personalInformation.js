@@ -9,11 +9,11 @@ import {
   ssnSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const suffixOptions = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'MD', 'DO', 'PhD', 'NP', 'CRNA', 'RN', 'DNP'];
+const SUFFIX_OPTIONS = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'MD', 'DO', 'PhD', 'NP', 'CRNA', 'RN', 'DNP'];
 
 export const personalInformationUiSchema = {
   personalInformation: {
-    'ui:title': 'Personal Information',
+    'ui:title': 'Personal information',
     lastName: textUI({
       title: 'Last name',
       autocomplete: 'family-name',
@@ -39,7 +39,6 @@ export const personalInformationUiSchema = {
     }),
     dateOfBirth: currentOrPastDateUI({
       title: 'Date of birth',
-      hint: 'For example: January 19 1953',
       errorMessages: {
         required: 'Please enter your date of birth.',
         futureDate: 'Date of birth cannot be in the future.',
@@ -77,7 +76,7 @@ export const personalInformationSchema = {
           type: 'string',
           maxLength: 50,
         },
-        suffix: selectSchema(suffixOptions),
+        suffix: selectSchema(SUFFIX_OPTIONS),
         dateOfBirth: currentOrPastDateSchema,
         ssn: ssnSchema,
         cityOfBirth: {

@@ -10,10 +10,7 @@ import {
   clinicalPrivilegesUiSchema,
   clinicalPrivilegesSchema,
 } from '../../pages/clinicalPrivileges';
-import {
-  deaAdverseUiSchema,
-  deaAdverseSchema,
-} from '../../pages/deaAdverse';
+import { deaAdverseUiSchema, deaAdverseSchema } from '../../pages/deaAdverse';
 import {
   criminalHistoryUiSchema,
   criminalHistorySchema,
@@ -27,38 +24,43 @@ export default {
   title: 'Adverse History Disclosure',
   pages: {
     adverseLicensure: {
-      path: 'adverse-history/licensure-actions',
+      path: 'adverse-history-licensure',
       title: 'Adverse licensure actions',
       uiSchema: adverseLicensureUiSchema,
       schema: adverseLicensureSchema,
     },
+
     malpracticeHistory: {
-      path: 'adverse-history/malpractice',
+      path: 'adverse-history-malpractice',
       title: 'Malpractice history',
       uiSchema: malpracticeHistoryUiSchema,
       schema: malpracticeHistorySchema,
     },
+
     clinicalPrivileges: {
-      path: 'adverse-history/clinical-privileges',
+      path: 'adverse-history-clinical-privileges',
       title: 'Clinical privileges adverse actions',
       uiSchema: clinicalPrivilegesUiSchema,
       schema: clinicalPrivilegesSchema,
     },
+
     deaAdverse: {
-      path: 'adverse-history/dea-actions',
+      path: 'adverse-history-dea',
       title: 'DEA registration adverse actions',
       uiSchema: deaAdverseUiSchema,
       schema: deaAdverseSchema,
     },
+
     criminalHistory: {
-      path: 'adverse-history/criminal-history',
+      path: 'adverse-history-criminal',
       title: 'Criminal history',
       uiSchema: criminalHistoryUiSchema,
       schema: criminalHistorySchema,
     },
+
     federalExclusion: {
-      path: 'adverse-history/federal-exclusion',
-      title: 'Federal exclusion',
+      path: 'adverse-history-federal-exclusion',
+      title: 'Federal exclusion status',
       uiSchema: federalExclusionUiSchema,
       schema: federalExclusionSchema,
     },

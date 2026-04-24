@@ -1,7 +1,7 @@
 import {
   appointmentDetailsUiSchema,
   appointmentDetailsSchema,
-} from '../../pages/appointmentDetailsPage';
+} from '../../pages/appointmentDetails';
 
 export default {
   title: 'Appointment Details',

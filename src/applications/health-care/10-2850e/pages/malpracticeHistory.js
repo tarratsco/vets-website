@@ -3,44 +3,44 @@ import {
   yesNoSchema,
   selectUI,
   selectSchema,
-  textareaUI,
-  textareaSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
+  textareaUI,
+  textareaSchema,
   textUI,
   textSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const outcomeOptions = [
-  'pending',
-  'dismissed',
-  'settled',
-  'judgmentForPlaintiff',
-  'judgmentForDefendant',
-];
+const OUTCOME_LABELS = {
+  pending: 'Pending',
+  dismissed: 'Dismissed',
+  settled: 'Settled',
+  judgmentForPlaintiff: 'Judgment for plaintiff',
+  judgmentForDefendant: 'Judgment for defendant',
+};
 
 export const malpracticeHistoryUiSchema = {
   adverseHistory: {
     malpracticeHistory: {
-      'ui:title': 'Malpractice History',
+      'ui:title': 'Malpractice history',
       hasMalpracticeHistory: yesNoUI({
         title:
           'Have you ever had a malpractice claim filed against you, or have you ever paid, or had paid on your behalf, any settlement or judgment in a malpractice action?',
-        hint:
+        description:
           "This includes claims that were dismissed, settled, or decided in your favor. Answer 'Yes' even if your malpractice insurer paid the settlement and you consider the matter closed.",
         errorMessages: {
-          required: 'Please answer whether you have had any malpractice claims.',
+          required: 'Please indicate whether you have had malpractice claims.',
         },
       }),
       claims: {
-        'ui:title': 'Malpractice Claim Details',
+        'ui:title': 'Malpractice claim details',
         'ui:options': {
           hideIf: formData =>
-            formData?.adverseHistory?.malpracticeHistory
-              ?.hasMalpracticeHistory !== true,
-          itemName: 'Claim',
+            formData?.adverseHistory?.malpracticeHistory?.hasMalpracticeHistory !==
+            true,
+          itemName: 'Malpractice claim',
           viewField: ({ formData }) =>
-            `Claim — ${formData.incidentDate || ''} — ${formData.outcome || 'pending'}`,
+            `${formData.allegationType || 'Claim'} — ${formData.outcome || ''}`,
         },
         items: {
           incidentDate: currentOrPastDateUI({
@@ -53,17 +53,19 @@ export const malpracticeHistoryUiSchema = {
           claimFiledDate: currentOrPastDateUI({
             title: 'Date the claim was filed',
             errorMessages: {
-              required: 'Please enter the date the claim was filed.',
+              required: 'Please enter the claim filed date.',
+              futureDate: 'Claim filed date cannot be in the future.',
             },
           }),
           allegationType: textUI({
             title: 'Primary allegation',
             hint:
-              'Describe the primary allegation type (e.g., failure to diagnose, surgical error, medication error).',
-            errorMessages: { required: 'Please describe the allegation type.' },
+              'Describe the primary type of clinical allegation (e.g., Failure to diagnose, Surgical error, Medication error)',
+            errorMessages: { required: 'Please enter the allegation type.' },
           }),
           outcome: selectUI({
             title: 'Outcome of this claim',
+            labels: OUTCOME_LABELS,
             errorMessages: { required: 'Please select the outcome.' },
           }),
           settlementAmount: {
@@ -72,21 +74,23 @@ export const malpracticeHistoryUiSchema = {
               hint:
                 'Enter the total amount paid, including amounts paid by your malpractice insurer. Do not include defense legal fees.',
               inputType: 'number',
+              errorMessages: {
+                required: 'Please enter the settlement or judgment amount.',
+              },
             }),
             'ui:options': {
-              hideIf: (formData, index) => {
-                const claims = formData?.adverseHistory?.malpracticeHistory?.claims;
-                if (!claims || !claims[index]) return true;
-                const outcome = claims[index].outcome;
-                return outcome !== 'settled' && outcome !== 'judgmentForPlaintiff';
-              },
+              hideIf: formData =>
+                !formData ||
+                (formData.outcome !== 'settled' &&
+                  formData.outcome !== 'judgmentForPlaintiff'),
+              expandUnder: 'outcome',
             },
           },
           explanation: textareaUI({
             title: 'Briefly explain the nature of the claim and any relevant context',
             charcount: true,
             errorMessages: {
-              required: 'Please provide an explanation.',
+              required: 'Please provide an explanation of this malpractice claim.',
             },
           }),
         },
@@ -115,9 +119,13 @@ export const malpracticeHistorySchema = {
                   incidentDate: currentOrPastDateSchema,
                   claimFiledDate: currentOrPastDateSchema,
                   allegationType: { type: 'string', maxLength: 200 },
-                  outcome: selectSchema(outcomeOptions),
+                  outcome: selectSchema(Object.keys(OUTCOME_LABELS)),
                   settlementAmount: { type: 'number', minimum: 0 },
-                  explanation: { type: 'string', minLength: 10, maxLength: 3000 },
+                  explanation: {
+                    type: 'string',
+                    minLength: 10,
+                    maxLength: 3000,
+                  },
                 },
               },
             },

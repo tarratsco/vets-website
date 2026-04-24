@@ -27,21 +27,23 @@ export default {
   title: 'Supporting Documents',
   pages: {
     licenseDocuments: {
-      path: 'document-upload/licenses',
-      title: 'Professional license documents',
+      path: 'document-upload-licenses',
+      title: 'License documents',
       uiSchema: licenseDocumentsUiSchema,
       schema: licenseDocumentsSchema,
     },
+
     deaCertificate: {
-      path: 'document-upload/dea-certificate',
+      path: 'document-upload-dea',
       title: 'DEA certificate',
       depends: formData =>
         formData?.deaRegistration?.deaApplicable === 'yes-current',
       uiSchema: deaCertificateUiSchema,
       schema: deaCertificateSchema,
     },
+
     boardCertDocuments: {
-      path: 'document-upload/board-certifications',
+      path: 'document-upload-board-certs',
       title: 'Board certification documents',
       depends: formData =>
         Array.isArray(formData?.boardCertifications) &&
@@ -49,14 +51,16 @@ export default {
       uiSchema: boardCertDocumentsUiSchema,
       schema: boardCertDocumentsSchema,
     },
+
     malpracticeInsurance: {
-      path: 'document-upload/malpractice-insurance',
+      path: 'document-upload-malpractice',
       title: 'Malpractice insurance certificate',
       uiSchema: malpracticeInsuranceUiSchema,
       schema: malpracticeInsuranceSchema,
     },
+
     adverseHistoryDocs: {
-      path: 'document-upload/adverse-history-docs',
+      path: 'document-upload-adverse',
       title: 'Adverse history documents',
       depends: formData =>
         formData?.adverseHistory?.adverseLicensureActions
@@ -69,13 +73,14 @@ export default {
           ?.hasAdverseDeaHistory === true ||
         formData?.adverseHistory?.criminalHistory?.hasFelonyConviction ===
           true ||
-        formData?.adverseHistory?.criminalHistory
-          ?.hasMisdemeanorConviction === true,
+        formData?.adverseHistory?.criminalHistory?.hasMisdemeanorConviction ===
+          true,
       uiSchema: adverseHistoryDocsUiSchema,
       schema: adverseHistoryDocsSchema,
     },
+
     otherDocuments: {
-      path: 'document-upload/other',
+      path: 'document-upload-other',
       title: 'Other documents',
       uiSchema: otherDocumentsUiSchema,
       schema: otherDocumentsSchema,

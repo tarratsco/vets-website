@@ -25,55 +25,59 @@ export const IntroductionPage = ({ route }) => {
       <FormTitle title={TITLE} subTitle={SUBTITLE} />
 
       <p className="va-introtext">
-        Use this form to apply for a clinical position at a VA Medical Center,
-        or to complete your credentialing and privileging application as a
-        healthcare professional.
+        Use this form to apply for a clinical position at a VA Medical Center or
+        to complete your credentialing and privileging application. This form is
+        for healthcare professionals seeking initial appointment, reappointment,
+        transfer credentialing, or temporary/fee-basis appointments.
       </p>
 
-      <h2 className="vads-u-margin-top--3">
+      <h2 className="vads-u-font-size--h3 vads-u-margin-top--3">
         What to know before you fill out this form
       </h2>
-      <p>
-        This application collects your professional credentials, employment
-        history, education, references, and disclosure information required for
-        VA credentialing under VHA Handbook 1100.19.
-      </p>
+      <ul>
+        <li>
+          You must be signed in with a verified Login.gov or ID.me account to
+          complete this form.
+        </li>
+        <li>
+          You will need to provide information about all professional licenses
+          ever held, employment history for the past 10 years, and at least 3
+          professional references.
+        </li>
+        <li>
+          You must answer all adverse history disclosure questions completely and
+          accurately.
+        </li>
+        <li>
+          Gathering all required documents before you start will help you
+          complete the form more efficiently.
+        </li>
+      </ul>
 
       <va-accordion>
-        <va-accordion-item
-          header="Documents you'll need to complete this form"
-          id="doc-checklist"
-        >
+        <va-accordion-item header="Documents you'll need to complete this form">
           <p>Before you start, gather the following documents:</p>
           <ul>
-            <li>Current professional license(s) — copies of all licenses ever held</li>
+            <li>Current professional license(s) — copies of all licenses</li>
             <li>DEA registration certificate (if applicable)</li>
             <li>Board certification certificate(s) (if applicable)</li>
             <li>Employment history for the past 10 years</li>
             <li>Professional references (at least 3)</li>
             <li>Malpractice insurance certificate</li>
-            <li>Educational transcripts or diploma (if applicable)</li>
-            <li>Work authorization documents (if applicable)</li>
+            <li>
+              Work authorization documents (if you are not a U.S. citizen)
+            </li>
+            <li>Graduate degree and postgraduate training information</li>
           </ul>
-        </va-accordion-item>
-        <va-accordion-item
-          header="Who can use this form"
-          id="who-can-use"
-        >
-          <p>
-            Licensed healthcare professionals applying for clinical positions at
-            VA Medical Centers, including initial appointments, reappointments,
-            transfers, and temporary or fee-basis appointments.
-          </p>
         </va-accordion-item>
       </va-accordion>
 
-      <va-alert status="info" visible>
-        <p slot="headline">Sign in to save your progress</p>
-        <p>
-          This is a complex form with multiple sections. Sign in so you can
-          save your work and return to it later. Your application will be saved
-          for 60 days.
+      <va-alert status="info" class="vads-u-margin-top--3">
+        <p className="vads-u-margin-y--0">
+          <strong>Note:</strong> This form collects sensitive personal
+          information including your Social Security Number, malpractice history,
+          criminal history, and professional licensure information. All
+          information is encrypted and stored securely.
         </p>
       </va-alert>
 
@@ -88,7 +92,7 @@ export const IntroductionPage = ({ route }) => {
         }}
       />
 
-      <div className="omb-info--container">
+      <div className="omb-info--container vads-u-margin-top--4">
         <va-omb-info
           res-burden={OMB_RES_BURDEN}
           omb-number={OMB_NUMBER}

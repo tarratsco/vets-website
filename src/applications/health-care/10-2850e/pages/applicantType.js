@@ -23,7 +23,7 @@ export const applicantTypeUiSchema = {
   occupationalCategory: textUI({
     title: 'What is your primary professional occupation?',
     hint:
-      'Enter the occupation that most closely describes the clinical role for which you are applying (e.g., Certified Registered Nurse Anesthetist, Nurse Practitioner, Registered Nurse).',
+      'Enter the occupation that most closely describes the clinical role for which you are applying (e.g., Registered Nurse, Nurse Anesthetist, Nurse Practitioner).',
     errorMessages: {
       required: 'Please enter your occupational category.',
     },

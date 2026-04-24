@@ -11,9 +11,9 @@ import {
   textareaSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const CERT_STATUS_LABELS = {
+const CERTIFICATION_STATUS_LABELS = {
   current: 'Current and active',
-  pending: 'Initial certification pending',
+  pending: 'Initial certification pending (exam scheduled or results awaited)',
   lapsed: 'Lapsed (not recertified by expiration date)',
   revoked: 'Revoked',
 };
@@ -22,21 +22,22 @@ export const boardCertificationsUiSchema = {
   boardCertifications: {
     'ui:title': 'Board certifications',
     'ui:description':
-      'List all board certifications you hold or have held. If you have no board certifications, you may leave this section empty and continue.',
+      'List all board certifications you hold or have held. If you have no board certifications, select Continue to proceed.',
     'ui:options': {
-      itemName: 'Certification',
-      viewField: item =>
-        `${item.certifyingBoard || 'Board'} — ${item.specialty || ''}`,
-      keepInPageOnReview: true,
+      itemName: 'Board certification',
+      viewField: ({ formData }) =>
+        `${formData.certifyingBoard || 'Certification'} — ${formData.specialty || ''}`,
     },
     items: {
       certifyingBoard: textUI({
         title: 'Certifying board or organization',
-        hint: 'For example: ANCC, NBCRNA, AANA, ABMS. If not listed, enter the full name.',
+        hint:
+          'For example: ANCC, NBCRNA, AANA. If your certifying organization is not listed, enter the name.',
         errorMessages: { required: 'Please enter the certifying board.' },
       }),
       specialty: textUI({
         title: 'Specialty or subspecialty certified',
+        hint: 'For example: Critical Care Nursing, Nurse Anesthesia',
         errorMessages: { required: 'Please enter the specialty.' },
       }),
       certificationNumber: textUI({
@@ -55,30 +56,33 @@ export const boardCertificationsUiSchema = {
       }),
       certificationStatus: radioUI({
         title: 'Current status of this certification',
-        labels: CERT_STATUS_LABELS,
-        errorMessages: { required: 'Please select the certification status.' },
-      }),
-      anticipatedCertificationDate: currentOrPastDateUI({
-        title: 'Expected date of certification',
-        'ui:options': {
-          hideIf: (formData, index) => {
-            const certs = formData?.boardCertifications;
-            if (!certs || !certs[index]) return true;
-            return certs[index].certificationStatus !== 'pending';
-          },
+        labels: CERTIFICATION_STATUS_LABELS,
+        errorMessages: {
+          required: 'Please select the certification status.',
         },
       }),
-      statusExplanation: textareaUI({
-        title: 'Explain the lapsed or revoked status',
+      anticipatedCertificationDate: {
+        ...currentOrPastDateUI({
+          title: 'Expected date of certification or exam date',
+        }),
         'ui:options': {
-          hideIf: (formData, index) => {
-            const certs = formData?.boardCertifications;
-            if (!certs || !certs[index]) return true;
-            const status = certs[index].certificationStatus;
-            return status !== 'lapsed' && status !== 'revoked';
-          },
+          hideIf: formData => !formData || formData.certificationStatus !== 'pending',
+          expandUnder: 'certificationStatus',
         },
-      }),
+      },
+      statusExplanation: {
+        ...textareaUI({
+          title: 'Explain the status of this certification',
+          charcount: true,
+        }),
+        'ui:options': {
+          hideIf: formData =>
+            !formData ||
+            (formData.certificationStatus !== 'lapsed' &&
+              formData.certificationStatus !== 'revoked'),
+          expandUnder: 'certificationStatus',
+        },
+      },
     },
   },
 };
@@ -92,11 +96,12 @@ export const boardCertificationsSchema = {
         type: 'object',
         properties: {
           certifyingBoard: { type: 'string', maxLength: 200 },
+          certifyingBoardOther: { type: 'string', maxLength: 200 },
           specialty: { type: 'string', maxLength: 200 },
           certificationNumber: { type: 'string', maxLength: 50 },
           initialCertificationDate: currentOrPastDateSchema,
           expirationDate: currentOrPastDateSchema,
-          certificationStatus: radioSchema(Object.keys(CERT_STATUS_LABELS)),
+          certificationStatus: radioSchema(['current', 'pending', 'lapsed', 'revoked']),
           anticipatedCertificationDate: currentOrPastDateSchema,
           statusExplanation: { type: 'string', maxLength: 1000 },
         },

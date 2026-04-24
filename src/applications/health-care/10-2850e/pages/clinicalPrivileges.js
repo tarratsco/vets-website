@@ -10,36 +10,45 @@ import {
 export const clinicalPrivilegesUiSchema = {
   adverseHistory: {
     clinicalPrivilegesAdverse: {
-      'ui:title': 'Clinical Privileges Adverse Actions',
+      'ui:title': 'Clinical privileges adverse actions',
       hasAdversePrivilegesHistory: yesNoUI({
         title:
           'Have your clinical privileges at any healthcare facility ever been denied, suspended, revoked, reduced, or not renewed, or have you ever resigned clinical privileges while under investigation?',
         errorMessages: {
           required:
-            'Please answer whether you have had any adverse clinical privileges actions.',
+            'Please indicate whether you have had adverse clinical privileges history.',
         },
       }),
       actionDate: {
         ...currentOrPastDateUI({
           title: 'Date of the adverse privileges action',
+          errorMessages: {
+            required: 'Please enter the date of the adverse action.',
+            futureDate: 'Action date cannot be in the future.',
+          },
         }),
         'ui:options': {
           hideIf: formData =>
             formData?.adverseHistory?.clinicalPrivilegesAdverse
               ?.hasAdversePrivilegesHistory !== true,
+          expandUnder: 'hasAdversePrivilegesHistory',
         },
       },
       explanation: {
         ...textareaUI({
-          title:
-            'Explain the circumstances of the adverse privileges action and the current resolution status',
+          title: 'Explain the circumstances of this adverse privileges action',
+          hint:
+            'Provide a full explanation of what occurred, the reason for the action, and its current resolution status.',
           charcount: true,
-          errorMessages: { required: 'Please provide an explanation.' },
+          errorMessages: {
+            required: 'Please provide an explanation of this adverse privileges action.',
+          },
         }),
         'ui:options': {
           hideIf: formData =>
             formData?.adverseHistory?.clinicalPrivilegesAdverse
               ?.hasAdversePrivilegesHistory !== true,
+          expandUnder: 'hasAdversePrivilegesHistory',
         },
       },
     },

@@ -1,28 +1,28 @@
 import {
   textUI,
   textSchema,
-  selectUI,
-  selectSchema,
   yesNoUI,
   yesNoSchema,
-  emailUI,
-  emailSchema,
+  selectUI,
+  selectSchema,
   phoneUI,
   phoneSchema,
+  emailUI,
+  emailSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const stateOptions = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
-  'DC', 'PR', 'GU', 'VI', 'AS', 'MP',
+const US_STATES = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
+  'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME',
+  'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH',
+  'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI',
+  'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI',
+  'WY', 'AS', 'GU', 'MP', 'PR', 'VI',
 ];
 
 export const contactInformationUiSchema = {
   contactInformation: {
-    'ui:title': 'Contact Information',
+    'ui:title': 'Contact information',
     homeAddress: {
       'ui:title': 'Home address',
       street: textUI({
@@ -46,8 +46,8 @@ export const contactInformationUiSchema = {
       }),
       zipCode: textUI({
         title: 'ZIP code',
-        inputType: 'text',
         autocomplete: 'postal-code',
+        inputType: 'numeric',
         errorMessages: {
           required: 'Please enter your ZIP code.',
           pattern: 'Please enter a valid 5-digit ZIP code.',
@@ -56,10 +56,6 @@ export const contactInformationUiSchema = {
     },
     mailingAddressSameAsHome: yesNoUI({
       title: 'Is your mailing address the same as your home address?',
-      labels: {
-        Y: 'Yes, my mailing address is the same as my home address',
-        N: 'No, my mailing address is different',
-      },
     }),
     mailingAddress: {
       'ui:title': 'Mailing address',
@@ -69,9 +65,12 @@ export const contactInformationUiSchema = {
       },
       street: textUI({
         title: 'Street address',
+        autocomplete: 'street-address',
         errorMessages: { required: 'Please enter your mailing street address.' },
       }),
-      street2: textUI({ title: 'Apartment or unit number' }),
+      street2: textUI({
+        title: 'Apartment or unit number',
+      }),
       city: textUI({
         title: 'City',
         errorMessages: { required: 'Please enter your mailing city.' },
@@ -82,6 +81,7 @@ export const contactInformationUiSchema = {
       }),
       zipCode: textUI({
         title: 'ZIP code',
+        inputType: 'numeric',
         errorMessages: {
           required: 'Please enter your mailing ZIP code.',
           pattern: 'Please enter a valid 5-digit ZIP code.',
@@ -90,12 +90,15 @@ export const contactInformationUiSchema = {
     },
     primaryPhone: phoneUI({
       title: 'Primary phone number',
+      hint: 'Enter a 10-digit U.S. phone number.',
       errorMessages: {
         required: 'Please enter your primary phone number.',
-        pattern: 'Please enter a valid 10-digit U.S. phone number.',
+        pattern: 'Please enter a valid 10-digit phone number.',
       },
     }),
-    alternatePhone: phoneUI('Alternate phone number (optional)'),
+    alternatePhone: phoneUI({
+      title: 'Alternate phone number (optional)',
+    }),
     professionalEmail: emailUI({
       title: 'Professional email address',
       hint:
@@ -108,6 +111,21 @@ export const contactInformationUiSchema = {
   },
 };
 
+const addressSchema = {
+  type: 'object',
+  required: ['street', 'city', 'state', 'zipCode'],
+  properties: {
+    street: { type: 'string', maxLength: 100 },
+    street2: { type: 'string', maxLength: 50 },
+    city: { type: 'string', maxLength: 100 },
+    state: selectSchema(US_STATES),
+    zipCode: {
+      type: 'string',
+      pattern: '^\\d{5}(-\\d{4})?$',
+    },
+  },
+};
+
 export const contactInformationSchema = {
   type: 'object',
   required: ['contactInformation'],
@@ -116,34 +134,9 @@ export const contactInformationSchema = {
       type: 'object',
       required: ['homeAddress', 'primaryPhone', 'professionalEmail'],
       properties: {
-        homeAddress: {
-          type: 'object',
-          required: ['street', 'city', 'state', 'zipCode'],
-          properties: {
-            street: { type: 'string', maxLength: 100 },
-            street2: { type: 'string', maxLength: 50 },
-            city: { type: 'string', maxLength: 100 },
-            state: selectSchema(stateOptions),
-            zipCode: {
-              type: 'string',
-              pattern: '^\\d{5}(-\\d{4})?$',
-            },
-          },
-        },
+        homeAddress: addressSchema,
         mailingAddressSameAsHome: yesNoSchema,
-        mailingAddress: {
-          type: 'object',
-          properties: {
-            street: { type: 'string', maxLength: 100 },
-            street2: { type: 'string', maxLength: 50 },
-            city: { type: 'string', maxLength: 100 },
-            state: selectSchema(stateOptions),
-            zipCode: {
-              type: 'string',
-              pattern: '^\\d{5}(-\\d{4})?$',
-            },
-          },
-        },
+        mailingAddress: addressSchema,
         primaryPhone: phoneSchema,
         alternatePhone: phoneSchema,
         professionalEmail: emailSchema,

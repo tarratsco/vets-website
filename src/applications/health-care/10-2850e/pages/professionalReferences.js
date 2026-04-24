@@ -3,25 +3,25 @@ import {
   textSchema,
   selectUI,
   selectSchema,
-  emailUI,
-  emailSchema,
   phoneUI,
   phoneSchema,
+  emailUI,
+  emailSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const relationshipOptions = [
-  'direct-supervisor',
-  'peer-colleague',
-  'department-chair',
-  'training-program-director',
-  'other-professional',
-];
+const RELATIONSHIP_LABELS = {
+  'direct-supervisor': 'Direct supervisor',
+  'peer-colleague': 'Peer/colleague',
+  'department-chair': 'Department chair or medical director',
+  'training-program-director': 'Training program director',
+  'other-professional': 'Other professional',
+};
 
 export const professionalReferencesUiSchema = {
   professionalReferences: {
-    'ui:title': 'Professional References',
+    'ui:title': 'Professional references',
     'ui:description':
-      'You must provide at least 3 professional references. References should be colleagues, supervisors, or clinical peers — not family members or personal friends.',
+      'Provide at least 3 professional references. References must be colleagues, supervisors, or clinical peers — not family members or personal friends.',
     'ui:options': {
       itemName: 'Reference',
       viewField: ({ formData }) =>
@@ -30,11 +30,15 @@ export const professionalReferencesUiSchema = {
     items: {
       lastName: textUI({
         title: "Reference's last name",
-        errorMessages: { required: "Please enter the reference's last name." },
+        errorMessages: {
+          required: "Please enter the reference's last name.",
+        },
       }),
       firstName: textUI({
         title: "Reference's first name",
-        errorMessages: { required: "Please enter the reference's first name." },
+        errorMessages: {
+          required: "Please enter the reference's first name.",
+        },
       }),
       professionalTitle: textUI({
         title: "Reference's professional title and credentials",
@@ -53,7 +57,7 @@ export const professionalReferencesUiSchema = {
         title: "Reference's phone number",
         errorMessages: {
           required: "Please enter the reference's phone number.",
-          pattern: 'Please enter a valid 10-digit U.S. phone number.',
+          pattern: 'Please enter a valid 10-digit phone number.',
         },
       }),
       email: emailUI({
@@ -65,12 +69,15 @@ export const professionalReferencesUiSchema = {
       }),
       relationship: selectUI({
         title: "This reference's relationship to you",
+        hint: 'Do not list family members or personal friends as professional references.',
+        labels: RELATIONSHIP_LABELS,
         errorMessages: {
-          required: "Please select the reference's relationship to you.",
+          required: 'Please select the relationship to this reference.',
         },
       }),
       yearsKnown: textUI({
         title: 'How many years have you known this reference?',
+        hint: 'Enter a number between 0 and 60.',
         inputType: 'number',
         errorMessages: {
           required: 'Please enter the number of years known.',
@@ -89,16 +96,28 @@ export const professionalReferencesSchema = {
       minItems: 3,
       items: {
         type: 'object',
-        required: ['lastName', 'firstName', 'professionalTitle', 'institution', 'phone', 'email', 'relationship'],
+        required: [
+          'lastName',
+          'firstName',
+          'professionalTitle',
+          'institution',
+          'phone',
+          'email',
+          'relationship',
+        ],
         properties: {
-          lastName: { type: 'string', minLength: 1, maxLength: 50 },
-          firstName: { type: 'string', minLength: 1, maxLength: 50 },
-          professionalTitle: { type: 'string', minLength: 1, maxLength: 200 },
-          institution: { type: 'string', minLength: 1, maxLength: 200 },
+          lastName: { type: 'string', maxLength: 50 },
+          firstName: { type: 'string', maxLength: 50 },
+          professionalTitle: { type: 'string', maxLength: 200 },
+          institution: { type: 'string', maxLength: 200 },
           phone: phoneSchema,
           email: emailSchema,
-          relationship: selectSchema(relationshipOptions),
-          yearsKnown: { type: 'integer', minimum: 0, maximum: 60 },
+          relationship: selectSchema(Object.keys(RELATIONSHIP_LABELS)),
+          yearsKnown: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 60,
+          },
         },
       },
     },

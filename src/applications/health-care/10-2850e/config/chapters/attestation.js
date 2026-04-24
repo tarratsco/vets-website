@@ -4,7 +4,7 @@ import {
 } from '../../pages/attestation';
 
 export default {
-  title: 'Attestation & Signature',
+  title: 'Attestation and Signature',
   pages: {
     attestation: {
       path: 'attestation',

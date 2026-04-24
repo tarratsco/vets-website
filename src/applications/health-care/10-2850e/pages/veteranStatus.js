@@ -3,13 +3,13 @@ import {
   yesNoSchema,
   textUI,
   textSchema,
-  selectUI,
-  selectSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
+  selectUI,
+  selectSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const dischargeOptions = [
+const DISCHARGE_CHARACTER_OPTIONS = [
   'honorable',
   'general',
   'other-than-honorable',
@@ -18,13 +18,22 @@ const dischargeOptions = [
   'uncharacterized',
 ];
 
+const DISCHARGE_CHARACTER_LABELS = {
+  honorable: 'Honorable',
+  general: 'General (Under Honorable Conditions)',
+  'other-than-honorable': 'Other Than Honorable',
+  'bad-conduct': 'Bad Conduct',
+  dishonorable: 'Dishonorable',
+  uncharacterized: 'Uncharacterized',
+};
+
 export const veteranStatusUiSchema = {
   veteranStatus: {
-    'ui:title': 'Veteran Status',
+    'ui:title': 'Veteran status',
     isVeteran: yesNoUI({
       title: 'Are you a Veteran of the U.S. Armed Forces?',
-      hint:
-        'As a Veteran, you may be eligible for Veterans preference in federal hiring.',
+      description:
+        'As a Veteran, you may be eligible for Veterans\' preference in federal hiring. Your service information will be recorded for preference determination purposes.',
       errorMessages: {
         required: 'Please indicate whether you are a Veteran.',
       },
@@ -35,24 +44,30 @@ export const veteranStatusUiSchema = {
         hint: 'For example: United States Army, United States Navy',
       }),
       'ui:options': {
-        expandUnder: 'isVeteran',
-        expandUnderCondition: true,
+        hideIf: formData => !formData?.veteranStatus?.isVeteran,
       },
     },
     dischargeDate: {
-      ...currentOrPastDateUI('Date of discharge or separation'),
+      ...currentOrPastDateUI({
+        title: 'Date of discharge',
+        errorMessages: {
+          required: 'Please enter your discharge date.',
+        },
+      }),
       'ui:options': {
-        expandUnder: 'isVeteran',
-        expandUnderCondition: true,
+        hideIf: formData => !formData?.veteranStatus?.isVeteran,
       },
     },
     characterOfDischarge: {
       ...selectUI({
         title: 'Character of discharge',
+        labels: DISCHARGE_CHARACTER_LABELS,
+        errorMessages: {
+          required: 'Please select your character of discharge.',
+        },
       }),
       'ui:options': {
-        expandUnder: 'isVeteran',
-        expandUnderCondition: true,
+        hideIf: formData => !formData?.veteranStatus?.isVeteran,
       },
     },
   },
@@ -67,7 +82,7 @@ export const veteranStatusSchema = {
         isVeteran: yesNoSchema,
         branchOfService: { type: 'string', maxLength: 100 },
         dischargeDate: currentOrPastDateSchema,
-        characterOfDischarge: selectSchema(dischargeOptions),
+        characterOfDischarge: selectSchema(DISCHARGE_CHARACTER_OPTIONS),
       },
     },
   },

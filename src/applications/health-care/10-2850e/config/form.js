@@ -14,6 +14,9 @@ import supportingDocuments from './chapters/supportingDocuments';
 import appointmentDetails from './chapters/appointmentDetails';
 import attestation from './chapters/attestation';
 
+const TITLE = 'Apply for a VA Clinical Position';
+const SUBTITLE = 'VA Form 10-2850e';
+
 /** @type {FormConfig} */
 const formConfig = {
   rootUrl: manifest.rootUrl,
@@ -24,14 +27,14 @@ const formConfig = {
   introduction: IntroductionPage,
   confirmation: ConfirmationPage,
   footerContent,
-  formId: '10-2850e',
+  formId: '10-2850E',
   saveInProgress: {
     messages: {
       inProgress:
-        'Your VA clinical position application (10-2850e) is in progress.',
+        'Your VA Form 10-2850e clinical position application is in progress.',
       expired:
-        'Your saved VA clinical position application (10-2850e) has expired. If you want to apply, please start a new application.',
-      saved: 'Your VA clinical position application has been saved.',
+        'Your saved VA Form 10-2850e application has expired. If you want to apply for a VA clinical position, please start a new application.',
+      saved: 'Your VA Form 10-2850e application has been saved.',
     },
   },
   version: 0,
@@ -42,22 +45,18 @@ const formConfig = {
     noAuth:
       'Please sign in again to continue your VA clinical position application.',
   },
-  title: 'Apply for a VA Clinical Position',
-  subTitle: 'VA Form 10-2850e',
+  title: TITLE,
+  subTitle: SUBTITLE,
   defaultDefinitions: {},
-  dev: {
-    showNavLinks: true,
-    collapsibleNavLinks: true,
-  },
   chapters: {
-    applicantInformation,
-    licensure,
-    educationTraining,
-    employmentHistory,
-    adverseHistory,
-    supportingDocuments,
-    appointmentDetails,
-    attestation,
+    applicantInformationChapter: applicantInformation,
+    licensureChapter: licensure,
+    educationTrainingChapter: educationTraining,
+    employmentHistoryChapter: employmentHistory,
+    adverseHistoryChapter: adverseHistory,
+    supportingDocumentsChapter: supportingDocuments,
+    appointmentDetailsChapter: appointmentDetails,
+    attestationChapter: attestation,
   },
 };
 

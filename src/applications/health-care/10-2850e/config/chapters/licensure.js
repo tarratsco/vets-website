@@ -1,11 +1,11 @@
 import {
-  professionalLicenseUiSchema,
-  professionalLicenseSchema,
-} from '../../pages/professionalLicense';
+  professionalLicensesUiSchema,
+  professionalLicensesSchema,
+} from '../../pages/professionalLicenses';
 import {
-  boardCertificationUiSchema,
-  boardCertificationSchema,
-} from '../../pages/boardCertification';
+  boardCertificationsUiSchema,
+  boardCertificationsSchema,
+} from '../../pages/boardCertifications';
 import {
   deaRegistrationUiSchema,
   deaRegistrationSchema,
@@ -17,15 +17,17 @@ export default {
     professionalLicenses: {
       path: 'professional-licenses',
       title: 'Professional licenses',
-      uiSchema: professionalLicenseUiSchema,
-      schema: professionalLicenseSchema,
+      uiSchema: professionalLicensesUiSchema,
+      schema: professionalLicensesSchema,
     },
+
     boardCertifications: {
       path: 'board-certifications',
       title: 'Board certifications',
-      uiSchema: boardCertificationUiSchema,
-      schema: boardCertificationSchema,
+      uiSchema: boardCertificationsUiSchema,
+      schema: boardCertificationsSchema,
     },
+
     deaRegistration: {
       path: 'dea-registration',
       title: 'DEA registration',
