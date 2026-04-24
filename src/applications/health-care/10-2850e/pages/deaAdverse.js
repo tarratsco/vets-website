@@ -1,10 +1,10 @@
 import {
   yesNoUI,
   yesNoSchema,
-  textareaUI,
-  textareaSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
+  textareaUI,
+  textareaSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 export const deaAdverseUiSchema = {
@@ -15,13 +15,14 @@ export const deaAdverseUiSchema = {
         title:
           'Has your DEA registration ever been denied, suspended, revoked, or surrendered?',
         hint: 'Answer Yes even if you do not currently hold or need a DEA registration.',
-        errorMessages: {
-          required: 'Please indicate whether you have any adverse DEA registration history.',
-        },
+        errorMessages: { required: 'Please answer this question.' },
       }),
       actionDate: {
         ...currentOrPastDateUI({
           title: 'Date of the action',
+          errorMessages: {
+            futureDate: 'Action date cannot be in the future.',
+          },
         }),
         'ui:options': {
           hideIf: formData =>
@@ -31,11 +32,8 @@ export const deaAdverseUiSchema = {
       },
       explanation: {
         ...textareaUI({
-          title: 'Explain the circumstances of this action',
-          charcount: true,
-          errorMessages: {
-            required: 'Please explain the circumstances.',
-          },
+          title: 'Explain the circumstances and current resolution status',
+          errorMessages: { required: 'Please provide an explanation.' },
         }),
         'ui:options': {
           hideIf: formData =>

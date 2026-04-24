@@ -1,32 +1,79 @@
 import {
   textUI,
   textSchema,
+  selectUI,
+  selectSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
   yesNoUI,
   yesNoSchema,
-  selectUI,
-  selectSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const US_STATES = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
-  'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME',
-  'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH',
-  'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI',
-  'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
-  'AS', 'GU', 'MP', 'PR', 'VI', 'Outside the United States',
-];
+const STATE_OPTIONS = {
+  AL: 'Alabama',
+  AK: 'Alaska',
+  AZ: 'Arizona',
+  AR: 'Arkansas',
+  CA: 'California',
+  CO: 'Colorado',
+  CT: 'Connecticut',
+  DE: 'Delaware',
+  DC: 'District of Columbia',
+  FL: 'Florida',
+  GA: 'Georgia',
+  HI: 'Hawaii',
+  ID: 'Idaho',
+  IL: 'Illinois',
+  IN: 'Indiana',
+  IA: 'Iowa',
+  KS: 'Kansas',
+  KY: 'Kentucky',
+  LA: 'Louisiana',
+  ME: 'Maine',
+  MD: 'Maryland',
+  MA: 'Massachusetts',
+  MI: 'Michigan',
+  MN: 'Minnesota',
+  MS: 'Mississippi',
+  MO: 'Missouri',
+  MT: 'Montana',
+  NE: 'Nebraska',
+  NV: 'Nevada',
+  NH: 'New Hampshire',
+  NJ: 'New Jersey',
+  NM: 'New Mexico',
+  NY: 'New York',
+  NC: 'North Carolina',
+  ND: 'North Dakota',
+  OH: 'Ohio',
+  OK: 'Oklahoma',
+  OR: 'Oregon',
+  PA: 'Pennsylvania',
+  RI: 'Rhode Island',
+  SC: 'South Carolina',
+  SD: 'South Dakota',
+  TN: 'Tennessee',
+  TX: 'Texas',
+  UT: 'Utah',
+  VT: 'Vermont',
+  VA: 'Virginia',
+  WA: 'Washington',
+  WV: 'West Virginia',
+  WI: 'Wisconsin',
+  WY: 'Wyoming',
+  OUTSIDE_US: 'Outside the United States',
+};
 
 export const employmentHistoryUiSchema = {
   employmentHistory: {
     'ui:title': 'Employment history',
     'ui:description':
-      'List all positions you have held in the past 10 years. You must account for all time, including any gaps of 30 days or more.',
+      'List all positions you have held in the past 10 years, including your current position. You must account for all time, including any gaps of 30 or more days.',
     'ui:options': {
       itemName: 'Position',
-      viewField: ({ formData }) =>
-        `${formData?.positionTitle || 'Position'} at ${formData?.employerName || ''}`,
+      viewField: item =>
+        `${item.positionTitle || 'Position'} at ${item.employerName || ''}`,
+      keepInPageOnReview: true,
     },
     items: {
       employerName: textUI({
@@ -38,11 +85,12 @@ export const employmentHistoryUiSchema = {
       }),
       employerCity: textUI({
         title: 'City',
-        errorMessages: { required: 'Please enter the city.' },
+        errorMessages: { required: 'Please enter the employer city.' },
       }),
       employerState: selectUI({
         title: 'State',
-        errorMessages: { required: 'Please select the state.' },
+        labels: STATE_OPTIONS,
+        errorMessages: { required: 'Please select the employer state.' },
       }),
       positionTitle: textUI({
         title: 'Position title or job title',
@@ -54,34 +102,40 @@ export const employmentHistoryUiSchema = {
       startDate: currentOrPastDateUI({
         title: 'Start date of employment',
         errorMessages: {
-          required: 'Please enter your employment start date.',
+          required: 'Please enter your start date.',
           futureDate: 'Start date cannot be in the future.',
         },
       }),
       isCurrentPosition: yesNoUI({
-        title: 'I currently work here',
+        title: 'Is this your current position?',
+        labels: {
+          Y: 'Yes, I currently work here.',
+          N: 'No, this is a previous position.',
+        },
       }),
       endDate: {
         ...currentOrPastDateUI({
           title: 'End date of employment',
         }),
         'ui:options': {
-          hideIf: (formData, index) =>
-            formData?.employmentHistory?.[index]?.isCurrentPosition === true,
+          hideIf: (formData, index) => {
+            const history = formData?.employmentHistory;
+            if (!history || !history[index]) return false;
+            return history[index].isCurrentPosition === true;
+          },
         },
-        'ui:required': (formData, index) =>
-          formData?.employmentHistory?.[index]?.isCurrentPosition !== true,
       },
-      reasonForLeaving: {
-        ...textUI({
-          title: 'Reason for leaving',
-          hint: 'Examples: Voluntary resignation, End of contract, Position eliminated, Relocation, Career advancement.',
-        }),
+      reasonForLeaving: textUI({
+        title: 'Reason for leaving',
+        hint: 'Examples: Voluntary resignation, End of contract, Position eliminated, Relocation, Career advancement.',
         'ui:options': {
-          hideIf: (formData, index) =>
-            formData?.employmentHistory?.[index]?.isCurrentPosition === true,
+          hideIf: (formData, index) => {
+            const history = formData?.employmentHistory;
+            if (!history || !history[index]) return false;
+            return history[index].isCurrentPosition === true;
+          },
         },
-      },
+      }),
       hoursPerWeek: textUI({
         title: 'Average hours per week',
         hint: 'Enter your average weekly clinical hours in this position.',
@@ -100,13 +154,19 @@ export const employmentHistorySchema = {
       minItems: 1,
       items: {
         type: 'object',
-        required: ['employerName', 'employerCity', 'employerState', 'positionTitle', 'startDate'],
+        required: [
+          'employerName',
+          'employerCity',
+          'employerState',
+          'positionTitle',
+          'startDate',
+        ],
         properties: {
-          employerName: { type: 'string', maxLength: 200, minLength: 1 },
+          employerName: { type: 'string', minLength: 1, maxLength: 200 },
           employerStreetAddress: { type: 'string', maxLength: 200 },
           employerCity: { type: 'string', maxLength: 100 },
-          employerState: selectSchema(US_STATES),
-          positionTitle: { type: 'string', maxLength: 200, minLength: 1 },
+          employerState: selectSchema(Object.keys(STATE_OPTIONS)),
+          positionTitle: { type: 'string', minLength: 1, maxLength: 200 },
           department: { type: 'string', maxLength: 200 },
           startDate: currentOrPastDateSchema,
           endDate: currentOrPastDateSchema,

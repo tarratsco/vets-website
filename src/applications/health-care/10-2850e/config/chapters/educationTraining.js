@@ -8,7 +8,7 @@ import {
 } from '../../pages/postgraduateTraining';
 
 export default {
-  title: 'Education and Training',
+  title: 'Education & Training',
   pages: {
     graduateDegree: {
       path: 'education-graduate',

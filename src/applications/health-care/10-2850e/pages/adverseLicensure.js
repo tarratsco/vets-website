@@ -1,24 +1,90 @@
 import {
   yesNoUI,
   yesNoSchema,
-  textareaUI,
-  textareaSchema,
   selectUI,
   selectSchema,
+  textUI,
+  textSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
+  textareaUI,
+  textareaSchema,
   radioUI,
   radioSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const US_STATES = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
-  'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME',
-  'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH',
-  'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI',
-  'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
-  'AS', 'GU', 'MP', 'PR', 'VI', 'Other jurisdiction',
-];
+const ACTION_TYPE_LABELS = {
+  'denial-of-initial-application': 'Denial of initial application',
+  'restriction-limitation': 'Restriction or limitation',
+  probation: 'Probation',
+  suspension: 'Suspension',
+  revocation: 'Revocation',
+  'voluntary-surrender-non-disciplinary':
+    'Voluntary surrender (non-disciplinary)',
+  'voluntary-surrender-disciplinary':
+    'Voluntary surrender (in lieu of disciplinary action)',
+  other: 'Other',
+};
+
+const CURRENT_STATUS_LABELS = {
+  resolved: 'Resolved',
+  ongoing: 'Ongoing',
+};
+
+const STATE_OPTIONS = {
+  AL: 'Alabama',
+  AK: 'Alaska',
+  AZ: 'Arizona',
+  AR: 'Arkansas',
+  CA: 'California',
+  CO: 'Colorado',
+  CT: 'Connecticut',
+  DE: 'Delaware',
+  DC: 'District of Columbia',
+  FL: 'Florida',
+  GA: 'Georgia',
+  HI: 'Hawaii',
+  ID: 'Idaho',
+  IL: 'Illinois',
+  IN: 'Indiana',
+  IA: 'Iowa',
+  KS: 'Kansas',
+  KY: 'Kentucky',
+  LA: 'Louisiana',
+  ME: 'Maine',
+  MD: 'Maryland',
+  MA: 'Massachusetts',
+  MI: 'Michigan',
+  MN: 'Minnesota',
+  MS: 'Mississippi',
+  MO: 'Missouri',
+  MT: 'Montana',
+  NE: 'Nebraska',
+  NV: 'Nevada',
+  NH: 'New Hampshire',
+  NJ: 'New Jersey',
+  NM: 'New Mexico',
+  NY: 'New York',
+  NC: 'North Carolina',
+  ND: 'North Dakota',
+  OH: 'Ohio',
+  OK: 'Oklahoma',
+  OR: 'Oregon',
+  PA: 'Pennsylvania',
+  RI: 'Rhode Island',
+  SC: 'South Carolina',
+  SD: 'South Dakota',
+  TN: 'Tennessee',
+  TX: 'Texas',
+  UT: 'Utah',
+  VT: 'Vermont',
+  VA: 'Virginia',
+  WA: 'Washington',
+  WV: 'West Virginia',
+  WI: 'Wisconsin',
+  WY: 'Wyoming',
+  OTHER: 'Other jurisdiction',
+};
 
 export const adverseLicensureUiSchema = {
   adverseHistory: {
@@ -27,10 +93,9 @@ export const adverseLicensureUiSchema = {
       hasAdverseLicensureActions: yesNoUI({
         title:
           'Has any state licensing board or professional regulatory body ever denied, limited, suspended, revoked, or accepted the surrender of your professional license or certification for cause?',
-        hint:
-          'Answer Yes even if the matter was resolved, the license was later reinstated, or the action occurred in another state.',
+        hint: 'Answer Yes even if the matter was resolved, the license was later reinstated, or the action occurred in another state. You will have an opportunity to explain the circumstances.',
         errorMessages: {
-          required: 'Please indicate whether you have any adverse licensure actions.',
+          required: 'Please answer this question.',
         },
       }),
       actions: {
@@ -39,42 +104,38 @@ export const adverseLicensureUiSchema = {
           hideIf: formData =>
             formData?.adverseHistory?.adverseLicensureActions
               ?.hasAdverseLicensureActions !== true,
-          itemName: 'Adverse action',
-          viewField: ({ formData }) =>
-            `${formData?.actionType || 'Action'} — ${formData?.stateOrJurisdiction || ''}`,
+          itemName: 'Action',
+          viewField: item =>
+            `${item.actionType || 'Action'} — ${item.stateOrJurisdiction || ''}`,
+          keepInPageOnReview: true,
         },
         items: {
           actionType: selectUI({
             title: 'Type of adverse action',
+            labels: ACTION_TYPE_LABELS,
             errorMessages: { required: 'Please select the action type.' },
           }),
           stateOrJurisdiction: selectUI({
             title: 'State or jurisdiction of the licensing board',
+            labels: STATE_OPTIONS,
             errorMessages: { required: 'Please select the state or jurisdiction.' },
           }),
           actionDate: currentOrPastDateUI({
             title: 'Date of the action',
             errorMessages: {
-              required: 'Please enter the date of this action.',
+              required: 'Please enter the date of the action.',
               futureDate: 'Action date cannot be in the future.',
             },
           }),
           explanation: textareaUI({
             title:
               'Explain the circumstances of this action and its current resolution status',
-            hint: 'Provide a full explanation including circumstances, outcome, and whether the matter was resolved.',
-            charcount: true,
-            errorMessages: {
-              required: 'Please explain the circumstances of this action.',
-              minLength: 'Please provide at least 10 characters.',
-            },
+            hint: 'Provide a full explanation including the circumstances, outcome, and whether and how the matter was resolved.',
+            errorMessages: { required: 'Please explain the circumstances.' },
           }),
           currentStatus: radioUI({
             title: 'Current status of this action',
-            labels: {
-              resolved: 'Resolved',
-              ongoing: 'Ongoing',
-            },
+            labels: CURRENT_STATUS_LABELS,
             errorMessages: { required: 'Please select the current status.' },
           }),
         },
@@ -100,22 +161,22 @@ export const adverseLicensureSchema = {
               type: 'array',
               items: {
                 type: 'object',
-                required: ['actionType', 'stateOrJurisdiction', 'actionDate', 'explanation'],
+                required: [
+                  'actionType',
+                  'stateOrJurisdiction',
+                  'actionDate',
+                  'explanation',
+                ],
                 properties: {
-                  actionType: selectSchema([
-                    'denial-of-initial-application',
-                    'restriction-limitation',
-                    'probation',
-                    'suspension',
-                    'revocation',
-                    'voluntary-surrender-non-disciplinary',
-                    'voluntary-surrender-disciplinary',
-                    'other',
-                  ]),
-                  stateOrJurisdiction: selectSchema(US_STATES),
+                  actionType: selectSchema(Object.keys(ACTION_TYPE_LABELS)),
+                  stateOrJurisdiction: selectSchema(
+                    Object.keys(STATE_OPTIONS),
+                  ),
                   actionDate: currentOrPastDateSchema,
-                  explanation: { type: 'string', maxLength: 3000, minLength: 10 },
-                  currentStatus: radioSchema(['resolved', 'ongoing']),
+                  explanation: { type: 'string', minLength: 10, maxLength: 3000 },
+                  currentStatus: radioSchema(
+                    Object.keys(CURRENT_STATUS_LABELS),
+                  ),
                 },
               },
             },

@@ -3,17 +3,30 @@ import {
   textSchema,
   selectUI,
   selectSchema,
+  phoneUI,
+  phoneSchema,
+  emailUI,
+  emailSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
+
+const RELATIONSHIP_LABELS = {
+  'direct-supervisor': 'Direct supervisor',
+  'peer-colleague': 'Peer / colleague',
+  'department-chair': 'Department chair or medical director',
+  'training-program-director': 'Training program director',
+  'other-professional': 'Other professional',
+};
 
 export const professionalReferencesUiSchema = {
   professionalReferences: {
     'ui:title': 'Professional references',
     'ui:description':
-      'Provide at least 3 professional references. Do not list family members or personal friends.',
+      'Provide at least 3 professional references. Do not list family members or personal friends. References should be colleagues, supervisors, or clinical peers who can speak to your professional qualifications.',
     'ui:options': {
       itemName: 'Reference',
-      viewField: ({ formData }) =>
-        `${formData?.firstName || ''} ${formData?.lastName || ''} — ${formData?.institution || ''}`,
+      viewField: item =>
+        `${item.firstName || ''} ${item.lastName || ''} — ${item.professionalTitle || ''}`,
+      keepInPageOnReview: true,
     },
     items: {
       lastName: textUI({
@@ -22,43 +35,35 @@ export const professionalReferencesUiSchema = {
       }),
       firstName: textUI({
         title: "Reference's first name",
-        errorMessages: { required: "Please enter the reference's first name." },
+        errorMessages: {
+          required: "Please enter the reference's first name.",
+        },
       }),
       professionalTitle: textUI({
         title: "Reference's professional title and credentials",
         hint: 'Example: Director of Nursing, MSN, RN',
-        errorMessages: { required: "Please enter the reference's professional title." },
+        errorMessages: {
+          required: "Please enter the reference's professional title.",
+        },
       }),
       institution: textUI({
         title: 'Institution or organization where reference works',
-        errorMessages: { required: "Please enter the reference's institution." },
-      }),
-      phone: textUI({
-        title: "Reference's phone number",
-        inputType: 'tel',
         errorMessages: {
-          required: "Please enter the reference's phone number.",
-          pattern: 'Please enter a valid phone number.',
+          required: 'Please enter the institution or organization.',
         },
       }),
-      email: textUI({
-        title: "Reference's email address",
-        inputType: 'email',
-        errorMessages: {
-          required: "Please enter the reference's email address.",
-          format: 'Please enter a valid email address.',
-        },
-      }),
+      phone: phoneUI("Reference's phone number"),
+      email: emailUI("Reference's email address"),
       relationship: selectUI({
         title: "This reference's relationship to you",
+        labels: RELATIONSHIP_LABELS,
         hint: 'Do not list family members or personal friends as professional references.',
-        errorMessages: { required: 'Please select the relationship.' },
+        errorMessages: { required: 'Please select the relationship type.' },
       }),
       yearsKnown: textUI({
         title: 'How many years have you known this reference?',
-        hint: 'Enter a number between 0 and 60.',
         inputType: 'number',
-        errorMessages: { required: 'Please enter how many years you have known this reference.' },
+        hint: 'Enter a number between 0 and 60.',
       }),
     },
   },
@@ -73,24 +78,23 @@ export const professionalReferencesSchema = {
       minItems: 3,
       items: {
         type: 'object',
-        required: ['lastName', 'firstName', 'professionalTitle', 'institution', 'phone', 'email', 'relationship'],
+        required: [
+          'lastName',
+          'firstName',
+          'professionalTitle',
+          'institution',
+          'phone',
+          'email',
+          'relationship',
+        ],
         properties: {
-          lastName: { type: 'string', maxLength: 50, minLength: 1 },
-          firstName: { type: 'string', maxLength: 50, minLength: 1 },
-          professionalTitle: { type: 'string', maxLength: 200, minLength: 1 },
-          institution: { type: 'string', maxLength: 200, minLength: 1 },
-          phone: {
-            type: 'string',
-            pattern: '^(?:\\(?[2-9]\\d{2}\\)?[-. ]?){1}\\d{3}[-. ]?\\d{4}$',
-          },
-          email: { type: 'string', format: 'email', maxLength: 256 },
-          relationship: selectSchema([
-            'direct-supervisor',
-            'peer-colleague',
-            'department-chair',
-            'training-program-director',
-            'other-professional',
-          ]),
+          lastName: { type: 'string', minLength: 1, maxLength: 50 },
+          firstName: { type: 'string', minLength: 1, maxLength: 50 },
+          professionalTitle: { type: 'string', minLength: 1, maxLength: 200 },
+          institution: { type: 'string', minLength: 1, maxLength: 200 },
+          phone: phoneSchema,
+          email: emailSchema,
+          relationship: selectSchema(Object.keys(RELATIONSHIP_LABELS)),
           yearsKnown: { type: 'integer', minimum: 0, maximum: 60 },
         },
       },

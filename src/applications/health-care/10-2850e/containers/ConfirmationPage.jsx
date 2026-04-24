@@ -19,20 +19,13 @@ export const ConfirmationPage = ({ route }) => {
   const applicantName =
     form?.data?.personalInformation || {};
 
-  const submitterName = applicantName
-    ? {
-        first: applicantName.firstName,
-        middle: applicantName.middleName,
-        last: applicantName.lastName,
-      }
-    : undefined;
-
-  const alertContent = (
+  const submissionAlertContent = (
     <p>
       Thank you for submitting your application for a VA clinical position. We
-      will review your credentialing application and contact you if we need
-      additional information. The VA Medical Center Human Resources office will
-      be in touch regarding next steps.
+      will route your application to the VA Medical Center you selected.
+      {formattedSubmitDate
+        ? ` Your application was submitted on ${formattedSubmitDate}.`
+        : ''}
     </p>
   );
 
@@ -41,23 +34,33 @@ export const ConfirmationPage = ({ route }) => {
       formConfig={route?.formConfig}
       submitDate={submitDate}
       confirmationNumber={confirmationNumber}
-      submitterName={submitterName}
+      submitterName={applicantName}
       devOnly={{ showButtons: true }}
     >
       <ConfirmationView.SubmissionAlert
-        title={`You've submitted your VA clinical position application${
-          formattedSubmitDate ? ` on ${formattedSubmitDate}` : ''
-        }`}
-        content={alertContent}
+        title="Your application has been submitted"
+        content={submissionAlertContent}
+        actions={<p />}
       />
-      <ConfirmationView.ChapterSectionCollection />
+
+      <div
+        data-dd-privacy="mask"
+        data-dd-action-name="confirmation summary"
+      >
+        <ConfirmationView.ChapterSectionCollection />
+      </div>
+
       <ConfirmationView.PrintThisPage />
+
       <ConfirmationView.WhatsNextProcessList
-        item1Header="We'll review your application"
-        item1Content="The VA Medical Center credentialing office will review your submitted application and verify your credentials through primary source verification."
-        item2Header="We'll contact you about next steps"
-        item2Content="If we need more information, we'll contact you at the email address or phone number you provided. Allow 4-6 weeks for the credentialing review process."
+        item1Header="We'll route your application to the VA facility"
+        item1Content="Your application will be sent to the credentialing office at the VA Medical Center you selected. They will contact you regarding next steps in the credentialing and privileging process."
+        item1Actions={<p />}
+        item2Header="Primary source verification will begin"
+        item2Content="The VA credentialing office will verify your licenses, certifications, education, and employment history through primary source verification (PSV) as required by VHA Handbook 1100.19."
+        item2Actions={<p />}
       />
+
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />
       <ConfirmationView.NeedHelp />

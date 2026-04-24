@@ -1,29 +1,45 @@
 import {
   textUI,
   textSchema,
-  radioUI,
-  radioSchema,
   selectUI,
   selectSchema,
+  radioUI,
+  radioSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
   textareaUI,
   textareaSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
+const TRAINING_TYPE_LABELS = {
+  internship: 'Internship',
+  residency: 'Residency',
+  fellowship: 'Fellowship',
+  'clinical-practicum': 'Clinical practicum',
+  other: 'Other',
+};
+
+const COMPLETION_STATUS_LABELS = {
+  completed: 'Yes, completed',
+  'in-progress': 'Currently in progress',
+  'did-not-complete': 'Did not complete',
+};
+
 export const postgraduateTrainingUiSchema = {
   postgraduateTraining: {
     'ui:title': 'Postgraduate training',
     'ui:description':
-      'List all residency, fellowship, internship, and other postgraduate training programs you have completed or are currently enrolled in. If you have no postgraduate training, continue to the next section.',
+      'List all postgraduate training programs (residency, fellowship, internship) you have completed or are currently enrolled in. If you have no postgraduate training, you may leave this section empty and continue.',
     'ui:options': {
       itemName: 'Training program',
-      viewField: ({ formData }) =>
-        `${formData?.trainingType || 'Training'} — ${formData?.programName || ''}`,
+      viewField: item =>
+        `${item.trainingType || 'Training'} — ${item.programName || ''}`,
+      keepInPageOnReview: true,
     },
     items: {
       trainingType: selectUI({
         title: 'Type of postgraduate training',
+        labels: TRAINING_TYPE_LABELS,
         errorMessages: { required: 'Please select the training type.' },
       }),
       programName: textUI({
@@ -32,7 +48,9 @@ export const postgraduateTrainingUiSchema = {
       }),
       sponsoringInstitution: textUI({
         title: 'Name of sponsoring institution or hospital',
-        errorMessages: { required: 'Please enter the sponsoring institution.' },
+        errorMessages: {
+          required: 'Please enter the sponsoring institution.',
+        },
       }),
       specialty: textUI({
         title: 'Specialty or focus area of training',
@@ -44,38 +62,30 @@ export const postgraduateTrainingUiSchema = {
           futureDate: 'Start date cannot be in the future.',
         },
       }),
-      endDate: {
-        ...currentOrPastDateUI({
-          title: 'Training end date',
-          hint: 'If you are currently in this training program, leave this blank.',
-        }),
-        'ui:required': () => false,
-      },
+      endDate: currentOrPastDateUI({
+        title: 'Training end date',
+        hint: 'If you are currently in this training program, leave this blank.',
+      }),
       completionStatus: radioUI({
         title: 'Did you complete this training program?',
-        labels: {
-          completed: 'Yes, completed',
-          'in-progress': 'Currently in progress',
-          'did-not-complete': 'Did not complete',
+        labels: COMPLETION_STATUS_LABELS,
+        errorMessages: { required: 'Please select a completion status.' },
+      }),
+      nonCompletionExplanation: textareaUI({
+        title: 'Explain why this training was not completed',
+        'ui:options': {
+          hideIf: (formData, index) => {
+            const training = formData?.postgraduateTraining;
+            if (!training || !training[index]) return true;
+            return (
+              training[index].completionStatus !== 'did-not-complete'
+            );
+          },
         },
         errorMessages: {
-          required: 'Please select the completion status.',
+          required: 'Please explain why the training was not completed.',
         },
       }),
-      nonCompletionExplanation: {
-        ...textareaUI({
-          title: 'Explain why you did not complete this training program',
-          charcount: true,
-          errorMessages: {
-            required: 'Please explain why you did not complete this program.',
-          },
-        }),
-        'ui:options': {
-          hideIf: (formData, index) =>
-            formData?.postgraduateTraining?.[index]?.completionStatus !==
-            'did-not-complete',
-        },
-      },
     },
   },
 };
@@ -87,21 +97,27 @@ export const postgraduateTrainingSchema = {
       type: 'array',
       items: {
         type: 'object',
-        required: ['trainingType', 'programName', 'sponsoringInstitution', 'startDate', 'completionStatus'],
+        required: [
+          'trainingType',
+          'programName',
+          'sponsoringInstitution',
+          'startDate',
+          'completionStatus',
+        ],
         properties: {
-          trainingType: selectSchema([
-            'internship',
-            'residency',
-            'fellowship',
-            'clinical-practicum',
-            'other',
-          ]),
-          programName: { type: 'string', maxLength: 200, minLength: 1 },
-          sponsoringInstitution: { type: 'string', maxLength: 200, minLength: 1 },
+          trainingType: selectSchema(Object.keys(TRAINING_TYPE_LABELS)),
+          programName: { type: 'string', minLength: 1, maxLength: 200 },
+          sponsoringInstitution: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 200,
+          },
           specialty: { type: 'string', maxLength: 200 },
           startDate: currentOrPastDateSchema,
           endDate: currentOrPastDateSchema,
-          completionStatus: radioSchema(['completed', 'in-progress', 'did-not-complete']),
+          completionStatus: radioSchema(
+            Object.keys(COMPLETION_STATUS_LABELS),
+          ),
           nonCompletionExplanation: { type: 'string', maxLength: 1000 },
         },
       },

@@ -3,9 +3,9 @@ import {
   employmentHistorySchema,
 } from '../../pages/employmentHistory';
 import {
-  employmentGapUiSchema,
-  employmentGapSchema,
-} from '../../pages/employmentGap';
+  employmentGapsUiSchema,
+  employmentGapsSchema,
+} from '../../pages/employmentGaps';
 import {
   professionalReferencesUiSchema,
   professionalReferencesSchema,
@@ -21,12 +21,13 @@ export default {
       schema: employmentHistorySchema,
     },
 
-    employmentGap: {
-      path: 'employment-gap-explanation',
-      title: 'Employment gap explanation',
-      uiSchema: employmentGapUiSchema,
-      schema: employmentGapSchema,
+    employmentGaps: {
+      path: 'employment-gaps',
+      title: 'Employment gaps',
+      uiSchema: employmentGapsUiSchema,
+      schema: employmentGapsSchema,
     },
+
     professionalReferences: {
       path: 'professional-references',
       title: 'Professional references',

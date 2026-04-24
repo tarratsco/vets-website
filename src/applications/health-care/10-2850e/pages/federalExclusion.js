@@ -10,9 +10,11 @@ export const federalExclusionUiSchema = {
       isCurrentlyExcluded: yesNoUI({
         title:
           'Are you currently listed on the HHS Office of Inspector General (OIG) List of Excluded Individuals and Entities, the SAM.gov excluded parties list, or any other federal healthcare program exclusion list?',
-        errorMessages: {
-          required: 'Please indicate your federal exclusion status.',
+        labels: {
+          Y: 'Yes, I am currently listed on a federal exclusion list.',
+          N: 'No, I am not currently listed on any federal exclusion list.',
         },
+        errorMessages: { required: 'Please answer this question.' },
       }),
     },
   },

@@ -6,11 +6,11 @@ import {
 export const boardCertDocumentsUiSchema = {
   supportingDocuments: {
     boardCertificationDocuments: fileInputMultipleUI({
-      title: 'Upload copies of your board certification certificates',
-      hint: 'Upload a copy of each board certification certificate you listed in the Licensure section. Accepted file types: PDF, JPG, PNG. Maximum file size: 20 MB.',
+      title: 'Upload your board certification certificates',
+      hint: 'Upload a copy of each board certification certificate you listed in the Licensure section. Accepted formats: PDF, JPG, PNG. Maximum file size: 20MB per file.',
       required: true,
       errorMessages: {
-        required: 'Please upload at least one board certification document.',
+        required: 'Please upload your board certification documents.',
       },
     }),
   },
@@ -18,9 +18,11 @@ export const boardCertDocumentsUiSchema = {
 
 export const boardCertDocumentsSchema = {
   type: 'object',
+  required: ['supportingDocuments'],
   properties: {
     supportingDocuments: {
       type: 'object',
+      required: ['boardCertificationDocuments'],
       properties: {
         boardCertificationDocuments: fileInputMultipleSchema(),
       },

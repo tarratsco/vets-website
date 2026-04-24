@@ -9,7 +9,20 @@ import {
   selectSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const SUFFIX_OPTIONS = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'MD', 'DO', 'PhD', 'NP', 'CRNA', 'RN', 'DNP'];
+const SUFFIX_OPTIONS = {
+  'Jr.': 'Jr.',
+  'Sr.': 'Sr.',
+  II: 'II',
+  III: 'III',
+  IV: 'IV',
+  MD: 'MD',
+  DO: 'DO',
+  PhD: 'PhD',
+  NP: 'NP',
+  CRNA: 'CRNA',
+  RN: 'RN',
+  DNP: 'DNP',
+};
 
 export const personalInformationUiSchema = {
   personalInformation: {
@@ -31,12 +44,13 @@ export const personalInformationUiSchema = {
     }),
     middleName: textUI({
       title: 'Middle name',
-      hint: 'Enter your middle name or initial if applicable.',
+      hint: 'Enter your middle name, if applicable. If you have a middle initial only, enter the initial.',
       autocomplete: 'additional-name',
     }),
     suffix: selectUI({
       title: 'Suffix',
       hint: 'Select a suffix only if it appears on your professional license or government-issued ID.',
+      labels: SUFFIX_OPTIONS,
     }),
     dateOfBirth: currentOrPastDateUI({
       title: 'Date of birth',
@@ -64,14 +78,31 @@ export const personalInformationSchema = {
       type: 'object',
       required: ['lastName', 'firstName', 'dateOfBirth', 'ssn'],
       properties: {
-        lastName: { type: 'string', maxLength: 50, minLength: 1 },
-        firstName: { type: 'string', maxLength: 50, minLength: 1 },
-        middleName: { type: 'string', maxLength: 50 },
-        suffix: selectSchema(SUFFIX_OPTIONS),
+        lastName: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 50,
+        },
+        firstName: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 50,
+        },
+        middleName: {
+          type: 'string',
+          maxLength: 50,
+        },
+        suffix: selectSchema(Object.keys(SUFFIX_OPTIONS)),
         dateOfBirth: currentOrPastDateSchema,
         ssn: ssnSchema,
-        cityOfBirth: { type: 'string', maxLength: 100 },
-        stateOrCountryOfBirth: { type: 'string', maxLength: 100 },
+        cityOfBirth: {
+          type: 'string',
+          maxLength: 100,
+        },
+        stateOrCountryOfBirth: {
+          type: 'string',
+          maxLength: 100,
+        },
       },
     },
   },
