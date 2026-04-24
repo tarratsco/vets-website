@@ -4,18 +4,26 @@ import {
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 export const otherDocumentsUiSchema = {
-  otherDocuments: fileInputMultipleUI({
-    title: 'Upload additional required documents',
-    hint:
-      'Upload any additional required documents such as your diploma, training certificates, or work authorization documents if applicable. Accepted formats: PDF, JPG, PNG. Maximum 20MB per file.',
-    required: false,
-    errorMessages: {},
-  }),
+  supportingDocuments: {
+    otherDocuments: fileInputMultipleUI({
+      title: 'Upload any additional required documents',
+      hint: 'Upload any additional required documents such as your diploma, training certificates, or work authorization documents. Accepted file types: PDF, JPG, PNG. Maximum file size: 20 MB.',
+      required: false,
+      errorMessages: {
+        required: 'Please upload a document.',
+      },
+    }),
+  },
 };
 
 export const otherDocumentsSchema = {
   type: 'object',
   properties: {
-    otherDocuments: fileInputMultipleSchema(),
+    supportingDocuments: {
+      type: 'object',
+      properties: {
+        otherDocuments: fileInputMultipleSchema(),
+      },
+    },
   },
 };

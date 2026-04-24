@@ -9,13 +9,13 @@ import {
 
 export const clinicalPrivilegesUiSchema = {
   adverseHistory: {
-    'ui:title': 'Clinical privileges adverse actions',
     clinicalPrivilegesAdverse: {
+      'ui:title': 'Clinical privileges adverse history',
       hasAdversePrivilegesHistory: yesNoUI({
         title:
           'Have your clinical privileges at any healthcare facility ever been denied, suspended, revoked, reduced, or not renewed, or have you ever resigned clinical privileges while under investigation?',
         errorMessages: {
-          required: 'Please answer this question.',
+          required: 'Please indicate whether you have any adverse clinical privileges history.',
         },
       }),
       actionDate: {
@@ -24,28 +24,35 @@ export const clinicalPrivilegesUiSchema = {
         }),
         'ui:options': {
           hideIf: formData =>
-            !formData?.adverseHistory?.clinicalPrivilegesAdverse
-              ?.hasAdversePrivilegesHistory,
+            formData?.adverseHistory?.clinicalPrivilegesAdverse
+              ?.hasAdversePrivilegesHistory !== true,
         },
       },
-      explanation: textareaUI({
-        title: 'Explain the circumstances of this action',
-        charcount: true,
+      explanation: {
+        ...textareaUI({
+          title: 'Explain the circumstances of this action',
+          charcount: true,
+          errorMessages: {
+            required: 'Please explain the circumstances.',
+          },
+        }),
         'ui:options': {
           hideIf: formData =>
-            !formData?.adverseHistory?.clinicalPrivilegesAdverse
-              ?.hasAdversePrivilegesHistory,
+            formData?.adverseHistory?.clinicalPrivilegesAdverse
+              ?.hasAdversePrivilegesHistory !== true,
         },
-      }),
+      },
     },
   },
 };
 
 export const clinicalPrivilegesSchema = {
   type: 'object',
+  required: ['adverseHistory'],
   properties: {
     adverseHistory: {
       type: 'object',
+      required: ['clinicalPrivilegesAdverse'],
       properties: {
         clinicalPrivilegesAdverse: {
           type: 'object',

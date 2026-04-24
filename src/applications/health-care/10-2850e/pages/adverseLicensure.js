@@ -1,79 +1,81 @@
 import {
   yesNoUI,
   yesNoSchema,
-  selectUI,
-  selectSchema,
   textareaUI,
   textareaSchema,
+  selectUI,
+  selectSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
   radioUI,
   radioSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
+const US_STATES = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
+  'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME',
+  'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH',
+  'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI',
+  'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+  'AS', 'GU', 'MP', 'PR', 'VI', 'Other jurisdiction',
+];
+
 export const adverseLicensureUiSchema = {
   adverseHistory: {
-    'ui:title': 'Adverse licensure actions',
     adverseLicensureActions: {
+      'ui:title': 'Adverse licensure actions',
       hasAdverseLicensureActions: yesNoUI({
         title:
           'Has any state licensing board or professional regulatory body ever denied, limited, suspended, revoked, or accepted the surrender of your professional license or certification for cause?',
         hint:
-          'Answer Yes even if the matter was resolved, the license was later reinstated, or the action occurred in another state. You will have an opportunity to explain the circumstances.',
+          'Answer Yes even if the matter was resolved, the license was later reinstated, or the action occurred in another state.',
         errorMessages: {
-          required: 'Please answer this question.',
+          required: 'Please indicate whether you have any adverse licensure actions.',
         },
       }),
       actions: {
+        'ui:title': 'Adverse licensure action details',
         'ui:options': {
-          itemName: 'adverse action',
-          viewField: ActionViewField,
           hideIf: formData =>
-            !formData?.adverseHistory?.adverseLicensureActions
-              ?.hasAdverseLicensureActions,
-          keepInPageOnReview: true,
+            formData?.adverseHistory?.adverseLicensureActions
+              ?.hasAdverseLicensureActions !== true,
+          itemName: 'Adverse action',
+          viewField: ({ formData }) =>
+            `${formData?.actionType || 'Action'} — ${formData?.stateOrJurisdiction || ''}`,
         },
         items: {
           actionType: selectUI({
             title: 'Type of adverse action',
-            labels: {
-              'denial-of-initial-application': 'Denial of initial application',
-              'restriction-limitation': 'Restriction or limitation',
-              probation: 'Probation',
-              suspension: 'Suspension',
-              revocation: 'Revocation',
-              'voluntary-surrender-non-disciplinary':
-                'Voluntary surrender (non-disciplinary)',
-              'voluntary-surrender-disciplinary':
-                'Voluntary surrender (in lieu of disciplinary action)',
-              other: 'Other',
-            },
-            errorMessages: {
-              required: 'Please select the type of action.',
-            },
+            errorMessages: { required: 'Please select the action type.' },
           }),
-          stateOrJurisdiction: textareaUI({
+          stateOrJurisdiction: selectUI({
             title: 'State or jurisdiction of the licensing board',
+            errorMessages: { required: 'Please select the state or jurisdiction.' },
           }),
           actionDate: currentOrPastDateUI({
             title: 'Date of the action',
+            errorMessages: {
+              required: 'Please enter the date of this action.',
+              futureDate: 'Action date cannot be in the future.',
+            },
           }),
           explanation: textareaUI({
             title:
               'Explain the circumstances of this action and its current resolution status',
-            hint:
-              'Provide a full explanation of the circumstances, the outcome, and how the matter was resolved. Attach supporting documentation in the next section.',
+            hint: 'Provide a full explanation including circumstances, outcome, and whether the matter was resolved.',
             charcount: true,
             errorMessages: {
-              required: 'Please provide an explanation.',
+              required: 'Please explain the circumstances of this action.',
+              minLength: 'Please provide at least 10 characters.',
             },
           }),
           currentStatus: radioUI({
-            title: 'Current status of this matter',
+            title: 'Current status of this action',
             labels: {
               resolved: 'Resolved',
               ongoing: 'Ongoing',
             },
+            errorMessages: { required: 'Please select the current status.' },
           }),
         },
       },
@@ -81,15 +83,13 @@ export const adverseLicensureUiSchema = {
   },
 };
 
-function ActionViewField({ formData }) {
-  return <div>{formData.actionType}</div>;
-}
-
 export const adverseLicensureSchema = {
   type: 'object',
+  required: ['adverseHistory'],
   properties: {
     adverseHistory: {
       type: 'object',
+      required: ['adverseLicensureActions'],
       properties: {
         adverseLicensureActions: {
           type: 'object',
@@ -112,7 +112,7 @@ export const adverseLicensureSchema = {
                     'voluntary-surrender-disciplinary',
                     'other',
                   ]),
-                  stateOrJurisdiction: { type: 'string', maxLength: 100 },
+                  stateOrJurisdiction: selectSchema(US_STATES),
                   actionDate: currentOrPastDateSchema,
                   explanation: { type: 'string', maxLength: 3000, minLength: 10 },
                   currentStatus: radioSchema(['resolved', 'ongoing']),

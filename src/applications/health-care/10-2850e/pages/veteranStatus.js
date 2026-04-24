@@ -7,6 +7,8 @@ import {
   currentOrPastDateSchema,
   radioUI,
   radioSchema,
+  selectUI,
+  selectSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 export const veteranStatusUiSchema = {
@@ -14,36 +16,41 @@ export const veteranStatusUiSchema = {
     'ui:title': 'Veteran status',
     isVeteran: yesNoUI({
       title: 'Are you a Veteran of the U.S. Armed Forces?',
-      hint:
-        'As a Veteran, you may be eligible for Veterans preference in federal hiring.',
-    }),
-    branchOfService: textUI({
-      title: 'Branch of service',
-      hint: 'For example: United States Army',
-      'ui:options': {
-        hideIf: formData => !formData?.veteranStatus?.isVeteran,
+      errorMessages: {
+        required: 'Please indicate whether you are a Veteran.',
       },
     }),
-    characterOfDischarge: radioUI({
-      title: 'Character of discharge',
-      labels: {
-        honorable: 'Honorable',
-        general: 'General',
-        'other-than-honorable': 'Other than honorable',
-        'bad-conduct': 'Bad conduct',
-        dishonorable: 'Dishonorable',
-        uncharacterized: 'Uncharacterized',
-      },
-      'ui:options': {
-        hideIf: formData => !formData?.veteranStatus?.isVeteran,
-      },
-    }),
-    dischargeDate: {
-      ...currentOrPastDateUI({
-        title: 'Discharge date',
+    branchOfService: {
+      ...textUI({
+        title: 'Branch of service',
+        hint: 'For example: United States Army, United States Navy',
       }),
       'ui:options': {
-        hideIf: formData => !formData?.veteranStatus?.isVeteran,
+        hideIf: formData => formData?.veteranStatus?.isVeteran !== true,
+      },
+    },
+    dischargeDate: {
+      ...currentOrPastDateUI({
+        title: 'Date of discharge',
+      }),
+      'ui:options': {
+        hideIf: formData => formData?.veteranStatus?.isVeteran !== true,
+      },
+    },
+    characterOfDischarge: {
+      ...radioUI({
+        title: 'Character of discharge',
+        labels: {
+          honorable: 'Honorable',
+          general: 'General (Under Honorable Conditions)',
+          'other-than-honorable': 'Other Than Honorable',
+          'bad-conduct': 'Bad Conduct',
+          dishonorable: 'Dishonorable',
+          uncharacterized: 'Uncharacterized',
+        },
+      }),
+      'ui:options': {
+        hideIf: formData => formData?.veteranStatus?.isVeteran !== true,
       },
     },
   },
@@ -51,12 +58,15 @@ export const veteranStatusUiSchema = {
 
 export const veteranStatusSchema = {
   type: 'object',
+  required: ['veteranStatus'],
   properties: {
     veteranStatus: {
       type: 'object',
+      required: ['isVeteran'],
       properties: {
         isVeteran: yesNoSchema,
         branchOfService: { type: 'string', maxLength: 100 },
+        dischargeDate: currentOrPastDateSchema,
         characterOfDischarge: radioSchema([
           'honorable',
           'general',
@@ -65,7 +75,6 @@ export const veteranStatusSchema = {
           'dishonorable',
           'uncharacterized',
         ]),
-        dischargeDate: currentOrPastDateSchema,
       },
     },
   },

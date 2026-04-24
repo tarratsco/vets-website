@@ -9,14 +9,14 @@ import {
 
 export const deaAdverseUiSchema = {
   adverseHistory: {
-    'ui:title': 'DEA registration adverse actions',
     deaRegistrationAdverse: {
+      'ui:title': 'DEA registration adverse actions',
       hasAdverseDeaHistory: yesNoUI({
         title:
           'Has your DEA registration ever been denied, suspended, revoked, or surrendered?',
         hint: 'Answer Yes even if you do not currently hold or need a DEA registration.',
         errorMessages: {
-          required: 'Please answer this question.',
+          required: 'Please indicate whether you have any adverse DEA registration history.',
         },
       }),
       actionDate: {
@@ -25,26 +25,35 @@ export const deaAdverseUiSchema = {
         }),
         'ui:options': {
           hideIf: formData =>
-            !formData?.adverseHistory?.deaRegistrationAdverse?.hasAdverseDeaHistory,
+            formData?.adverseHistory?.deaRegistrationAdverse
+              ?.hasAdverseDeaHistory !== true,
         },
       },
-      explanation: textareaUI({
-        title: 'Explain the circumstances of this action',
-        charcount: true,
+      explanation: {
+        ...textareaUI({
+          title: 'Explain the circumstances of this action',
+          charcount: true,
+          errorMessages: {
+            required: 'Please explain the circumstances.',
+          },
+        }),
         'ui:options': {
           hideIf: formData =>
-            !formData?.adverseHistory?.deaRegistrationAdverse?.hasAdverseDeaHistory,
+            formData?.adverseHistory?.deaRegistrationAdverse
+              ?.hasAdverseDeaHistory !== true,
         },
-      }),
+      },
     },
   },
 };
 
 export const deaAdverseSchema = {
   type: 'object',
+  required: ['adverseHistory'],
   properties: {
     adverseHistory: {
       type: 'object',
+      required: ['deaRegistrationAdverse'],
       properties: {
         deaRegistrationAdverse: {
           type: 'object',

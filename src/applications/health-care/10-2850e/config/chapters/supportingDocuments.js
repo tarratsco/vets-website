@@ -28,21 +28,21 @@ export default {
   pages: {
     licenseDocuments: {
       path: 'document-upload-licenses',
-      title: 'Upload professional licenses',
+      title: 'License documents',
       uiSchema: licenseDocumentsUiSchema,
       schema: licenseDocumentsSchema,
     },
     deaCertificate: {
       path: 'document-upload-dea',
-      title: 'Upload DEA certificate',
+      title: 'DEA certificate',
       depends: formData =>
         formData?.deaRegistration?.deaApplicable === 'yes-current',
       uiSchema: deaCertificateUiSchema,
       schema: deaCertificateSchema,
     },
     boardCertDocuments: {
-      path: 'document-upload-board-certifications',
-      title: 'Upload board certification documents',
+      path: 'document-upload-board-certs',
+      title: 'Board certification documents',
       depends: formData =>
         Array.isArray(formData?.boardCertifications) &&
         formData.boardCertifications.length > 0,
@@ -50,14 +50,14 @@ export default {
       schema: boardCertDocumentsSchema,
     },
     malpracticeInsurance: {
-      path: 'document-upload-malpractice-insurance',
-      title: 'Upload malpractice insurance certificate',
+      path: 'document-upload-malpractice',
+      title: 'Malpractice insurance certificate',
       uiSchema: malpracticeInsuranceUiSchema,
       schema: malpracticeInsuranceSchema,
     },
     adverseHistoryDocs: {
       path: 'document-upload-adverse-history',
-      title: 'Upload adverse history documents',
+      title: 'Adverse history documents',
       depends: formData =>
         formData?.adverseHistory?.adverseLicensureActions
           ?.hasAdverseLicensureActions === true ||
@@ -76,7 +76,7 @@ export default {
     },
     otherDocuments: {
       path: 'document-upload-other',
-      title: 'Upload other documents',
+      title: 'Other documents',
       uiSchema: otherDocumentsUiSchema,
       schema: otherDocumentsSchema,
     },

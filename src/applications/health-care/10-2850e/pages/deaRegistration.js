@@ -15,7 +15,6 @@ const SCHEDULE_LABELS = {
   IV: 'Schedule IV',
   V: 'Schedule V',
 };
-
 const SCHEDULE_KEYS = Object.keys(SCHEDULE_LABELS);
 
 export const deaRegistrationUiSchema = {
@@ -23,9 +22,9 @@ export const deaRegistrationUiSchema = {
     'ui:title': 'DEA registration',
     deaApplicable: radioUI({
       title:
-        'Do you hold a DEA registration, or is a DEA registration required for the position for which you are applying?',
+        'Do you hold a DEA registration, or is a DEA registration required for the position you are applying for?',
       hint:
-        'A DEA registration is required if you will prescribe, administer, or dispense controlled substances in your clinical role.',
+        'A DEA registration is required if you will prescribe, administer, or dispense controlled substances.',
       labels: {
         'yes-current': 'Yes, I currently hold an active DEA registration',
         'yes-required':
@@ -37,31 +36,39 @@ export const deaRegistrationUiSchema = {
         required: 'Please select a DEA registration option.',
       },
     }),
-    deaNumber: textUI({
-      title: 'DEA registration number',
-      hint: 'Enter your DEA number as shown on your certificate. Example: AB1234567',
+    deaNumber: {
+      ...textUI({
+        title: 'DEA registration number',
+        hint: 'Enter your DEA number as it appears on your certificate. Example: AB1234567',
+        errorMessages: {
+          required: 'Please enter your DEA registration number.',
+          pattern: 'Please enter a valid DEA number (two letters followed by 7 digits).',
+        },
+      }),
       'ui:options': {
-        hideIf: formData =>
-          formData?.deaRegistration?.deaApplicable !== 'yes-current',
+        hideIf: formData => formData?.deaRegistration?.deaApplicable !== 'yes-current',
       },
-    }),
-    authorizedSchedules: checkboxGroupUI({
-      title: 'Which schedules are authorized under your DEA registration?',
-      hint: 'Check all schedules listed on your current DEA certificate.',
-      labels: SCHEDULE_LABELS,
-      required: false,
+    },
+    authorizedSchedules: {
+      ...checkboxGroupUI({
+        title: 'Which schedules are authorized under your DEA registration?',
+        hint: 'Check all schedules listed on your current DEA certificate.',
+        required: false,
+        labels: SCHEDULE_LABELS,
+      }),
       'ui:options': {
-        hideIf: formData =>
-          formData?.deaRegistration?.deaApplicable !== 'yes-current',
+        hideIf: formData => formData?.deaRegistration?.deaApplicable !== 'yes-current',
       },
-    }),
+    },
     deaIssueDate: {
       ...currentOrPastDateUI({
         title: 'DEA registration issue date',
+        errorMessages: {
+          required: 'Please enter your DEA registration issue date.',
+        },
       }),
       'ui:options': {
-        hideIf: formData =>
-          formData?.deaRegistration?.deaApplicable !== 'yes-current',
+        hideIf: formData => formData?.deaRegistration?.deaApplicable !== 'yes-current',
       },
     },
     deaExpirationDate: {
@@ -69,33 +76,36 @@ export const deaRegistrationUiSchema = {
         title: 'DEA registration expiration date',
       }),
       'ui:options': {
-        hideIf: formData =>
-          formData?.deaRegistration?.deaApplicable !== 'yes-current',
+        hideIf: formData => formData?.deaRegistration?.deaApplicable !== 'yes-current',
       },
     },
-    deaState: textUI({
-      title: 'State of DEA registration',
-      hint: 'Enter the 2-letter state abbreviation (e.g., CA).',
+    deaState: {
+      ...textUI({
+        title: 'State(s) in which your DEA registration is valid',
+        errorMessages: {
+          required: 'Please enter the state(s) of your DEA registration.',
+        },
+      }),
       'ui:options': {
-        hideIf: formData =>
-          formData?.deaRegistration?.deaApplicable !== 'yes-current',
+        hideIf: formData => formData?.deaRegistration?.deaApplicable !== 'yes-current',
       },
-    }),
+    },
   },
 };
 
 export const deaRegistrationSchema = {
   type: 'object',
+  required: ['deaRegistration'],
   properties: {
     deaRegistration: {
       type: 'object',
+      required: ['deaApplicable'],
       properties: {
-        deaApplicable: radioSchema([
-          'yes-current',
-          'yes-required',
-          'no-not-applicable',
-        ]),
-        deaNumber: { type: 'string', pattern: '^[A-Z]{2}\\d{7}$' },
+        deaApplicable: radioSchema(['yes-current', 'yes-required', 'no-not-applicable']),
+        deaNumber: {
+          type: 'string',
+          pattern: '^[A-Z]{2}\\d{7}$',
+        },
         authorizedSchedules: checkboxGroupSchema(SCHEDULE_KEYS),
         deaIssueDate: currentOrPastDateSchema,
         deaExpirationDate: currentOrPastDateSchema,

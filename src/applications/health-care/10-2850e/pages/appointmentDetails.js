@@ -1,28 +1,39 @@
 import {
   textUI,
   textSchema,
-  selectUI,
-  selectSchema,
   radioUI,
   radioSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
+  selectUI,
+  selectSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
+
+const PILOT_FACILITIES = [
+  '636 — Jesse Brown VA Medical Center',
+  '537 — Edward Hines, Jr. VA Hospital',
+  '695 — Milwaukee VA Medical Center',
+  '695BY — Clement J. Zablocki VA Medical Center',
+  '042 — VA Boston Healthcare System',
+  '523 — VA NY Harbor Healthcare System',
+  '526 — James J. Peters VA Medical Center',
+  '460 — Audie L. Murphy Memorial VA Medical Center',
+  '671 — South Texas Veterans Health Care System',
+  'Other (contact HR office)',
+];
 
 export const appointmentDetailsUiSchema = {
   appointmentDetails: {
     'ui:title': 'Appointment details',
-    facilityId: textUI({
-      title: 'VA Medical Center facility ID',
-      hint:
-        'Enter the VA facility station ID where you are applying (e.g., 636 for Jesse Brown VAMC). Contact the facility HR office if you do not know the station ID.',
+    facilityId: selectUI({
+      title: 'VA Medical Center or facility where you are applying',
+      hint: 'Select the specific VA facility where you are applying. If you are applying to multiple facilities, you will need to submit a separate application for each.',
       errorMessages: {
-        required: 'Please enter the facility station ID.',
+        required: 'Please select the VA facility where you are applying.',
       },
     }),
     facilityName: textUI({
-      title: 'VA Medical Center name',
-      hint: 'Enter the full name of the VA Medical Center where you are applying.',
+      title: 'Facility name (if not listed above)',
     }),
     positionTitle: textUI({
       title: 'Position or job title for this application',
@@ -43,20 +54,24 @@ export const appointmentDetailsUiSchema = {
         'without-compensation': 'Without compensation (WOC)',
       },
       errorMessages: {
-        required: 'Please select an appointment type.',
+        required: 'Please select the appointment type.',
       },
     }),
-    requestedStartDate: currentOrPastDateUI({
-      title: 'Requested start date',
-      hint: 'Enter the date you would like to begin, if known.',
-    }),
-    priorVaFacility: textUI({
-      title: 'Name of the VA facility where you most recently held clinical privileges',
-      hint: 'Required only for transfer applicants.',
+    requestedStartDate: {
+      ...currentOrPastDateUI({
+        title: 'Requested start date',
+      }),
+      'ui:required': () => false,
+    },
+    priorVaFacility: {
+      ...textUI({
+        title: 'Name of the VA facility where you most recently held clinical privileges',
+        hint: 'Required only for transfer applicants.',
+      }),
       'ui:options': {
         hideIf: formData => formData?.applicationType !== 'transfer',
       },
-    }),
+    },
   },
 };
 
@@ -68,7 +83,7 @@ export const appointmentDetailsSchema = {
       type: 'object',
       required: ['facilityId', 'positionTitle', 'appointmentType'],
       properties: {
-        facilityId: { type: 'string', maxLength: 20 },
+        facilityId: selectSchema(PILOT_FACILITIES),
         facilityName: { type: 'string', maxLength: 200 },
         positionTitle: { type: 'string', maxLength: 200, minLength: 1 },
         department: { type: 'string', maxLength: 200 },

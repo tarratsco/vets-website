@@ -28,6 +28,7 @@ export default {
       uiSchema: applicantTypeUiSchema,
       schema: applicantTypeSchema,
     },
+
     personalInformation: {
       path: 'personal-information',
       title: 'Personal information',

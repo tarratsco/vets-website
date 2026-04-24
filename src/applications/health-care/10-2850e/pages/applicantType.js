@@ -1,8 +1,8 @@
 import {
   radioUI,
   radioSchema,
-  textUI,
-  textSchema,
+  selectUI,
+  selectSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 export const applicantTypeUiSchema = {
@@ -20,12 +20,11 @@ export const applicantTypeUiSchema = {
       required: 'Please select an application type.',
     },
   }),
-  occupationalCategory: textUI({
+  occupationalCategory: selectUI({
     title: 'What is your primary professional occupation?',
-    hint:
-      'Enter the occupation that most closely describes the clinical role for which you are applying (e.g., Registered Nurse, Nurse Anesthetist, Nurse Practitioner).',
+    hint: 'Select the occupation that most closely describes your clinical role.',
     errorMessages: {
-      required: 'Please enter your occupational category.',
+      required: 'Please select an occupational category.',
     },
   }),
 };
@@ -36,8 +35,24 @@ export const applicantTypeSchema = {
   properties: {
     applicationType: radioSchema(['initial', 'reappointment', 'transfer', 'temporary']),
     occupationalCategory: {
-      type: 'string',
-      maxLength: 200,
+      ...selectSchema([
+        'Registered Nurse (RN)',
+        'Advanced Practice Registered Nurse (APRN)',
+        'Certified Registered Nurse Anesthetist (CRNA)',
+        'Nurse Practitioner (NP)',
+        'Clinical Nurse Specialist (CNS)',
+        'Physician (MD/DO)',
+        'Dentist',
+        'Optometrist',
+        'Podiatrist',
+        'Pharmacist',
+        'Physical Therapist',
+        'Occupational Therapist',
+        'Speech-Language Pathologist',
+        'Psychologist',
+        'Social Worker',
+        'Other',
+      ]),
     },
   },
 };

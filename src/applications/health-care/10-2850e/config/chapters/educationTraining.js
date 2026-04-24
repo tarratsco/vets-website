@@ -8,7 +8,7 @@ import {
 } from '../../pages/postgraduateTraining';
 
 export default {
-  title: 'Education & Training',
+  title: 'Education and Training',
   pages: {
     graduateDegree: {
       path: 'education-graduate',
@@ -16,6 +16,7 @@ export default {
       uiSchema: graduateDegreeUiSchema,
       schema: graduateDegreeSchema,
     },
+
     postgraduateTraining: {
       path: 'education-postgraduate',
       title: 'Postgraduate training',

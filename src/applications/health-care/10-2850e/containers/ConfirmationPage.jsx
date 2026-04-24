@@ -7,27 +7,32 @@ import { formatDateLong } from 'platform/utilities/date';
 
 export const ConfirmationPage = ({ route }) => {
   const form = useSelector(state => state.form || {});
-  const { submission, data } = form;
+  const submission = form?.submission || {};
   const submitDate = submission?.timestamp || '';
-  const formattedDate = submitDate ? formatDateLong(submitDate) : '';
+  const formattedSubmitDate = submitDate ? formatDateLong(submitDate) : '';
+
   const confirmationNumber =
     submission?.response?.confirmationNumber ||
     submission?.response?.attributes?.confirmationNumber ||
     '';
 
-  const applicantName = data?.personalInformation
+  const applicantName =
+    form?.data?.personalInformation || {};
+
+  const submitterName = applicantName
     ? {
-        first: data.personalInformation.firstName || '',
-        last: data.personalInformation.lastName || '',
+        first: applicantName.firstName,
+        middle: applicantName.middleName,
+        last: applicantName.lastName,
       }
-    : {};
+    : undefined;
 
   const alertContent = (
     <p>
-      Thank you for submitting your VA clinical position application
-      {formattedDate ? ` on ${formattedDate}` : ''}. The VA Medical Center
-      credentialing office will review your application and contact you if
-      additional information is needed.
+      Thank you for submitting your application for a VA clinical position. We
+      will review your credentialing application and contact you if we need
+      additional information. The VA Medical Center Human Resources office will
+      be in touch regarding next steps.
     </p>
   );
 
@@ -36,22 +41,22 @@ export const ConfirmationPage = ({ route }) => {
       formConfig={route?.formConfig}
       submitDate={submitDate}
       confirmationNumber={confirmationNumber}
-      submitterName={applicantName}
+      submitterName={submitterName}
       devOnly={{ showButtons: true }}
     >
       <ConfirmationView.SubmissionAlert
-        title="Your application has been submitted"
+        title={`You've submitted your VA clinical position application${
+          formattedSubmitDate ? ` on ${formattedSubmitDate}` : ''
+        }`}
         content={alertContent}
-        actions={<p />}
       />
       <ConfirmationView.ChapterSectionCollection />
       <ConfirmationView.PrintThisPage />
       <ConfirmationView.WhatsNextProcessList
         item1Header="We'll review your application"
-        item1Content="The VA Medical Center credentialing office will review all submitted information and verify your credentials through primary source verification."
-        item1Actions={<p />}
+        item1Content="The VA Medical Center credentialing office will review your submitted application and verify your credentials through primary source verification."
         item2Header="We'll contact you about next steps"
-        item2Content="The credentialing office will contact you regarding your application status and any additional requirements."
+        item2Content="If we need more information, we'll contact you at the email address or phone number you provided. Allow 4-6 weeks for the credentialing review process."
       />
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />

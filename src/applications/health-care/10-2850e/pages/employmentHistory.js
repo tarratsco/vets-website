@@ -1,133 +1,95 @@
 import {
   textUI,
   textSchema,
-  selectUI,
-  selectSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
   yesNoUI,
   yesNoSchema,
+  selectUI,
+  selectSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-import { states } from 'platform/forms/address';
-
-const stateLabels = states.USA.reduce((acc, { value, label }) => {
-  acc[value] = label;
-  return acc;
-}, {});
-
-stateLabels['outside-us'] = 'Outside the United States';
-
-const employmentItemUiSchema = {
-  employerName: textUI({
-    title: 'Employer or facility name',
-    errorMessages: {
-      required: 'Please enter the employer or facility name.',
-    },
-  }),
-  employerStreetAddress: textUI({
-    title: 'Employer street address',
-  }),
-  employerCity: textUI({
-    title: 'City',
-    errorMessages: {
-      required: 'Please enter the city.',
-    },
-  }),
-  employerState: selectUI({
-    title: 'State',
-    labels: stateLabels,
-    errorMessages: {
-      required: 'Please select a state.',
-    },
-  }),
-  positionTitle: textUI({
-    title: 'Position title or job title',
-    errorMessages: {
-      required: 'Please enter your position title.',
-    },
-  }),
-  department: textUI({
-    title: 'Department, unit, or service',
-  }),
-  startDate: currentOrPastDateUI({
-    title: 'Start date of employment',
-    errorMessages: {
-      required: 'Please enter a start date.',
-    },
-  }),
-  isCurrentPosition: yesNoUI({
-    title: 'Do you currently work here?',
-  }),
-  endDate: {
-    ...currentOrPastDateUI({
-      title: 'End date of employment',
-    }),
-    'ui:options': {
-      hideIf: (formData, index) => {
-        const history = formData?.employmentHistory;
-        if (!history || !history[index]) return false;
-        return history[index].isCurrentPosition === true;
-      },
-    },
-  },
-  reasonForLeaving: textUI({
-    title: 'Reason for leaving',
-    hint: 'Examples: Voluntary resignation, End of contract, Relocation',
-    'ui:options': {
-      hideIf: (formData, index) => {
-        const history = formData?.employmentHistory;
-        if (!history || !history[index]) return false;
-        return history[index].isCurrentPosition === true;
-      },
-    },
-  }),
-  hoursPerWeek: textUI({
-    title: 'Average hours per week',
-    hint: 'Enter your average weekly clinical hours in this position.',
-    inputType: 'number',
-  }),
-};
-
-const employmentItemSchema = {
-  type: 'object',
-  required: ['employerName', 'employerCity', 'employerState', 'positionTitle', 'startDate'],
-  properties: {
-    employerName: { type: 'string', maxLength: 200, minLength: 1 },
-    employerStreetAddress: { type: 'string', maxLength: 200 },
-    employerCity: { type: 'string', maxLength: 100 },
-    employerState: selectSchema(Object.keys(stateLabels)),
-    positionTitle: { type: 'string', maxLength: 200, minLength: 1 },
-    department: { type: 'string', maxLength: 200 },
-    startDate: currentOrPastDateSchema,
-    isCurrentPosition: yesNoSchema,
-    endDate: currentOrPastDateSchema,
-    reasonForLeaving: { type: 'string', maxLength: 500 },
-    hoursPerWeek: { type: 'number', minimum: 0.1, maximum: 168 },
-  },
-};
+const US_STATES = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
+  'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME',
+  'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH',
+  'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI',
+  'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+  'AS', 'GU', 'MP', 'PR', 'VI', 'Outside the United States',
+];
 
 export const employmentHistoryUiSchema = {
-  'ui:title': 'Employment history',
-  'ui:description':
-    'List all positions you have held in the past 10 years, including your current position. You must account for all employment periods.',
   employmentHistory: {
+    'ui:title': 'Employment history',
+    'ui:description':
+      'List all positions you have held in the past 10 years. You must account for all time, including any gaps of 30 days or more.',
     'ui:options': {
-      itemName: 'employment record',
-      viewField: EmploymentViewField,
-      keepInPageOnReview: true,
+      itemName: 'Position',
+      viewField: ({ formData }) =>
+        `${formData?.positionTitle || 'Position'} at ${formData?.employerName || ''}`,
     },
-    items: employmentItemUiSchema,
+    items: {
+      employerName: textUI({
+        title: 'Employer or facility name',
+        errorMessages: { required: 'Please enter the employer name.' },
+      }),
+      employerStreetAddress: textUI({
+        title: 'Employer street address',
+      }),
+      employerCity: textUI({
+        title: 'City',
+        errorMessages: { required: 'Please enter the city.' },
+      }),
+      employerState: selectUI({
+        title: 'State',
+        errorMessages: { required: 'Please select the state.' },
+      }),
+      positionTitle: textUI({
+        title: 'Position title or job title',
+        errorMessages: { required: 'Please enter your position title.' },
+      }),
+      department: textUI({
+        title: 'Department, unit, or service',
+      }),
+      startDate: currentOrPastDateUI({
+        title: 'Start date of employment',
+        errorMessages: {
+          required: 'Please enter your employment start date.',
+          futureDate: 'Start date cannot be in the future.',
+        },
+      }),
+      isCurrentPosition: yesNoUI({
+        title: 'I currently work here',
+      }),
+      endDate: {
+        ...currentOrPastDateUI({
+          title: 'End date of employment',
+        }),
+        'ui:options': {
+          hideIf: (formData, index) =>
+            formData?.employmentHistory?.[index]?.isCurrentPosition === true,
+        },
+        'ui:required': (formData, index) =>
+          formData?.employmentHistory?.[index]?.isCurrentPosition !== true,
+      },
+      reasonForLeaving: {
+        ...textUI({
+          title: 'Reason for leaving',
+          hint: 'Examples: Voluntary resignation, End of contract, Position eliminated, Relocation, Career advancement.',
+        }),
+        'ui:options': {
+          hideIf: (formData, index) =>
+            formData?.employmentHistory?.[index]?.isCurrentPosition === true,
+        },
+      },
+      hoursPerWeek: textUI({
+        title: 'Average hours per week',
+        hint: 'Enter your average weekly clinical hours in this position.',
+        inputType: 'number',
+      }),
+    },
   },
 };
-
-function EmploymentViewField({ formData }) {
-  return (
-    <div>
-      <strong>{formData.positionTitle}</strong> &mdash; {formData.employerName}
-    </div>
-  );
-}
 
 export const employmentHistorySchema = {
   type: 'object',
@@ -136,7 +98,23 @@ export const employmentHistorySchema = {
     employmentHistory: {
       type: 'array',
       minItems: 1,
-      items: employmentItemSchema,
+      items: {
+        type: 'object',
+        required: ['employerName', 'employerCity', 'employerState', 'positionTitle', 'startDate'],
+        properties: {
+          employerName: { type: 'string', maxLength: 200, minLength: 1 },
+          employerStreetAddress: { type: 'string', maxLength: 200 },
+          employerCity: { type: 'string', maxLength: 100 },
+          employerState: selectSchema(US_STATES),
+          positionTitle: { type: 'string', maxLength: 200, minLength: 1 },
+          department: { type: 'string', maxLength: 200 },
+          startDate: currentOrPastDateSchema,
+          endDate: currentOrPastDateSchema,
+          isCurrentPosition: yesNoSchema,
+          reasonForLeaving: { type: 'string', maxLength: 500 },
+          hoursPerWeek: { type: 'number', minimum: 0.1, maximum: 168 },
+        },
+      },
     },
   },
 };

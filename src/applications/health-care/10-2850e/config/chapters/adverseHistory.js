@@ -10,10 +10,7 @@ import {
   clinicalPrivilegesUiSchema,
   clinicalPrivilegesSchema,
 } from '../../pages/clinicalPrivileges';
-import {
-  deaAdverseUiSchema,
-  deaAdverseSchema,
-} from '../../pages/deaAdverse';
+import { deaAdverseUiSchema, deaAdverseSchema } from '../../pages/deaAdverse';
 import {
   criminalHistoryUiSchema,
   criminalHistorySchema,
@@ -40,13 +37,13 @@ export default {
     },
     clinicalPrivileges: {
       path: 'adverse-history-clinical-privileges',
-      title: 'Clinical privileges adverse actions',
+      title: 'Clinical privileges',
       uiSchema: clinicalPrivilegesUiSchema,
       schema: clinicalPrivilegesSchema,
     },
     deaAdverse: {
       path: 'adverse-history-dea',
-      title: 'DEA registration adverse actions',
+      title: 'DEA adverse actions',
       uiSchema: deaAdverseUiSchema,
       schema: deaAdverseSchema,
     },
@@ -58,7 +55,7 @@ export default {
     },
     federalExclusion: {
       path: 'adverse-history-federal-exclusion',
-      title: 'Federal exclusion status',
+      title: 'Federal exclusion',
       uiSchema: federalExclusionUiSchema,
       schema: federalExclusionSchema,
     },

@@ -11,24 +11,23 @@ import {
 
 export const criminalHistoryUiSchema = {
   adverseHistory: {
-    'ui:title': 'Criminal history',
-    'ui:description':
-      'You must answer Yes even if: the conviction was later expunged or sealed; the matter occurred while you were a minor; or the conviction occurred in another state or country.',
     criminalHistory: {
+      'ui:title': 'Criminal history',
+      'ui:description':
+        'You must answer Yes even if: the conviction was later expunged or sealed; the matter occurred while you were a minor; or the conviction occurred in another state or country.',
       hasFelonyConviction: yesNoUI({
         title:
           'Have you ever been convicted of, pled guilty to, or pled no contest to a felony?',
         errorMessages: {
-          required: 'Please answer this question.',
+          required: 'Please indicate whether you have any felony convictions.',
         },
       }),
       felonyDetails: {
+        'ui:title': 'Felony conviction details',
         'ui:options': {
-          itemName: 'felony conviction',
-          viewField: FelonyViewField,
           hideIf: formData =>
-            !formData?.adverseHistory?.criminalHistory?.hasFelonyConviction,
-          keepInPageOnReview: true,
+            formData?.adverseHistory?.criminalHistory?.hasFelonyConviction !== true,
+          itemName: 'Felony',
         },
         items: {
           offenseType: textUI({
@@ -38,13 +37,13 @@ export const criminalHistoryUiSchema = {
             title: 'Date of conviction',
           }),
           jurisdiction: textUI({
-            title: 'State or jurisdiction',
+            title: 'Jurisdiction (state/country)',
           }),
           court: textUI({
             title: 'Court name',
           }),
           explanation: textareaUI({
-            title: 'Explain the circumstances',
+            title: 'Explain the circumstances of this conviction',
             charcount: true,
           }),
         },
@@ -53,16 +52,16 @@ export const criminalHistoryUiSchema = {
         title:
           'Have you ever been convicted of, pled guilty to, or pled no contest to a misdemeanor (other than minor traffic violations)?',
         errorMessages: {
-          required: 'Please answer this question.',
+          required: 'Please indicate whether you have any misdemeanor convictions.',
         },
       }),
       misdemeanorDetails: {
+        'ui:title': 'Misdemeanor conviction details',
         'ui:options': {
-          itemName: 'misdemeanor conviction',
-          viewField: MisdemeanorViewField,
           hideIf: formData =>
-            !formData?.adverseHistory?.criminalHistory?.hasMisdemeanorConviction,
-          keepInPageOnReview: true,
+            formData?.adverseHistory?.criminalHistory
+              ?.hasMisdemeanorConviction !== true,
+          itemName: 'Misdemeanor',
         },
         items: {
           offenseType: textUI({
@@ -72,13 +71,13 @@ export const criminalHistoryUiSchema = {
             title: 'Date of conviction',
           }),
           jurisdiction: textUI({
-            title: 'State or jurisdiction',
+            title: 'Jurisdiction (state/country)',
           }),
           court: textUI({
             title: 'Court name',
           }),
           explanation: textareaUI({
-            title: 'Explain the circumstances',
+            title: 'Explain the circumstances of this conviction',
             charcount: true,
           }),
         },
@@ -87,30 +86,13 @@ export const criminalHistoryUiSchema = {
   },
 };
 
-function FelonyViewField({ formData }) {
-  return <div>Felony: {formData.offenseType}</div>;
-}
-
-function MisdemeanorViewField({ formData }) {
-  return <div>Misdemeanor: {formData.offenseType}</div>;
-}
-
-const criminalEventSchema = {
-  type: 'object',
-  properties: {
-    offenseType: { type: 'string', maxLength: 200 },
-    convictionDate: currentOrPastDateSchema,
-    jurisdiction: { type: 'string', maxLength: 200 },
-    court: { type: 'string', maxLength: 200 },
-    explanation: { type: 'string', maxLength: 3000 },
-  },
-};
-
 export const criminalHistorySchema = {
   type: 'object',
+  required: ['adverseHistory'],
   properties: {
     adverseHistory: {
       type: 'object',
+      required: ['criminalHistory'],
       properties: {
         criminalHistory: {
           type: 'object',
@@ -119,12 +101,30 @@ export const criminalHistorySchema = {
             hasFelonyConviction: yesNoSchema,
             felonyDetails: {
               type: 'array',
-              items: criminalEventSchema,
+              items: {
+                type: 'object',
+                properties: {
+                  offenseType: { type: 'string', maxLength: 200 },
+                  convictionDate: currentOrPastDateSchema,
+                  jurisdiction: { type: 'string', maxLength: 200 },
+                  court: { type: 'string', maxLength: 200 },
+                  explanation: { type: 'string', maxLength: 3000 },
+                },
+              },
             },
             hasMisdemeanorConviction: yesNoSchema,
             misdemeanorDetails: {
               type: 'array',
-              items: criminalEventSchema,
+              items: {
+                type: 'object',
+                properties: {
+                  offenseType: { type: 'string', maxLength: 200 },
+                  convictionDate: currentOrPastDateSchema,
+                  jurisdiction: { type: 'string', maxLength: 200 },
+                  court: { type: 'string', maxLength: 200 },
+                  explanation: { type: 'string', maxLength: 3000 },
+                },
+              },
             },
           },
         },

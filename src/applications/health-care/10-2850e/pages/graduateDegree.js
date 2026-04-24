@@ -7,34 +7,27 @@ import {
 
 export const graduateDegreeUiSchema = {
   education: {
-    'ui:title': 'Graduate or professional degree',
+    'ui:title': 'Graduate degree information',
     graduateDegree: {
-      'ui:title': 'Degree information',
+      'ui:title': 'Professional degree',
       institutionName: textUI({
         title: 'Name of school or institution',
-        errorMessages: {
-          required: 'Please enter the name of the institution.',
-        },
+        errorMessages: { required: 'Please enter the institution name.' },
       }),
       degreeType: textUI({
         title: 'Degree earned',
-        hint:
-          'Enter the degree type (e.g., BSN, MSN, DNP, PhD in Nursing, MS-CRNA).',
-        errorMessages: {
-          required: 'Please enter the degree type.',
-        },
+        hint: 'For example: BSN, MSN, DNP, PhD in Nursing, MS-CRNA, MD, DO',
+        errorMessages: { required: 'Please enter your degree type.' },
       }),
       fieldOfStudy: textUI({
         title: 'Field of study or major',
-        errorMessages: {
-          required: 'Please enter your field of study.',
-        },
+        errorMessages: { required: 'Please enter your field of study.' },
       }),
       graduationDate: currentOrPastDateUI({
         title: 'Date degree was awarded',
         errorMessages: {
           required: 'Please enter your graduation date.',
-          futureDate: 'Graduation date must be in the past.',
+          futureDate: 'Graduation date cannot be in the future.',
         },
       }),
       institutionCity: textUI({
@@ -42,7 +35,6 @@ export const graduateDegreeUiSchema = {
       }),
       institutionStateOrCountry: textUI({
         title: 'State or country',
-        hint: 'Enter the 2-letter state abbreviation or full country name.',
       }),
     },
   },
@@ -50,7 +42,6 @@ export const graduateDegreeUiSchema = {
 
 export const graduateDegreeSchema = {
   type: 'object',
-  required: ['education'],
   properties: {
     education: {
       type: 'object',
