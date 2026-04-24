@@ -3,66 +3,89 @@ import { expect } from 'chai';
 import {
   priorCertificationReferenceUiSchema,
   priorCertificationReferenceSchema,
-  ENROLLMENT_TYPE_KEYS,
-} from '../chapters/priorCertificationReference';
+} from './priorCertificationReference';
 
 describe('priorCertificationReference page', () => {
-  describe('uiSchema', () => {
-    it('has originalCertBeginDate field', () => {
-      expect(priorCertificationReferenceUiSchema.originalCertBeginDate).to.exist;
-    });
-
-    it('originalCertBeginDate has ui:title', () => {
-      expect(
-        priorCertificationReferenceUiSchema.originalCertBeginDate['ui:title'],
-      ).to.equal('Original certification begin date');
-    });
-
-    it('has originalCertEndDate field', () => {
-      expect(priorCertificationReferenceUiSchema.originalCertEndDate).to.exist;
-    });
-
-    it('has originalCreditHours field', () => {
-      expect(priorCertificationReferenceUiSchema.originalCreditHours).to.exist;
-    });
-
-    it('has originalEnrollmentType select field', () => {
-      expect(
-        priorCertificationReferenceUiSchema.originalEnrollmentType,
-      ).to.exist;
-    });
+  it('uiSchema has originalCertBeginDate field', () => {
+    expect(
+      priorCertificationReferenceUiSchema.studentAndPriorCertification
+        .originalCertBeginDate,
+    ).to.be.an('object');
   });
 
-  describe('schema', () => {
-    it('has type object', () => {
-      expect(priorCertificationReferenceSchema.type).to.equal('object');
+  it('uiSchema has originalCertEndDate field', () => {
+    expect(
+      priorCertificationReferenceUiSchema.studentAndPriorCertification
+        .originalCertEndDate,
+    ).to.be.an('object');
+  });
+
+  it('uiSchema has originalCreditHours field', () => {
+    expect(
+      priorCertificationReferenceUiSchema.studentAndPriorCertification
+        .originalCreditHours,
+    ).to.be.an('object');
+  });
+
+  it('uiSchema has originalEnrollmentType field', () => {
+    expect(
+      priorCertificationReferenceUiSchema.studentAndPriorCertification
+        .originalEnrollmentType,
+    ).to.be.an('object');
+  });
+
+  it('schema requires all four fields', () => {
+    const required =
+      priorCertificationReferenceSchema.properties.studentAndPriorCertification
+        .required;
+    expect(required).to.include('originalCertBeginDate');
+    expect(required).to.include('originalCertEndDate');
+    expect(required).to.include('originalCreditHours');
+    expect(required).to.include('originalEnrollmentType');
+  });
+
+  it('originalCreditHours schema has minimum of 1', () => {
+    expect(
+      priorCertificationReferenceSchema.properties.studentAndPriorCertification
+        .properties.originalCreditHours.minimum,
+    ).to.equal(1);
+  });
+
+  describe('validateCreditHours via ui:validations', () => {
+    const validations =
+      priorCertificationReferenceUiSchema.studentAndPriorCertification
+        .originalCreditHours['ui:validations'];
+
+    it('has validations array', () => {
+      expect(validations).to.be.an('array').with.lengthOf(1);
     });
 
-    it('requires originalCertBeginDate', () => {
-      expect(priorCertificationReferenceSchema.required).to.include(
-        'originalCertBeginDate',
-      );
+    it('does not add error for a valid credit hour value', () => {
+      const messages = [];
+      const errors = { addError: msg => messages.push(msg || '') };
+      validations[0](errors, 12);
+      expect(messages).to.have.lengthOf(0);
     });
 
-    it('requires originalCreditHours', () => {
-      expect(priorCertificationReferenceSchema.required).to.include(
-        'originalCreditHours',
-      );
+    it('adds error for zero credit hours', () => {
+      const messages = [];
+      const errors = { addError: msg => messages.push(msg || '') };
+      validations[0](errors, 0);
+      expect(messages).to.have.lengthOf(1);
     });
 
-    it('ENROLLMENT_TYPE_KEYS includes full_time', () => {
-      expect(ENROLLMENT_TYPE_KEYS).to.include('full_time');
+    it('adds error for credit hours over 99', () => {
+      const messages = [];
+      const errors = { addError: msg => messages.push(msg || '') };
+      validations[0](errors, 100);
+      expect(messages).to.have.lengthOf(1);
     });
 
-    it('originalCreditHours has correct min/max', () => {
-      expect(
-        priorCertificationReferenceSchema.properties.originalCreditHours
-          .minimum,
-      ).to.equal(1);
-      expect(
-        priorCertificationReferenceSchema.properties.originalCreditHours
-          .maximum,
-      ).to.equal(99);
+    it('does not add error when value is undefined', () => {
+      const messages = [];
+      const errors = { addError: msg => messages.push(msg || '') };
+      validations[0](errors, undefined);
+      expect(messages).to.have.lengthOf(0);
     });
   });
 });

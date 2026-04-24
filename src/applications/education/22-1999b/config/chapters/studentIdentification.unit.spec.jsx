@@ -3,72 +3,57 @@ import { expect } from 'chai';
 import {
   studentIdentificationUiSchema,
   studentIdentificationSchema,
-  BENEFIT_CHAPTER_KEYS,
-} from '../chapters/studentIdentification';
+} from './studentIdentification';
 
 describe('studentIdentification page', () => {
-  describe('uiSchema', () => {
-    it('has studentFirstName field', () => {
-      expect(studentIdentificationUiSchema.studentFirstName).to.exist;
-    });
-
-    it('studentFirstName has correct title', () => {
-      expect(
-        studentIdentificationUiSchema.studentFirstName['ui:title'],
-      ).to.equal("Student's first name");
-    });
-
-    it('has ssnOrFileNumberIndicator radio field', () => {
-      expect(
-        studentIdentificationUiSchema.ssnOrFileNumberIndicator,
-      ).to.exist;
-    });
-
-    it('ssnOrFileNumberIndicator uses VaRadioField', () => {
-      expect(
-        studentIdentificationUiSchema.ssnOrFileNumberIndicator[
-          'ui:webComponentField'
-        ],
-      ).to.exist;
-    });
-
-    it('has benefitChapter select field', () => {
-      expect(studentIdentificationUiSchema.benefitChapter).to.exist;
-    });
+  it('uiSchema has studentFirstName field', () => {
+    expect(
+      studentIdentificationUiSchema.studentAndPriorCertification
+        .studentFirstName,
+    ).to.be.an('object');
   });
 
-  describe('schema', () => {
-    it('has type object', () => {
-      expect(studentIdentificationSchema.type).to.equal('object');
-    });
+  it('uiSchema has ssnOrFileNumberIndicator radio', () => {
+    const field =
+      studentIdentificationUiSchema.studentAndPriorCertification
+        .ssnOrFileNumberIndicator;
+    expect(field).to.be.an('object');
+    expect(field['ui:title']).to.be.a('string');
+  });
 
-    it('requires studentFirstName', () => {
-      expect(studentIdentificationSchema.required).to.include(
-        'studentFirstName',
-      );
-    });
+  it('uiSchema has benefitChapter select', () => {
+    expect(
+      studentIdentificationUiSchema.studentAndPriorCertification
+        .benefitChapter,
+    ).to.be.an('object');
+  });
 
-    it('requires ssnOrFileNumberIndicator', () => {
-      expect(studentIdentificationSchema.required).to.include(
-        'ssnOrFileNumberIndicator',
-      );
-    });
+  it('schema requires studentFirstName and studentLastName', () => {
+    const required =
+      studentIdentificationSchema.properties.studentAndPriorCertification
+        .required;
+    expect(required).to.include('studentFirstName');
+    expect(required).to.include('studentLastName');
+  });
 
-    it('requires benefitChapter', () => {
-      expect(studentIdentificationSchema.required).to.include(
-        'benefitChapter',
-      );
-    });
+  it('schema requires ssnOrFileNumberIndicator', () => {
+    const required =
+      studentIdentificationSchema.properties.studentAndPriorCertification
+        .required;
+    expect(required).to.include('ssnOrFileNumberIndicator');
+  });
 
-    it('ssnOrFileNumberIndicator schema has enum', () => {
-      expect(
-        studentIdentificationSchema.properties.ssnOrFileNumberIndicator.enum,
-      ).to.deep.equal(['ssn', 'va_file_number']);
-    });
+  it('schema requires benefitChapter', () => {
+    const required =
+      studentIdentificationSchema.properties.studentAndPriorCertification
+        .required;
+    expect(required).to.include('benefitChapter');
+  });
 
-    it('BENEFIT_CHAPTER_KEYS has expected chapters', () => {
-      expect(BENEFIT_CHAPTER_KEYS).to.include('chapter_33');
-      expect(BENEFIT_CHAPTER_KEYS).to.include('chapter_30');
-    });
+  it('studentSsn has correct pattern', () => {
+    const pattern =
+      studentIdentificationSchema.properties.studentAndPriorCertification
+        .properties.studentSsn.pattern;
+    expect(pattern).to.equal('^\\d{9}$');
   });
 });

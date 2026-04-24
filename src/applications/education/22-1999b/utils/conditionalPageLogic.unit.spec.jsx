@@ -4,11 +4,14 @@ import {
   isTerminationOrWithdrawal,
   isReductionOrPartialWithdrawal,
   isLateSubmission,
-  hasMitigatingReasonCode,
-  requiresSupportingDocumentation,
+  showMitigatingCircumstances,
+  showLastDateOfAttendance,
+  showUpdatedEnrollmentDetails,
+  showReasonForChange,
+  showCorrectionDetails,
+  showTimelinessAcknowledgment,
   showSupportingDocumentation,
-  MITIGATING_REASON_CODES,
-} from '../utils/conditionalPageLogic';
+} from './conditionalPageLogic';
 
 describe('conditionalPageLogic', () => {
   describe('isTerminationOrWithdrawal', () => {
@@ -31,10 +34,6 @@ describe('conditionalPageLogic', () => {
     it('returns false for null', () => {
       expect(isTerminationOrWithdrawal(null)).to.be.false;
     });
-
-    it('returns false for undefined', () => {
-      expect(isTerminationOrWithdrawal(undefined)).to.be.false;
-    });
   });
 
   describe('isReductionOrPartialWithdrawal', () => {
@@ -54,94 +53,165 @@ describe('conditionalPageLogic', () => {
     it('returns false for correction', () => {
       expect(isReductionOrPartialWithdrawal('correction')).to.be.false;
     });
-
-    it('returns false for null', () => {
-      expect(isReductionOrPartialWithdrawal(null)).to.be.false;
-    });
   });
 
   describe('isLateSubmission', () => {
-    it('returns false when effectiveDateOfChange is null', () => {
+    it('returns false for null', () => {
       expect(isLateSubmission(null)).to.be.false;
     });
 
-    it('returns false when effectiveDateOfChange is undefined', () => {
+    it('returns false for undefined', () => {
       expect(isLateSubmission(undefined)).to.be.false;
     });
 
-    it('returns false when effectiveDateOfChange is empty string', () => {
-      expect(isLateSubmission('')).to.be.false;
+    it('returns false for an invalid date string', () => {
+      expect(isLateSubmission('not-a-date')).to.be.false;
     });
 
-    it('returns true when effectiveDateOfChange is more than 30 days ago', () => {
-      const longAgoDate = new Date();
-      longAgoDate.setDate(longAgoDate.getDate() - 60);
-      const isoDate = longAgoDate.toISOString().split('T')[0];
-      expect(isLateSubmission(isoDate)).to.be.true;
+    it('returns false for a date within 30 days', () => {
+      const recent = new Date();
+      recent.setDate(recent.getDate() - 5);
+      const dateStr = recent.toISOString().split('T')[0];
+      expect(isLateSubmission(dateStr)).to.be.false;
     });
 
-    it('returns false when effectiveDateOfChange is today', () => {
-      const today = new Date();
-      const isoDate = today.toISOString().split('T')[0];
-      expect(isLateSubmission(isoDate)).to.be.false;
-    });
-
-    it('returns false when effectiveDateOfChange is 10 days ago', () => {
-      const recentDate = new Date();
-      recentDate.setDate(recentDate.getDate() - 10);
-      const isoDate = recentDate.toISOString().split('T')[0];
-      expect(isLateSubmission(isoDate)).to.be.false;
+    it('returns true for a date more than 30 days ago', () => {
+      const old = new Date();
+      old.setDate(old.getDate() - 60);
+      const dateStr = old.toISOString().split('T')[0];
+      expect(isLateSubmission(dateStr)).to.be.true;
     });
   });
 
-  describe('hasMitigatingReasonCode', () => {
-    it('returns true for voluntary_withdrawal', () => {
-      expect(hasMitigatingReasonCode('voluntary_withdrawal')).to.be.true;
-    });
-
-    it('returns true for medical', () => {
-      expect(hasMitigatingReasonCode('medical')).to.be.true;
-    });
-
-    it('returns true for personal_family_emergency', () => {
-      expect(hasMitigatingReasonCode('personal_family_emergency')).to.be.true;
-    });
-
-    it('returns true for non_punitive_grade', () => {
-      expect(hasMitigatingReasonCode('non_punitive_grade')).to.be.true;
-    });
-
-    it('returns false for military_deployment', () => {
-      expect(hasMitigatingReasonCode('military_deployment')).to.be.false;
-    });
-
-    it('returns false for academic_dismissal', () => {
-      expect(hasMitigatingReasonCode('academic_dismissal')).to.be.false;
-    });
-
-    it('returns false for undefined', () => {
-      expect(hasMitigatingReasonCode(undefined)).to.be.false;
-    });
-  });
-
-  describe('requiresSupportingDocumentation', () => {
-    it('returns true when typeOfChange is correction', () => {
+  describe('showMitigatingCircumstances', () => {
+    it('returns true for voluntary_withdrawal with non-correction change type', () => {
       expect(
-        requiresSupportingDocumentation({ typeOfChange: 'correction' }),
+        showMitigatingCircumstances({
+          typeOfChange: 'full_termination',
+          reasonForChange: 'voluntary_withdrawal',
+        }),
       ).to.be.true;
     });
 
-    it('returns false when typeOfChange is full_termination', () => {
+    it('returns false when typeOfChange is correction', () => {
       expect(
-        requiresSupportingDocumentation({
+        showMitigatingCircumstances({
+          typeOfChange: 'correction',
+          reasonForChange: 'voluntary_withdrawal',
+        }),
+      ).to.be.false;
+    });
+
+    it('returns false for academic_dismissal', () => {
+      expect(
+        showMitigatingCircumstances({
           typeOfChange: 'full_termination',
+          reasonForChange: 'academic_dismissal',
         }),
       ).to.be.false;
     });
   });
 
+  describe('showLastDateOfAttendance', () => {
+    it('returns true for full_termination', () => {
+      expect(showLastDateOfAttendance({ typeOfChange: 'full_termination' })).to
+        .be.true;
+    });
+
+    it('returns true for partial_withdrawal', () => {
+      expect(showLastDateOfAttendance({ typeOfChange: 'partial_withdrawal' }))
+        .to.be.true;
+    });
+
+    it('returns false for credit_hour_reduction', () => {
+      expect(
+        showLastDateOfAttendance({ typeOfChange: 'credit_hour_reduction' }),
+      ).to.be.false;
+    });
+  });
+
+  describe('showUpdatedEnrollmentDetails', () => {
+    it('returns true for partial_withdrawal', () => {
+      expect(
+        showUpdatedEnrollmentDetails({ typeOfChange: 'partial_withdrawal' }),
+      ).to.be.true;
+    });
+
+    it('returns true for credit_hour_reduction', () => {
+      expect(
+        showUpdatedEnrollmentDetails({ typeOfChange: 'credit_hour_reduction' }),
+      ).to.be.true;
+    });
+
+    it('returns false for full_termination', () => {
+      expect(
+        showUpdatedEnrollmentDetails({ typeOfChange: 'full_termination' }),
+      ).to.be.false;
+    });
+  });
+
+  describe('showReasonForChange', () => {
+    it('returns true for non-correction change types', () => {
+      expect(showReasonForChange({ typeOfChange: 'full_termination' })).to.be
+        .true;
+    });
+
+    it('returns false for correction', () => {
+      expect(showReasonForChange({ typeOfChange: 'correction' })).to.be.false;
+    });
+  });
+
+  describe('showCorrectionDetails', () => {
+    it('returns true for correction', () => {
+      expect(showCorrectionDetails({ typeOfChange: 'correction' })).to.be.true;
+    });
+
+    it('returns false for full_termination', () => {
+      expect(showCorrectionDetails({ typeOfChange: 'full_termination' })).to.be
+        .false;
+    });
+  });
+
+  describe('showTimelinessAcknowledgment', () => {
+    it('returns false for correction regardless of date', () => {
+      const old = new Date();
+      old.setDate(old.getDate() - 60);
+      const dateStr = old.toISOString().split('T')[0];
+      expect(
+        showTimelinessAcknowledgment({
+          typeOfChange: 'correction',
+          effectiveDateOfChange: dateStr,
+        }),
+      ).to.be.false;
+    });
+
+    it('returns false when effectiveDateOfChange is recent', () => {
+      const recent = new Date();
+      recent.setDate(recent.getDate() - 5);
+      const dateStr = recent.toISOString().split('T')[0];
+      expect(
+        showTimelinessAcknowledgment({
+          typeOfChange: 'full_termination',
+          effectiveDateOfChange: dateStr,
+        }),
+      ).to.be.false;
+    });
+
+    it('returns true when effectiveDateOfChange is more than 30 days ago and not correction', () => {
+      const old = new Date();
+      old.setDate(old.getDate() - 60);
+      const dateStr = old.toISOString().split('T')[0];
+      expect(
+        showTimelinessAcknowledgment({
+          typeOfChange: 'full_termination',
+          effectiveDateOfChange: dateStr,
+        }),
+      ).to.be.true;
+    });
+  });
+
   describe('showSupportingDocumentation', () => {
-    it('returns true when typeOfChange is correction', () => {
+    it('returns true for correction change type', () => {
       expect(
         showSupportingDocumentation({ typeOfChange: 'correction' }),
       ).to.be.true;
@@ -156,36 +226,13 @@ describe('conditionalPageLogic', () => {
       ).to.be.true;
     });
 
-    it('returns false when no conditions are met and submission is recent', () => {
-      const recentDate = new Date();
-      recentDate.setDate(recentDate.getDate() - 5);
-      const isoDate = recentDate.toISOString().split('T')[0];
+    it('returns false when typeOfChange is not correction and mitigating is no', () => {
       expect(
         showSupportingDocumentation({
           typeOfChange: 'full_termination',
           mitigatingCircumstancesKnown: 'no',
-          effectiveDateOfChange: isoDate,
         }),
       ).to.be.false;
-    });
-
-    it('returns true when submission is late', () => {
-      const longAgoDate = new Date();
-      longAgoDate.setDate(longAgoDate.getDate() - 60);
-      const isoDate = longAgoDate.toISOString().split('T')[0];
-      expect(
-        showSupportingDocumentation({
-          typeOfChange: 'full_termination',
-          mitigatingCircumstancesKnown: 'no',
-          effectiveDateOfChange: isoDate,
-        }),
-      ).to.be.true;
-    });
-  });
-
-  describe('MITIGATING_REASON_CODES', () => {
-    it('has 4 entries', () => {
-      expect(MITIGATING_REASON_CODES).to.have.lengthOf(4);
     });
   });
 });

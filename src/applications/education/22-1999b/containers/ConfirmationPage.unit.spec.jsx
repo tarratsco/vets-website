@@ -5,12 +5,12 @@ import { Provider } from 'react-redux';
 import { createInitialState } from '@department-of-veterans-affairs/platform-forms-system/state/helpers';
 
 import formConfig from '../config/form';
-import { ConfirmationPage } from '../containers/ConfirmationPage';
+import { ConfirmationPage } from './ConfirmationPage';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
     user: {
-      login: { currentlyLoggedIn: false },
+      login: { currentlyLoggedIn: true },
       profile: {
         savedForms: [],
         prefillsAvailable: [],
@@ -23,16 +23,12 @@ const createMockStore = (overrides = {}) => ({
       ...overrides.user,
     },
     form: {
+      ...createInitialState(formConfig),
       formId: formConfig.formId,
       loadedStatus: 'success',
       savedStatus: '',
       loadedData: { metadata: {} },
-      data: {
-        studentFirstName: 'James',
-        studentLastName: 'Nguyen',
-        typeOfChange: 'full_termination',
-        effectiveDateOfChange: '2025-01-15',
-      },
+      data: {},
       submission: {
         response: { confirmationNumber: '1234567890' },
         timestamp: new Date('2024-01-15'),
@@ -56,35 +52,34 @@ describe('ConfirmationPage', () => {
   const defaultRoute = { formConfig };
 
   it('renders without crashing', () => {
-    const mockStore = createMockStore();
+    const store = createMockStore();
     const { container } = render(
-      <Provider store={mockStore}>
+      <Provider store={store}>
         <ConfirmationPage route={defaultRoute} />
       </Provider>,
     );
-    expect(container).to.exist;
+    expect(container).to.not.be.null;
   });
 
   it('renders a va-alert with success status', () => {
-    const mockStore = createMockStore();
+    const store = createMockStore();
     const { container } = render(
-      <Provider store={mockStore}>
+      <Provider store={store}>
         <ConfirmationPage route={defaultRoute} />
       </Provider>,
     );
-    const alerts = container.querySelectorAll('va-alert');
-    expect(alerts.length).to.be.greaterThan(0);
+    const alert = container.querySelector('va-alert[status="success"]');
+    expect(alert).to.not.be.null;
   });
 
-  it('renders a print button or similar action element', () => {
-    const mockStore = createMockStore();
+  it('renders a va-button for printing', () => {
+    const store = createMockStore();
     const { container } = render(
-      <Provider store={mockStore}>
+      <Provider store={store}>
         <ConfirmationPage route={defaultRoute} />
       </Provider>,
     );
-    // va-button or button should exist from PrintThisPage
-    const buttons = container.querySelectorAll('va-button, button');
+    const buttons = container.querySelectorAll('va-button');
     expect(buttons.length).to.be.greaterThan(0);
   });
 });

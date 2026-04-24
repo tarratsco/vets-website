@@ -1,10 +1,12 @@
 import { expect } from 'chai';
 import React from 'react';
-import { render } from '@testing-library/react';
 import sinon from 'sinon';
-import * as uiUtils from 'platform/utilities/ui';
+import { render } from '@testing-library/react';
+import { Provider } from 'react-redux';
 
+import * as uiUtils from 'platform/utilities/ui';
 import formConfig from '../config/form';
+import { IntroductionPage } from './IntroductionPage';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -52,59 +54,60 @@ describe('IntroductionPage', () => {
   });
 
   afterEach(() => {
-    scrollToTopStub.restore();
-    focusElementStub.restore();
+    sinon.restore();
   });
 
   const defaultRoute = {
     formConfig: {
-      formId: formConfig.formId,
       prefillEnabled: true,
-      savedFormMessages: {},
       saveInProgress: {
         messages: {
           inProgress: 'Your form is in progress.',
-          expired: 'Your form has expired.',
+          expired: 'Your saved form has expired.',
           saved: 'Your form has been saved.',
         },
       },
     },
-    pageList: [],
+    pageList: [{ path: '/introduction' }],
   };
 
   it('renders the form title', () => {
-    const { IntroductionPage } = require('../containers/IntroductionPage');
+    const store = createMockStore();
     const { container } = render(
-      <IntroductionPage
-        route={defaultRoute}
-        userLoggedIn={false}
-        userIdVerified={false}
-      />,
+      <Provider store={store}>
+        <IntroductionPage route={defaultRoute} />
+      </Provider>,
     );
-    expect(container.querySelector('article')).to.exist;
+    expect(container.querySelector('article')).to.not.be.null;
   });
 
-  it('renders a va-omb-info element', () => {
-    const { IntroductionPage } = require('../containers/IntroductionPage');
+  it('renders va-omb-info component', () => {
+    const store = createMockStore();
     const { container } = render(
-      <IntroductionPage
-        route={defaultRoute}
-        userLoggedIn={false}
-        userIdVerified={false}
-      />,
+      <Provider store={store}>
+        <IntroductionPage route={defaultRoute} />
+      </Provider>,
     );
-    expect(container.querySelector('va-omb-info')).to.exist;
+    expect(container.querySelector('va-omb-info')).to.not.be.null;
   });
 
-  it('renders va-process-list', () => {
-    const { IntroductionPage } = require('../containers/IntroductionPage');
-    const { container } = render(
-      <IntroductionPage
-        route={defaultRoute}
-        userLoggedIn={false}
-        userIdVerified={false}
-      />,
+  it('calls scrollToTop on mount', () => {
+    const store = createMockStore();
+    render(
+      <Provider store={store}>
+        <IntroductionPage route={defaultRoute} />
+      </Provider>,
     );
-    expect(container.querySelector('va-process-list')).to.exist;
+    expect(scrollToTopStub.called).to.be.true;
+  });
+
+  it('calls focusElement on mount', () => {
+    const store = createMockStore();
+    render(
+      <Provider store={store}>
+        <IntroductionPage route={defaultRoute} />
+      </Provider>,
+    );
+    expect(focusElementStub.calledWith('h1')).to.be.true;
   });
 });

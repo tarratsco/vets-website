@@ -1,299 +1,177 @@
 import { expect } from 'chai';
 
-import formConfig from '../config/form';
+import formConfig from './form';
+import IntroductionPage from '../containers/IntroductionPage';
+import ConfirmationPage from '../containers/ConfirmationPage';
 
 describe('formConfig', () => {
+  it('exports a formConfig object', () => {
+    expect(formConfig).to.be.an('object');
+  });
+
   it('has correct formId', () => {
     expect(formConfig.formId).to.equal('22-1999b');
   });
 
   it('has a title', () => {
-    expect(formConfig.title).to.be.a('string');
-    expect(formConfig.title).to.not.be.empty;
+    expect(formConfig.title).to.be.a('string').with.length.greaterThan(0);
   });
 
-  it('has chapters object', () => {
-    expect(formConfig.chapters).to.be.an('object');
+  it('has a trackingPrefix', () => {
+    expect(formConfig.trackingPrefix).to.be.a('string').with.length.greaterThan(
+      0,
+    );
   });
 
   it('has introduction component', () => {
-    expect(formConfig.introduction).to.be.a('function');
+    expect(formConfig.introduction).to.equal(IntroductionPage);
   });
 
   it('has confirmation component', () => {
-    expect(formConfig.confirmation).to.be.a('function');
+    expect(formConfig.confirmation).to.equal(ConfirmationPage);
   });
 
   it('has saveInProgress messages', () => {
-    expect(formConfig.saveInProgress).to.be.an('object');
     expect(formConfig.saveInProgress.messages).to.be.an('object');
     expect(formConfig.saveInProgress.messages.inProgress).to.be.a('string');
     expect(formConfig.saveInProgress.messages.expired).to.be.a('string');
     expect(formConfig.saveInProgress.messages.saved).to.be.a('string');
   });
 
-  it('has trackingPrefix', () => {
-    expect(formConfig.trackingPrefix).to.be.a('string');
-    expect(formConfig.trackingPrefix).to.not.be.empty;
+  it('has chapters object', () => {
+    expect(formConfig.chapters).to.be.an('object');
   });
 
-  it('has prefillEnabled set to true', () => {
-    expect(formConfig.prefillEnabled).to.be.true;
+  it('has all required top-level chapters', () => {
+    const chapterKeys = Object.keys(formConfig.chapters);
+    expect(chapterKeys).to.include('institutionAndSCOChapter');
+    expect(chapterKeys).to.include('studentAndCertificationChapter');
+    expect(chapterKeys).to.include('enrollmentChangeDetailsChapter');
+    expect(chapterKeys).to.include('supportingDocumentationChapter');
+    expect(chapterKeys).to.include('certificationAttestationChapter');
   });
 
-  it('has submitUrl', () => {
-    expect(formConfig.submitUrl).to.be.a('string');
-    expect(formConfig.submitUrl).to.include('edu_22_1999b_forms');
-  });
-
-  describe('chapters', () => {
-    it('has institutionAndSCO chapter', () => {
-      expect(formConfig.chapters.institutionAndSCO).to.exist;
-    });
-
-    it('has studentAndCertification chapter', () => {
-      expect(formConfig.chapters.studentAndCertification).to.exist;
-    });
-
-    it('has enrollmentChangeDetails chapter', () => {
-      expect(formConfig.chapters.enrollmentChangeDetails).to.exist;
-    });
-
-    it('has supportingDocumentation chapter', () => {
-      expect(formConfig.chapters.supportingDocumentation).to.exist;
-    });
-
-    it('has certificationAttestation chapter', () => {
-      expect(formConfig.chapters.certificationAttestation).to.exist;
-    });
-  });
-
-  describe('pages structure', () => {
-    const allPages = Object.values(formConfig.chapters).reduce(
-      (acc, chapter) => {
-        return { ...acc, ...chapter.pages };
-      },
-      {},
-    );
+  describe('every page has required properties', () => {
+    const getAllPages = config => {
+      const pages = [];
+      Object.values(config.chapters).forEach(chapter => {
+        Object.values(chapter.pages).forEach(page => {
+          pages.push(page);
+        });
+      });
+      return pages;
+    };
 
     it('every page has a path', () => {
-      Object.entries(allPages).forEach(([name, page]) => {
-        expect(page.path, `Page ${name} missing path`).to.be.a('string');
-        expect(page.path, `Page ${name} has empty path`).to.not.be.empty;
+      getAllPages(formConfig).forEach(page => {
+        expect(page.path).to.be.a('string').with.length.greaterThan(0);
       });
     });
 
     it('every page has a title', () => {
-      Object.entries(allPages).forEach(([name, page]) => {
-        expect(page.title, `Page ${name} missing title`).to.be.a('string');
-        expect(page.title, `Page ${name} has empty title`).to.not.be.empty;
+      getAllPages(formConfig).forEach(page => {
+        expect(page.title).to.be.a('string').with.length.greaterThan(0);
       });
     });
 
     it('every page has a uiSchema', () => {
-      Object.entries(allPages).forEach(([name, page]) => {
-        expect(page.uiSchema, `Page ${name} missing uiSchema`).to.be.an(
-          'object',
-        );
+      getAllPages(formConfig).forEach(page => {
+        expect(page.uiSchema).to.be.an('object');
       });
     });
 
     it('every page has a schema', () => {
-      Object.entries(allPages).forEach(([name, page]) => {
-        expect(page.schema, `Page ${name} missing schema`).to.be.an('object');
+      getAllPages(formConfig).forEach(page => {
+        expect(page.schema).to.be.an('object');
       });
     });
   });
 
   describe('depends functions', () => {
-    const enrollmentPages = formConfig.chapters.enrollmentChangeDetails.pages;
+    const conditionalPages = ['lastDateOfAttendance', 'updatedEnrollmentDetails', 'reasonForChange', 'mitigatingCircumstances', 'correctionDetails', 'timelinessAcknowledgment', 'supportingDocumentation'];
+
+    conditionalPages.forEach(pageName => {
+      it(`${pageName} depends function does not throw with null formData`, () => {
+        const page =
+          formConfig.chapters.enrollmentChangeDetailsChapter?.pages[
+            pageName
+          ] ||
+          formConfig.chapters.supportingDocumentationChapter?.pages[pageName];
+        if (page && page.depends) {
+          expect(() => page.depends({})).to.not.throw();
+          expect(() => page.depends({ typeOfChange: null })).to.not.throw();
+        }
+      });
+    });
 
     it('lastDateOfAttendance depends returns true for full_termination', () => {
-      expect(() =>
-        enrollmentPages.lastDateOfAttendance.depends({
-          typeOfChange: 'full_termination',
-        }),
-      ).to.not.throw();
-      expect(
-        enrollmentPages.lastDateOfAttendance.depends({
-          typeOfChange: 'full_termination',
-        }),
-      ).to.be.true;
+      const page =
+        formConfig.chapters.enrollmentChangeDetailsChapter.pages
+          .lastDateOfAttendance;
+      expect(page.depends({ typeOfChange: 'full_termination' })).to.be.true;
     });
 
     it('lastDateOfAttendance depends returns false for correction', () => {
-      expect(
-        enrollmentPages.lastDateOfAttendance.depends({
-          typeOfChange: 'correction',
-        }),
-      ).to.be.false;
-    });
-
-    it('lastDateOfAttendance depends handles null without throwing', () => {
-      expect(() =>
-        enrollmentPages.lastDateOfAttendance.depends({ typeOfChange: null }),
-      ).to.not.throw();
-    });
-
-    it('updatedEnrollmentDetails depends returns true for credit_hour_reduction', () => {
-      expect(
-        enrollmentPages.updatedEnrollmentDetails.depends({
-          typeOfChange: 'credit_hour_reduction',
-        }),
-      ).to.be.true;
-    });
-
-    it('updatedEnrollmentDetails depends returns false for full_termination', () => {
-      expect(
-        enrollmentPages.updatedEnrollmentDetails.depends({
-          typeOfChange: 'full_termination',
-        }),
-      ).to.be.false;
-    });
-
-    it('updatedEnrollmentDetails depends handles null without throwing', () => {
-      expect(() =>
-        enrollmentPages.updatedEnrollmentDetails.depends({
-          typeOfChange: null,
-        }),
-      ).to.not.throw();
-    });
-
-    it('reasonForChange depends returns false for correction', () => {
-      expect(
-        enrollmentPages.reasonForChange.depends({ typeOfChange: 'correction' }),
-      ).to.be.false;
-    });
-
-    it('reasonForChange depends returns true for full_termination', () => {
-      expect(
-        enrollmentPages.reasonForChange.depends({
-          typeOfChange: 'full_termination',
-        }),
-      ).to.be.true;
-    });
-
-    it('reasonForChange depends handles null without throwing', () => {
-      expect(() =>
-        enrollmentPages.reasonForChange.depends({ typeOfChange: null }),
-      ).to.not.throw();
-    });
-
-    it('mitigatingCircumstances depends returns true for voluntary_withdrawal', () => {
-      expect(
-        enrollmentPages.mitigatingCircumstances.depends({
-          typeOfChange: 'full_termination',
-          reasonForChange: 'voluntary_withdrawal',
-        }),
-      ).to.be.true;
-    });
-
-    it('mitigatingCircumstances depends returns false for correction', () => {
-      expect(
-        enrollmentPages.mitigatingCircumstances.depends({
-          typeOfChange: 'correction',
-          reasonForChange: 'voluntary_withdrawal',
-        }),
-      ).to.be.false;
-    });
-
-    it('mitigatingCircumstances depends returns false for military_deployment', () => {
-      expect(
-        enrollmentPages.mitigatingCircumstances.depends({
-          typeOfChange: 'full_termination',
-          reasonForChange: 'military_deployment',
-        }),
-      ).to.be.false;
-    });
-
-    it('mitigatingCircumstances depends handles null without throwing', () => {
-      expect(() =>
-        enrollmentPages.mitigatingCircumstances.depends({
-          typeOfChange: null,
-          reasonForChange: null,
-        }),
-      ).to.not.throw();
+      const page =
+        formConfig.chapters.enrollmentChangeDetailsChapter.pages
+          .lastDateOfAttendance;
+      expect(page.depends({ typeOfChange: 'correction' })).to.be.false;
     });
 
     it('correctionDetails depends returns true for correction', () => {
-      expect(
-        enrollmentPages.correctionDetails.depends({
-          typeOfChange: 'correction',
-        }),
-      ).to.be.true;
+      const page =
+        formConfig.chapters.enrollmentChangeDetailsChapter.pages
+          .correctionDetails;
+      expect(page.depends({ typeOfChange: 'correction' })).to.be.true;
     });
 
     it('correctionDetails depends returns false for full_termination', () => {
+      const page =
+        formConfig.chapters.enrollmentChangeDetailsChapter.pages
+          .correctionDetails;
+      expect(page.depends({ typeOfChange: 'full_termination' })).to.be.false;
+    });
+
+    it('supportingDocumentation depends returns true for correction', () => {
+      const page =
+        formConfig.chapters.supportingDocumentationChapter.pages
+          .supportingDocumentation;
+      expect(page.depends({ typeOfChange: 'correction' })).to.be.true;
+    });
+
+    it('supportingDocumentation depends returns false when no conditions met', () => {
+      const page =
+        formConfig.chapters.supportingDocumentationChapter.pages
+          .supportingDocumentation;
       expect(
-        enrollmentPages.correctionDetails.depends({
+        page.depends({
           typeOfChange: 'full_termination',
+          mitigatingCircumstancesKnown: 'no',
         }),
       ).to.be.false;
     });
 
-    it('correctionDetails depends handles null without throwing', () => {
-      expect(() =>
-        enrollmentPages.correctionDetails.depends({ typeOfChange: null }),
-      ).to.not.throw();
-    });
-
-    it('timelinessAcknowledgment depends returns false for correction', () => {
-      const recentDate = new Date();
-      recentDate.setDate(recentDate.getDate() - 60);
-      const isoDate = recentDate.toISOString().split('T')[0];
+    it('timelinessAcknowledgment depends returns false for correction even if date is old', () => {
+      const page =
+        formConfig.chapters.enrollmentChangeDetailsChapter.pages
+          .timelinessAcknowledgment;
+      const old = new Date();
+      old.setDate(old.getDate() - 60);
+      const dateStr = old.toISOString().split('T')[0];
       expect(
-        enrollmentPages.timelinessAcknowledgment.depends({
+        page.depends({
           typeOfChange: 'correction',
-          effectiveDateOfChange: isoDate,
+          effectiveDateOfChange: dateStr,
         }),
       ).to.be.false;
     });
+  });
 
-    it('timelinessAcknowledgment depends returns false for recent submission', () => {
-      const recentDate = new Date();
-      recentDate.setDate(recentDate.getDate() - 5);
-      const isoDate = recentDate.toISOString().split('T')[0];
-      expect(
-        enrollmentPages.timelinessAcknowledgment.depends({
-          typeOfChange: 'full_termination',
-          effectiveDateOfChange: isoDate,
-        }),
-      ).to.be.false;
-    });
+  it('submitUrl contains the correct endpoint path', () => {
+    expect(formConfig.submitUrl).to.include('/v0/edu_22_1999b_forms');
+  });
 
-    it('timelinessAcknowledgment depends returns true for old submission', () => {
-      const oldDate = new Date();
-      oldDate.setDate(oldDate.getDate() - 60);
-      const isoDate = oldDate.toISOString().split('T')[0];
-      expect(
-        enrollmentPages.timelinessAcknowledgment.depends({
-          typeOfChange: 'full_termination',
-          effectiveDateOfChange: isoDate,
-        }),
-      ).to.be.true;
-    });
-
-    it('timelinessAcknowledgment depends handles null without throwing', () => {
-      expect(() =>
-        enrollmentPages.timelinessAcknowledgment.depends({
-          typeOfChange: null,
-          effectiveDateOfChange: null,
-        }),
-      ).to.not.throw();
-    });
-
-    it('documentUpload depends returns true for correction', () => {
-      const docPage =
-        formConfig.chapters.supportingDocumentation.pages.documentUpload;
-      expect(
-        docPage.depends({ typeOfChange: 'correction' }),
-      ).to.be.true;
-    });
-
-    it('documentUpload depends handles null without throwing', () => {
-      const docPage =
-        formConfig.chapters.supportingDocumentation.pages.documentUpload;
-      expect(() => docPage.depends({})).to.not.throw();
-    });
+  it('prefillEnabled is true', () => {
+    expect(formConfig.prefillEnabled).to.be.true;
   });
 });

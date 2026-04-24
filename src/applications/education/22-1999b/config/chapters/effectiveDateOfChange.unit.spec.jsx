@@ -3,42 +3,36 @@ import { expect } from 'chai';
 import {
   effectiveDateOfChangeUiSchema,
   effectiveDateOfChangeSchema,
-} from '../chapters/effectiveDateOfChange';
+} from './effectiveDateOfChange';
 
 describe('effectiveDateOfChange page', () => {
-  describe('uiSchema', () => {
-    it('has effectiveDateOfChange field', () => {
-      expect(effectiveDateOfChangeUiSchema.effectiveDateOfChange).to.exist;
-    });
-
-    it('effectiveDateOfChange has correct title', () => {
-      expect(
-        effectiveDateOfChangeUiSchema.effectiveDateOfChange['ui:title'],
-      ).to.equal('Effective date of enrollment change');
-    });
-
-    it('has validations array', () => {
-      expect(
-        effectiveDateOfChangeUiSchema.effectiveDateOfChange['ui:validations'],
-      ).to.be.an('array');
-    });
+  it('uiSchema has effectiveDateOfChange field', () => {
+    expect(effectiveDateOfChangeUiSchema.effectiveDateOfChange).to.be.an(
+      'object',
+    );
   });
 
-  describe('schema', () => {
-    it('has type object', () => {
-      expect(effectiveDateOfChangeSchema.type).to.equal('object');
-    });
+  it('uiSchema has correct title', () => {
+    expect(
+      effectiveDateOfChangeUiSchema.effectiveDateOfChange['ui:title'],
+    ).to.equal('Effective date of enrollment change');
+  });
 
-    it('requires effectiveDateOfChange', () => {
-      expect(effectiveDateOfChangeSchema.required).to.include(
-        'effectiveDateOfChange',
-      );
-    });
+  it('uiSchema has validations array', () => {
+    expect(
+      effectiveDateOfChangeUiSchema.effectiveDateOfChange['ui:validations'],
+    ).to.be.an('array');
+  });
 
-    it('effectiveDateOfChange schema is a string type', () => {
-      expect(
-        effectiveDateOfChangeSchema.properties.effectiveDateOfChange.type,
-      ).to.equal('string');
-    });
+  it('schema requires effectiveDateOfChange', () => {
+    expect(effectiveDateOfChangeSchema.required).to.include(
+      'effectiveDateOfChange',
+    );
+  });
+
+  it('schema effectiveDateOfChange has correct type', () => {
+    expect(
+      effectiveDateOfChangeSchema.properties.effectiveDateOfChange.type,
+    ).to.equal('string');
   });
 });

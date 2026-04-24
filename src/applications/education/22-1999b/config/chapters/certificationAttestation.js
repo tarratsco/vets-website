@@ -3,31 +3,38 @@ import {
   checkboxGroupSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-export const ATTESTATION_LABELS = {
+const ATTESTATION_LABELS = {
   scoCertificationAttested:
     'I certify that, to the best of my knowledge, the information I have provided on this enrollment change certification is true and complete. I understand that any false statement may be punishable by fine or imprisonment under applicable Federal law.',
 };
 
-export const ATTESTATION_KEYS = Object.keys(ATTESTATION_LABELS);
+const ATTESTATION_KEYS = Object.keys(ATTESTATION_LABELS);
+
+const validateAttestation = (errors, value) => {
+  if (!Array.isArray(value) || !value.includes('scoCertificationAttested')) {
+    errors.addError(
+      'You must certify the accuracy of this information before submitting.',
+    );
+  }
+};
 
 export const certificationAttestationUiSchema = {
-  scoCertificationAttested: checkboxGroupUI({
+  certificationAttestation: checkboxGroupUI({
     title: 'Certification',
-    hint:
-      'By checking this box and submitting this form, you are providing a legally binding electronic attestation. This is equivalent to signing the paper form.',
     required: true,
     labels: ATTESTATION_LABELS,
     errorMessages: {
       required:
         'You must certify the accuracy of this information before submitting.',
     },
+    'ui:validations': [validateAttestation],
   }),
 };
 
 export const certificationAttestationSchema = {
   type: 'object',
-  required: ['scoCertificationAttested'],
+  required: ['certificationAttestation'],
   properties: {
-    scoCertificationAttested: checkboxGroupSchema(ATTESTATION_KEYS),
+    certificationAttestation: checkboxGroupSchema(ATTESTATION_KEYS),
   },
 };

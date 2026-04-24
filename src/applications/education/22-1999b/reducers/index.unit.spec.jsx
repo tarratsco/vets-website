@@ -1,19 +1,21 @@
 import { expect } from 'chai';
 
-import reducers from '../reducers/index';
+import reducers from './index';
 
 describe('reducers', () => {
-  it('returns a non-null object with a form key', () => {
+  it('exports an object with a form slice', () => {
     expect(reducers).to.be.an('object');
-    expect(reducers).to.have.key('form');
-  });
-
-  it('form reducer is a function', () => {
     expect(reducers.form).to.be.a('function');
   });
 
-  it('form reducer returns state when called with @@INIT', () => {
+  it('form reducer returns initial state on @@INIT', () => {
     const result = reducers.form(undefined, { type: '@@INIT' });
     expect(result).to.be.an('object');
+    expect(result).to.not.be.null;
+  });
+
+  it('form reducer has expected initial state keys', () => {
+    const result = reducers.form(undefined, { type: '@@INIT' });
+    expect(result).to.have.property('data');
   });
 });

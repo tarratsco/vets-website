@@ -3,50 +3,55 @@ import { expect } from 'chai';
 import {
   institutionInformationUiSchema,
   institutionInformationSchema,
-} from '../chapters/institutionInformation';
+} from './institutionInformation';
 
 describe('institutionInformation page', () => {
-  describe('uiSchema', () => {
-    it('has facilityCode field', () => {
-      expect(institutionInformationUiSchema.facilityCode).to.exist;
-    });
-
-    it('facilityCode has a ui:title', () => {
-      expect(institutionInformationUiSchema.facilityCode['ui:title']).to.equal(
-        'VA Facility Code',
-      );
-    });
-
-    it('has institutionName field', () => {
-      expect(institutionInformationUiSchema.institutionName).to.exist;
-    });
-
-    it('institutionName has a ui:title', () => {
-      expect(
-        institutionInformationUiSchema.institutionName['ui:title'],
-      ).to.equal('Institution name');
-    });
+  it('uiSchema has facilityCode field', () => {
+    expect(
+      institutionInformationUiSchema.institutionAndScoInformation.facilityCode,
+    ).to.be.an('object');
   });
 
-  describe('schema', () => {
-    it('has type object', () => {
-      expect(institutionInformationSchema.type).to.equal('object');
-    });
+  it('uiSchema facilityCode has a title', () => {
+    expect(
+      institutionInformationUiSchema.institutionAndScoInformation.facilityCode[
+        'ui:title'
+      ],
+    ).to.equal('VA Facility Code');
+  });
 
-    it('requires facilityCode', () => {
-      expect(institutionInformationSchema.required).to.include('facilityCode');
-    });
+  it('uiSchema has institutionName field', () => {
+    expect(
+      institutionInformationUiSchema.institutionAndScoInformation
+        .institutionName,
+    ).to.be.an('object');
+  });
 
-    it('requires institutionName', () => {
-      expect(institutionInformationSchema.required).to.include(
-        'institutionName',
-      );
-    });
+  it('schema requires facilityCode', () => {
+    expect(
+      institutionInformationSchema.properties.institutionAndScoInformation
+        .required,
+    ).to.include('facilityCode');
+  });
 
-    it('facilityCode has 8-digit pattern', () => {
-      expect(
-        institutionInformationSchema.properties.facilityCode.pattern,
-      ).to.equal('^\\d{8}$');
-    });
+  it('schema requires institutionName', () => {
+    expect(
+      institutionInformationSchema.properties.institutionAndScoInformation
+        .required,
+    ).to.include('institutionName');
+  });
+
+  it('facilityCode schema has pattern for 8 digits', () => {
+    expect(
+      institutionInformationSchema.properties.institutionAndScoInformation
+        .properties.facilityCode.pattern,
+    ).to.equal('^\\d{8}$');
+  });
+
+  it('schema institutionAddress has expected sub-properties', () => {
+    const addrProps =
+      institutionInformationSchema.properties.institutionAndScoInformation
+        .properties.institutionAddress.properties;
+    expect(addrProps).to.have.keys(['street', 'city', 'state', 'zip']);
   });
 });

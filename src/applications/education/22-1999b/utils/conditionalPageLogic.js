@@ -1,77 +1,43 @@
-export const MITIGATING_REASON_CODES = [
-  'voluntary_withdrawal',
-  'medical',
-  'personal_family_emergency',
-  'non_punitive_grade',
-];
+import { MITIGATING_REASON_CODES, LATE_SUBMISSION_THRESHOLD_DAYS } from '../constants';
 
-/**
- * Returns true when type of change is full termination or partial withdrawal.
- * Controls display of last-date-of-attendance page.
- * @param {string} typeOfChange
- * @returns {boolean}
- */
-export function isTerminationOrWithdrawal(typeOfChange) {
-  return (
-    typeOfChange === 'full_termination' ||
-    typeOfChange === 'partial_withdrawal'
-  );
-}
+export const isTerminationOrWithdrawal = typeOfChange =>
+  typeOfChange === 'full_termination' || typeOfChange === 'partial_withdrawal';
 
-/**
- * Returns true when type of change is credit hour reduction or partial withdrawal.
- * Controls display of updated-enrollment-details page.
- * @param {string} typeOfChange
- * @returns {boolean}
- */
-export function isReductionOrPartialWithdrawal(typeOfChange) {
-  return (
-    typeOfChange === 'credit_hour_reduction' ||
-    typeOfChange === 'partial_withdrawal'
-  );
-}
+export const isReductionOrPartialWithdrawal = typeOfChange =>
+  typeOfChange === 'credit_hour_reduction' ||
+  typeOfChange === 'partial_withdrawal';
 
-/**
- * Returns true when the effective date of change is more than 30 days before today.
- * Controls display of timeliness-acknowledgment page.
- * @param {string} effectiveDateOfChange ISO 8601 date string
- * @returns {boolean}
- */
-export function isLateSubmission(effectiveDateOfChange) {
+export const isLateSubmission = effectiveDateOfChange => {
   if (!effectiveDateOfChange) return false;
   const effective = new Date(`${effectiveDateOfChange}T00:00:00`);
+  if (Number.isNaN(effective.getTime())) return false;
   const today = new Date();
-  const diffDays = Math.floor((today - effective) / (1000 * 60 * 60 * 24));
-  return diffDays > 30;
-}
-
-/**
- * Returns true when the reason for change triggers the mitigating circumstances page.
- * @param {string} reasonForChange
- * @returns {boolean}
- */
-export function hasMitigatingReasonCode(reasonForChange) {
-  return MITIGATING_REASON_CODES.includes(reasonForChange);
-}
-
-/**
- * Returns true when the supporting documentation page should be required.
- * @param {object} formData
- * @returns {boolean}
- */
-export function requiresSupportingDocumentation(formData) {
-  return formData.typeOfChange === 'correction';
-}
-
-/**
- * Returns true when the supporting documentation page should be displayed.
- * @param {object} formData
- * @returns {boolean}
- */
-export function showSupportingDocumentation(formData) {
-  return (
-    formData.typeOfChange === 'correction' ||
-    formData.mitigatingCircumstancesKnown === 'yes' ||
-    isLateSubmission(formData.effectiveDateOfChange)
+  const diffDays = Math.floor(
+    (today - effective) / (1000 * 60 * 60 * 24),
   );
-}
+  return diffDays > LATE_SUBMISSION_THRESHOLD_DAYS;
+};
+
+export const showMitigatingCircumstances = formData =>
+  formData.typeOfChange !== 'correction' &&
+  MITIGATING_REASON_CODES.includes(formData.reasonForChange);
+
+export const showLastDateOfAttendance = formData =>
+  isTerminationOrWithdrawal(formData.typeOfChange);
+
+export const showUpdatedEnrollmentDetails = formData =>
+  isReductionOrPartialWithdrawal(formData.typeOfChange);
+
+export const showReasonForChange = formData =>
+  formData.typeOfChange !== 'correction';
+
+export const showCorrectionDetails = formData =>
+  formData.typeOfChange === 'correction';
+
+export const showTimelinessAcknowledgment = formData =>
+  formData.typeOfChange !== 'correction' &&
+  isLateSubmission(formData.effectiveDateOfChange);
+
+export const showSupportingDocumentation = formData =>
+  formData.typeOfChange === 'correction' ||
+  formData.mitigatingCircumstancesKnown === 'yes';
