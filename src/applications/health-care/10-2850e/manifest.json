@@ -1,0 +1,12 @@
+{
+  "appName": "Apply for VA Clinical Position (Form 10-2850e)",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "form-10-2850e",
+  "rootUrl": "/health-care/professional-employment/apply-for-clinical-position/10-2850e",
+  "productId": "form-10-2850e",
+  "template": {
+    "vagovprod": false,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
