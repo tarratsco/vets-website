@@ -1,13 +1,13 @@
-import 'platform/polyfills';
+import '@department-of-veterans-affairs/platform-polyfills';
 import './sass/22-1999b.scss';
 
-import startApp from 'platform/startup';
+import { startAppFromIndex } from '@department-of-veterans-affairs/platform-startup/exports';
 
 import routes from './routes';
 import reducer from './reducers';
 import manifest from './manifest.json';
 
-startApp({
+startAppFromIndex({
   entryName: manifest.entryName,
   url: manifest.rootUrl,
   reducer,

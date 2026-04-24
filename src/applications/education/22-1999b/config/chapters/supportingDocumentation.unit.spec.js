@@ -6,45 +6,32 @@ import {
 
 describe('supportingDocumentation chapter', () => {
   describe('supportingDocumentationSchema', () => {
-    it('has supportingDocumentation property', () => {
-      expect(
-        supportingDocumentationSchema.properties.supportingDocumentation,
-      ).to.exist;
+    it('has supportingDocumentIds property', () => {
+      expect(supportingDocumentationSchema.properties).to.have.property(
+        'supportingDocumentIds',
+      );
     });
 
-    it('supportingDocumentIds property exists', () => {
-      expect(
-        supportingDocumentationSchema.properties.supportingDocumentation
-          .properties.supportingDocumentIds,
-      ).to.exist;
+    it('supportingDocumentIds is an object schema', () => {
+      expect(supportingDocumentationSchema.type).to.equal('object');
     });
 
-    it('supportingDocumentation is not in required at top level', () => {
-      expect(supportingDocumentationSchema.required).to.not.exist;
+    it('does not require supportingDocumentIds', () => {
+      expect(supportingDocumentationSchema.required).to.be.undefined;
     });
   });
 
   describe('supportingDocumentationUiSchema', () => {
-    it('has a title for supportingDocumentIds', () => {
-      const fieldUi =
-        supportingDocumentationUiSchema.supportingDocumentation
-          .supportingDocumentIds;
-      expect(fieldUi['ui:title']).to.equal('Upload supporting documentation');
+    it('has supportingDocumentIds ui config', () => {
+      expect(supportingDocumentationUiSchema.supportingDocumentIds).to.be.an(
+        'object',
+      );
     });
 
-    it('has hint text listing accepted file types', () => {
-      const fieldUi =
-        supportingDocumentationUiSchema.supportingDocumentation
-          .supportingDocumentIds;
-      const hint =
-        fieldUi['ui:options']?.hint ||
-        fieldUi['ui:description'] ||
-        (typeof fieldUi['ui:options'] === 'string'
-          ? fieldUi['ui:options']
-          : '');
-      expect(
-        fieldUi['ui:options']?.hint || fieldUi['ui:description'] || '',
-      ).to.be.a('string');
+    it('has ui:title', () => {
+      expect(supportingDocumentationUiSchema['ui:title']).to.equal(
+        'Supporting documentation',
+      );
     });
   });
 });

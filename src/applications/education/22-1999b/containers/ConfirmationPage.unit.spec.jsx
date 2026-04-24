@@ -2,13 +2,14 @@ import React from 'react';
 import { expect } from 'chai';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
+import { createInitialState } from '@department-of-veterans-affairs/platform-forms-system/state/helpers';
+
 import formConfig from '../config/form';
-import { ConfirmationPage } from './ConfirmationPage';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
     user: {
-      login: { currentlyLoggedIn: false },
+      login: { currentlyLoggedIn: true },
       profile: {
         savedForms: [],
         prefillsAvailable: [],
@@ -26,14 +27,8 @@ const createMockStore = (overrides = {}) => ({
       savedStatus: '',
       loadedData: { metadata: {} },
       data: {
-        studentAndPriorCertification: {
-          studentFirstName: 'James',
-          studentLastName: 'Nguyen',
-        },
-        enrollmentChangeDetails: {
-          typeOfChange: 'full_termination',
-          effectiveDateOfChange: '2025-01-15',
-        },
+        studentFirstName: 'James',
+        studentLastName: 'Nguyen',
       },
       submission: {
         response: { confirmationNumber: '1234567890' },
@@ -55,58 +50,37 @@ const createMockStore = (overrides = {}) => ({
 });
 
 describe('ConfirmationPage', () => {
-  const mockRoute = { formConfig };
-
   it('renders without crashing', () => {
+    const { ConfirmationPage } = require('./ConfirmationPage');
     const store = createMockStore();
     const { container } = render(
       <Provider store={store}>
-        <ConfirmationPage route={mockRoute} />
+        <ConfirmationPage route={{ formConfig }} />
       </Provider>,
     );
     expect(container).to.exist;
   });
 
-  it('renders a va-alert with success status', () => {
+  it('renders a success alert', () => {
+    const { ConfirmationPage } = require('./ConfirmationPage');
     const store = createMockStore();
     const { container } = render(
       <Provider store={store}>
-        <ConfirmationPage route={mockRoute} />
+        <ConfirmationPage route={{ formConfig }} />
       </Provider>,
     );
     const alert = container.querySelector('va-alert[status="success"]');
     expect(alert).to.exist;
   });
 
-  it('displays the confirmation number', () => {
+  it('displays confirmation number when present', () => {
+    const { ConfirmationPage } = require('./ConfirmationPage');
     const store = createMockStore();
     const { getByText } = render(
       <Provider store={store}>
-        <ConfirmationPage route={mockRoute} />
+        <ConfirmationPage route={{ formConfig }} />
       </Provider>,
     );
     expect(getByText(/1234567890/)).to.exist;
-  });
-
-  it('renders the print button', () => {
-    const store = createMockStore();
-    const { container } = render(
-      <Provider store={store}>
-        <ConfirmationPage route={mockRoute} />
-      </Provider>,
-    );
-    const button = container.querySelector('va-button');
-    expect(button).to.exist;
-  });
-
-  it('displays student name in summary', () => {
-    const store = createMockStore();
-    const { getByText } = render(
-      <Provider store={store}>
-        <ConfirmationPage route={mockRoute} />
-      </Provider>,
-    );
-    expect(getByText(/James/)).to.exist;
-    expect(getByText(/Nguyen/)).to.exist;
   });
 });

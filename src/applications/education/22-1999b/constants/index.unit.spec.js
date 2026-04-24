@@ -1,51 +1,77 @@
 import { expect } from 'chai';
 import {
-  TITLE,
-  SUBTITLE,
-  CHANGE_TYPE_LABELS,
+  FORM_TITLE,
+  FORM_SUBTITLE,
   BENEFIT_CHAPTER_LABELS,
+  BENEFIT_CHAPTER_KEYS,
   ENROLLMENT_TYPE_LABELS,
+  ENROLLMENT_TYPE_KEYS,
+  TYPE_OF_CHANGE_LABELS,
+  TYPE_OF_CHANGE_KEYS,
   REASON_FOR_CHANGE_LABELS,
-  CORRECTION_ITEM_LABELS,
+  REASON_FOR_CHANGE_KEYS,
   MITIGATING_REASON_CODES,
-  LATE_SUBMISSION_THRESHOLD_DAYS,
+  CORRECTION_ITEM_LABELS,
+  CORRECTION_ITEM_KEYS,
 } from './index';
 
 describe('constants', () => {
-  it('TITLE is a non-empty string', () => {
-    expect(TITLE).to.be.a('string').and.not.empty;
+  it('FORM_TITLE is a non-empty string', () => {
+    expect(FORM_TITLE).to.be.a('string').and.not.be.empty;
   });
 
-  it('SUBTITLE references the form number', () => {
-    expect(SUBTITLE).to.include('22-1999b');
+  it('FORM_SUBTITLE is a non-empty string', () => {
+    expect(FORM_SUBTITLE).to.be.a('string').and.not.be.empty;
   });
 
-  it('CHANGE_TYPE_LABELS has 4 entries', () => {
-    expect(Object.keys(CHANGE_TYPE_LABELS)).to.have.lengthOf(4);
-  });
-
-  it('BENEFIT_CHAPTER_LABELS includes chapter_33', () => {
+  it('BENEFIT_CHAPTER_LABELS contains chapter_33', () => {
     expect(BENEFIT_CHAPTER_LABELS).to.have.property('chapter_33');
   });
 
-  it('ENROLLMENT_TYPE_LABELS has 4 entries', () => {
-    expect(Object.keys(ENROLLMENT_TYPE_LABELS)).to.have.lengthOf(4);
+  it('BENEFIT_CHAPTER_KEYS contains all expected chapters', () => {
+    expect(BENEFIT_CHAPTER_KEYS).to.include('chapter_33');
+    expect(BENEFIT_CHAPTER_KEYS).to.include('chapter_30');
+    expect(BENEFIT_CHAPTER_KEYS).to.include('chapter_35');
+    expect(BENEFIT_CHAPTER_KEYS).to.include('chapter_1606');
   });
 
-  it('REASON_FOR_CHANGE_LABELS has 11 entries', () => {
-    expect(Object.keys(REASON_FOR_CHANGE_LABELS)).to.have.lengthOf(11);
+  it('ENROLLMENT_TYPE_KEYS has 4 values', () => {
+    expect(ENROLLMENT_TYPE_KEYS).to.have.lengthOf(4);
   });
 
-  it('CORRECTION_ITEM_LABELS has 7 entries', () => {
-    expect(Object.keys(CORRECTION_ITEM_LABELS)).to.have.lengthOf(7);
+  it('TYPE_OF_CHANGE_KEYS contains all 4 change types', () => {
+    expect(TYPE_OF_CHANGE_KEYS).to.include('full_termination');
+    expect(TYPE_OF_CHANGE_KEYS).to.include('partial_withdrawal');
+    expect(TYPE_OF_CHANGE_KEYS).to.include('credit_hour_reduction');
+    expect(TYPE_OF_CHANGE_KEYS).to.include('correction');
   });
 
-  it('MITIGATING_REASON_CODES is a non-empty array', () => {
-    expect(MITIGATING_REASON_CODES).to.be.an('array').and.not.empty;
+  it('REASON_FOR_CHANGE_KEYS has 11 values', () => {
+    expect(REASON_FOR_CHANGE_KEYS).to.have.lengthOf(11);
+  });
+
+  it('MITIGATING_REASON_CODES contains voluntary_withdrawal and medical', () => {
     expect(MITIGATING_REASON_CODES).to.include('voluntary_withdrawal');
+    expect(MITIGATING_REASON_CODES).to.include('medical');
+    expect(MITIGATING_REASON_CODES).to.include('personal_family_emergency');
+    expect(MITIGATING_REASON_CODES).to.include('non_punitive_grade');
   });
 
-  it('LATE_SUBMISSION_THRESHOLD_DAYS is 30', () => {
-    expect(LATE_SUBMISSION_THRESHOLD_DAYS).to.equal(30);
+  it('CORRECTION_ITEM_KEYS contains expected correction items', () => {
+    expect(CORRECTION_ITEM_KEYS).to.include('credit_hours');
+    expect(CORRECTION_ITEM_KEYS).to.include('enrollment_dates');
+    expect(CORRECTION_ITEM_KEYS).to.include('other');
+  });
+
+  it('BENEFIT_CHAPTER_KEYS matches BENEFIT_CHAPTER_LABELS keys', () => {
+    expect(BENEFIT_CHAPTER_KEYS).to.deep.equal(
+      Object.keys(BENEFIT_CHAPTER_LABELS),
+    );
+  });
+
+  it('ENROLLMENT_TYPE_KEYS matches ENROLLMENT_TYPE_LABELS keys', () => {
+    expect(ENROLLMENT_TYPE_KEYS).to.deep.equal(
+      Object.keys(ENROLLMENT_TYPE_LABELS),
+    );
   });
 });

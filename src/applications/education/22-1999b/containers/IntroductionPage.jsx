@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
+import { connect } from 'react-redux';
 import { isLOA3, isLoggedIn } from 'platform/user/selectors';
 import FormTitle from 'platform/forms-system/src/js/components/FormTitle';
 import SaveInProgressIntro from 'platform/forms/save-in-progress/SaveInProgressIntro';
 import { focusElement, scrollToTop } from 'platform/utilities/ui';
 
-import { TITLE, SUBTITLE } from '../constants';
+import { FORM_TITLE, FORM_SUBTITLE } from '../constants';
 
 const ombInfo = {
   resBurden: '15',
-  ombNumber: '2900-0702',
+  ombNumber: '2900-0278',
   expDate: '09/30/2026',
 };
 
@@ -25,87 +25,71 @@ export const IntroductionPage = ({ route, userLoggedIn, userIdVerified }) => {
 
   return (
     <article className="schemaform-intro">
-      <FormTitle title={TITLE} subTitle={SUBTITLE} />
+      <FormTitle title={FORM_TITLE} subTitle={FORM_SUBTITLE} />
 
-      <p className="vads-u-font-size--lg vads-u-font-family--serif vads-u-font-weight--normal vads-u-line-height--4">
-        Use this form as a School Certifying Official (SCO) to report a change
-        or termination of a student-Veteran's enrollment under GI Bill education
-        benefits.
+      <p className="vads-u-font-size--lg">
+        Use this form if you are a School Certifying Official (SCO) reporting
+        an enrollment change or termination for a student using GI Bill
+        education benefits.
       </p>
 
-      <h2 className="vads-u-margin-top--3">What to know before you start</h2>
-      <p>
-        Only a School Certifying Official (SCO) at an approved VA educational
-        institution may complete this form. You must be signed in with an
-        identity-verified account to proceed.
-      </p>
-
-      <ul>
-        <li>
-          Use this form to amend a previously submitted VA Form 22-1999
-          (Enrollment Certification).
-        </li>
-        <li>
-          Report changes within 30 days of the effective date when possible.
-          Late submissions may result in an overpayment for your student.
-        </li>
-        <li>
-          Have the original VA Form 22-1999 certification dates and credit hours
-          on hand before you begin.
-        </li>
-        <li>
-          You may upload supporting documents such as withdrawal notices or
-          medical documentation (PDF, JPG, or PNG; max 25 MB per file, 3 files).
-        </li>
-      </ul>
-
-      <h2>What happens after you submit</h2>
-      <va-process-list uswds>
-        <va-process-list-item header="We receive your enrollment change certification">
-          <p>
-            We review the information you provided and match it to the
-            student-Veteran's record.
-          </p>
-        </va-process-list-item>
-        <va-process-list-item header="We adjust the student's benefits">
-          <p>
-            Based on the change you reported, VA will recalculate the
-            student's benefit payments. If an overpayment occurred, VA will
-            notify the student directly.
-          </p>
-        </va-process-list-item>
-        <va-process-list-item header="You receive a confirmation">
-          <p>
-            After submission, you will see a confirmation number on screen.
-            Save or print this page for your records.
-          </p>
-        </va-process-list-item>
-      </va-process-list>
-
-      <va-alert status="info" uswds>
-        <h2 slot="headline">Sign in to save your progress</h2>
+      <va-alert status="info" visible>
+        <h2 slot="headline">Before you start</h2>
         <p>
-          If you sign in to VA.gov before starting this form, you can save your
-          work and return to complete it within 60 days.
+          You must be signed in as a School Certifying Official to use this
+          form. Have the original VA Form 22-1999 certification information
+          available before you begin.
         </p>
       </va-alert>
 
-      <SaveInProgressIntro
-        headingLevel={2}
-        prefillEnabled={formConfig.prefillEnabled}
-        messages={formConfig.saveInProgress.messages}
-        pageList={pageList}
-        startText="Start your enrollment change certification"
-        unauthStartText="Sign in to start your enrollment change certification"
-        hideUnauthedStartLink={false}
-        devOnly={{ forceShowFormControls: true }}
-      />
+      <h2 className="vads-u-margin-top--3">What this form is for</h2>
+      <p>
+        VA Form 22-1999b allows School Certifying Officials to report the
+        following enrollment changes for students receiving GI Bill benefits:
+      </p>
+      <ul>
+        <li>Full termination of enrollment</li>
+        <li>Partial withdrawal from one or more courses</li>
+        <li>Reduction in credit hours</li>
+        <li>Correction to a previously submitted certification</li>
+      </ul>
+
+      <h2>What information you need</h2>
+      <va-process-list>
+        <va-process-list-item header="Your institution information">
+          Your VA Facility Code, institution name, and your contact information
+          as the School Certifying Official.
+        </va-process-list-item>
+        <va-process-list-item header="Student information">
+          The student-Veteran&apos;s full name, Social Security number or VA
+          File Number, and the GI Bill benefit chapter they are using.
+        </va-process-list-item>
+        <va-process-list-item header="Original certification details">
+          The enrollment period dates, credit hours, and enrollment type from
+          the original VA Form 22-1999 you are amending.
+        </va-process-list-item>
+        <va-process-list-item header="Change details">
+          The type of change, effective date, and any supporting information
+          required for the change type you are reporting.
+        </va-process-list-item>
+      </va-process-list>
+
+      <div className="vads-u-margin-top--4">
+        <SaveInProgressIntro
+          prefillEnabled={formConfig.prefillEnabled}
+          messages={formConfig.saveInProgress.messages}
+          pageList={pageList}
+          startText="Start your enrollment change certification"
+          unauthStartText="Sign in to start your enrollment change certification"
+          hideUnauthedStartLink={false}
+          devOnly={{ forceShowFormControls: true }}
+        />
+      </div>
 
       <va-omb-info
         res-burden={ombInfo.resBurden}
         omb-number={ombInfo.ombNumber}
         exp-date={ombInfo.expDate}
-        uswds
       />
     </article>
   );
@@ -118,10 +102,9 @@ IntroductionPage.propTypes = {
       saveInProgress: PropTypes.shape({
         messages: PropTypes.shape({}),
       }),
-      savedFormMessages: PropTypes.shape({}),
     }),
     pageList: PropTypes.array,
-  }).isRequired,
+  }),
   userIdVerified: PropTypes.bool,
   userLoggedIn: PropTypes.bool,
 };

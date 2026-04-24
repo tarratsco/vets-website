@@ -6,26 +6,25 @@ import {
 // ─── Chapter 1, Page 1: Institution Information ───────────────────────────────
 
 export const institutionInformationUiSchema = {
+  'ui:title': 'Institution information',
   institutionAndScoInformation: {
-    'ui:title': 'Institution information',
     facilityCode: textUI({
       title: 'VA Facility Code',
       hint:
-        'Your 8-character facility code is assigned by VA and identifies your school location. Example: 31000123. If you have multiple facility codes (branch campuses), enter the code for the location where this student is enrolled.',
-      inputType: 'text',
+        'Your 8-character facility code is assigned by VA and identifies your school location. Example: 31000123.',
       autocomplete: 'off',
       errorMessages: {
         required: 'Please enter your 8-digit VA Facility Code.',
         pattern:
-          "We couldn't find a valid VA Facility Code. Please enter exactly 8 numeric digits.",
+          "We couldn't find that VA Facility Code. Please check the code and try again.",
       },
     }),
     institutionName: textUI({
       title: 'Institution name',
       hint:
-        'This is the name of your school as registered with VA. If this name is incorrect, contact your VA Education Liaison Representative to update your school\'s record.',
+        'This is the name of your school as registered with VA. If this name is incorrect, contact your VA Education Liaison Representative.',
       errorMessages: {
-        required: 'Please enter the institution name.',
+        required: 'Please enter your institution name.',
       },
     }),
     institutionAddress: {
@@ -39,20 +38,14 @@ export const institutionInformationUiSchema = {
         autocomplete: 'address-level2',
       }),
       state: textUI({
-        title: 'State (2-letter abbreviation)',
-        hint: 'Example: VA',
+        title: 'State',
+        hint: 'Enter 2-letter state abbreviation. Example: VA',
         autocomplete: 'address-level1',
-        errorMessages: {
-          pattern: 'Please enter a valid 2-letter state abbreviation.',
-        },
       }),
       zip: textUI({
         title: 'ZIP code',
-        hint: 'Enter a 5-digit ZIP code. Example: 20190',
         autocomplete: 'postal-code',
-        errorMessages: {
-          pattern: 'Please enter a valid 5-digit ZIP code.',
-        },
+        hint: 'Enter 5-digit ZIP code. Example: 20190',
       }),
     },
   },
@@ -98,15 +91,13 @@ export const institutionInformationSchema = {
   },
 };
 
-// ─── Chapter 1, Page 2: SCO Contact Information ───────────────────────────────
+// ─── Chapter 1, Page 2: SCO Contact Information ──────────────────────────────
 
 export const scoContactInformationUiSchema = {
+  'ui:title': 'School Certifying Official contact information',
   institutionAndScoInformation: {
-    'ui:title': 'School Certifying Official contact information',
     scoFirstName: textUI({
       title: 'Your first name',
-      hint:
-        'Pre-filled from your account. Update if another SCO is completing this form.',
       autocomplete: 'given-name',
       errorMessages: {
         required: 'Please enter your first name.',
@@ -114,7 +105,6 @@ export const scoContactInformationUiSchema = {
     }),
     scoLastName: textUI({
       title: 'Your last name',
-      hint: 'Pre-filled from your account.',
       autocomplete: 'family-name',
       errorMessages: {
         required: 'Please enter your last name.',
@@ -123,11 +113,12 @@ export const scoContactInformationUiSchema = {
     scoTitle: textUI({
       title: 'Your title or role',
       hint: 'Example: Associate Registrar, School Certifying Official',
+      autocomplete: 'organization-title',
     }),
     scoPhone: textUI({
       title: 'Your phone number',
       hint:
-        'Enter a 10-digit U.S. phone number. Include area code. Example: 5558675309. VA may use this number to contact you about this submission.',
+        'Enter a 10-digit U.S. phone number including area code. Example: 555-867-5309',
       inputType: 'tel',
       autocomplete: 'tel',
       errorMessages: {
@@ -138,12 +129,13 @@ export const scoContactInformationUiSchema = {
     scoEmail: textUI({
       title: 'Your email address',
       hint:
-        'Enter the email address where VA should send your submission confirmation and any follow-up communications about this form.',
+        'Enter the email address where VA should send your submission confirmation.',
       inputType: 'email',
       autocomplete: 'email',
       errorMessages: {
-        required: 'Please enter a valid email address.',
-        pattern:
+        required:
+          'Please enter a valid email address in the format name@example.com.',
+        format:
           'Please enter a valid email address in the format name@example.com.',
       },
     }),
