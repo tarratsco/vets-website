@@ -7,11 +7,16 @@ import FormTitle from 'platform/forms-system/src/js/components/FormTitle';
 import SaveInProgressIntro from 'platform/forms/save-in-progress/SaveInProgressIntro';
 import { focusElement, scrollToTop } from 'platform/utilities/ui';
 
-const OMB_RES_BURDEN = 30;
-const OMB_NUMBER = '2900-XXXX';
-const OMB_EXP_DATE = '12/31/2026';
+const TITLE = 'Request a Government Headstone or Marker';
+const SUBTITLE = 'VA Form 40-1330M';
 
-export const IntroductionPage = ({ route, userIdVerified, userLoggedIn }) => {
+const ombInfo = {
+  resBurden: '20',
+  ombNumber: '2900-XXXX',
+  expDate: '12/31/2026',
+};
+
+export const IntroductionPage = ({ route, userLoggedIn, userIdVerified }) => {
   const { formConfig, pageList } = route;
 
   useEffect(() => {
@@ -21,52 +26,53 @@ export const IntroductionPage = ({ route, userIdVerified, userLoggedIn }) => {
 
   return (
     <article className="schemaform-intro">
-      <FormTitle
-        title="Request a Government Headstone or Marker"
-        subTitle="VA Form 40-1330M"
-      />
+      <FormTitle title={TITLE} subTitle={SUBTITLE} />
 
       <p className="vads-u-font-size--lg">
         Use this form to request a government-furnished headstone or marker for
-        an active duty service member or qualifying National Guard or Reserve
-        member who died in the line of duty.
+        a service member who died while on active duty or qualifying National
+        Guard or Reserve service.
       </p>
 
-      <va-alert status="info" visible>
-        <h2 slot="headline">Before you start</h2>
-        <div>
-          <p>
-            This form is for service members who died while on active duty or
-            qualifying National Guard or Reserve service. If the service member
-            was discharged before death, use VA Form 40-1330 instead.
-          </p>
-        </div>
-      </va-alert>
-
-      <h2>What you need to complete this form</h2>
-      <p>You may need these documents:</p>
+      <h2 className="vads-u-margin-top--3">Who can use this form?</h2>
+      <p>
+        This form is for requesting a headstone or marker when the service
+        member died:
+      </p>
       <ul>
+        <li>While on active duty, <strong>or</strong></li>
         <li>
-          <strong>Death certificate</strong> — an official copy
-        </li>
-        <li>
-          <strong>DD Form 1300</strong> (Report of Casualty) — for active duty
-          deaths
-        </li>
-        <li>
-          <strong>NGB Form 22</strong> or equivalent Guard/Reserve service
-          record — for Guard/Reserve deaths
-        </li>
-        <li>
-          <strong>Authorization document</strong> — if you are not the next of
-          kin
+          While serving in the National Guard or Reserve under qualifying
+          circumstances (died in the line of duty during active duty for
+          training, inactive duty for training, or was entitled to retirement
+          pay)
         </li>
       </ul>
 
-      <h2>What happens after you submit</h2>
+      <va-alert status="info" visible>
+        <h3 slot="headline">Is this the right form for you?</h3>
+        <p>
+          If the service member was discharged from service before death, use{' '}
+          <a href="/find-forms/about-form-40-1330/">VA Form 40-1330</a> instead.
+        </p>
+      </va-alert>
+
+      <h2 className="vads-u-margin-top--3">What you&apos;ll need</h2>
+      <p>Please have the following information ready:</p>
+      <ul>
+        <li>Service member&apos;s personal information (name, SSN, dates)</li>
+        <li>Military service information (branch, rank, service dates)</li>
+        <li>Cemetery and burial location information</li>
+        <li>Death certificate (upload required)</li>
+        <li>
+          DD Form 1300 (active duty) or NGB Form 22 (Guard/Reserve) — upload
+          required
+        </li>
+      </ul>
+
       <p>
-        The National Cemetery Administration (NCA) will review your request and
-        contact you if they need additional information. Processing times vary.
+        You can save your progress and finish later. You&apos;ll need to sign in
+        to save.
       </p>
 
       <SaveInProgressIntro
@@ -75,15 +81,25 @@ export const IntroductionPage = ({ route, userIdVerified, userLoggedIn }) => {
         messages={formConfig.saveInProgress.messages}
         pageList={pageList}
         startText="Start your request"
-        unauthStartText="Sign in to start your request"
-        hideUnauthedStartLink={false}
         devOnly={{ forceShowFormControls: true }}
-      />
+      >
+        Sign in or create an account to save your progress.
+      </SaveInProgressIntro>
+
+      {userLoggedIn && !userIdVerified && (
+        <va-alert status="warning" visible>
+          <h3 slot="headline">Verify your identity to save your progress</h3>
+          <p>
+            You need to verify your identity before you can save this form. Go
+            to your profile to verify your identity.
+          </p>
+        </va-alert>
+      )}
 
       <va-omb-info
-        res-burden={OMB_RES_BURDEN}
-        omb-number={OMB_NUMBER}
-        exp-date={OMB_EXP_DATE}
+        res-burden={ombInfo.resBurden}
+        omb-number={ombInfo.ombNumber}
+        exp-date={ombInfo.expDate}
       />
     </article>
   );
@@ -96,7 +112,6 @@ IntroductionPage.propTypes = {
       saveInProgress: PropTypes.shape({
         messages: PropTypes.shape({}),
       }),
-      savedFormMessages: PropTypes.shape({}),
     }),
     pageList: PropTypes.array,
   }).isRequired,

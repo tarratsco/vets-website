@@ -3,46 +3,17 @@ import {
   textSchema,
   fullNameUI,
   fullNameSchema,
-  ssnUI,
-  ssnSchema,
   currentOrPastDateUI,
   currentOrPastDateSchema,
-  radioUI,
-  radioSchema,
+  ssnUI,
+  ssnSchema,
   selectUI,
   selectSchema,
+  radioUI,
+  radioSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-// ─── Validation helpers ──────────────────────────────────────────────────────
-
-export function validateDateOfDeathAfterBirth(errors, fieldData, formData) {
-  const dob = formData?.decedent?.dateOfBirth;
-  const dod = fieldData;
-  if (!dob || !dod) return;
-  if (new Date(dod) <= new Date(dob)) {
-    errors.addError('Date of death must be after date of birth.');
-  }
-}
-
-export function validateDateOfDeathNotFuture(errors, fieldData) {
-  if (!fieldData) return;
-  if (new Date(fieldData) > new Date()) {
-    errors.addError('Date of death cannot be in the future.');
-  }
-}
-
-export function validateServiceEntryBeforeDeath(errors, fieldData, formData) {
-  const dod = formData?.decedent?.dateOfDeath;
-  const entry = fieldData;
-  if (!dod || !entry) return;
-  if (new Date(entry) >= new Date(dod)) {
-    errors.addError('Service entry date must be before the date of death.');
-  }
-}
-
-// ─── Branch of Service labels ────────────────────────────────────────────────
-
-const BRANCH_LABELS = {
+const BRANCH_OF_SERVICE_LABELS = {
   army: 'Army',
   navy: 'Navy',
   airForce: 'Air Force',
@@ -58,36 +29,32 @@ const BRANCH_LABELS = {
   coastGuardReserve: 'Coast Guard Reserve',
 };
 
-// ─── Decedent Personal Info ──────────────────────────────────────────────────
+const BRANCH_KEYS = Object.keys(BRANCH_OF_SERVICE_LABELS);
+
+// ── Chapter 2 Page 1 — Decedent Personal Info ─────────────────────────────────
 
 export const decedentPersonalInfoUiSchema = {
   decedent: {
     'ui:title': 'Personal information of the deceased service member',
     name: {
-      ...fullNameUI(
-        title =>
-          `Deceased service member\'s ${title} (as it appears on service records)`,
-      ),
+      ...fullNameUI(title => `Service member\'s ${title}`),
     },
-    ssn: ssnUI(),
+    ssn: {
+      ...ssnUI(),
+      'ui:title': 'Social Security number',
+      'ui:options': {
+        hint: 'Enter the service member\'s Social Security number. This is used to locate their service records.',
+        dataDogHidden: true,
+      },
+    },
     dateOfBirth: currentOrPastDateUI({
       title: 'Date of birth',
-      hint:
-        'Enter the date of birth as it appears on the service member\'s service records.',
-      dataDogHidden: true,
+      hint: 'Enter the service member\'s date of birth as it appears on their service records.',
     }),
-    dateOfDeath: {
-      ...currentOrPastDateUI({
-        title: 'Date of death',
-        hint:
-          'Enter the date of death as it appears on the death certificate or DD Form 1300.',
-        dataDogHidden: true,
-      }),
-      'ui:validations': [
-        validateDateOfDeathAfterBirth,
-        validateDateOfDeathNotFuture,
-      ],
-    },
+    dateOfDeath: currentOrPastDateUI({
+      title: 'Date of death',
+      hint: 'Enter the date of death as it appears on the death certificate or DD Form 1300.',
+    }),
   },
 };
 
@@ -108,7 +75,7 @@ export const decedentPersonalInfoSchema = {
   },
 };
 
-// ─── Decedent Service Info ───────────────────────────────────────────────────
+// ── Chapter 2 Page 2 — Decedent Service Info ──────────────────────────────────
 
 export const decedentServiceInfoUiSchema = {
   decedent: {
@@ -116,7 +83,8 @@ export const decedentServiceInfoUiSchema = {
       'ui:title': 'Military service information',
       branchOfService: selectUI({
         title: 'Branch of service',
-        labels: BRANCH_LABELS,
+        hint: 'Select the branch in which the service member served at the time of death.',
+        labels: BRANCH_OF_SERVICE_LABELS,
         errorMessages: {
           required: 'Please select a branch of service.',
         },
@@ -129,33 +97,27 @@ export const decedentServiceInfoUiSchema = {
           reserve: 'Reserve',
         },
         errorMessages: {
-          required: 'Please select a service component.',
+          required: 'Please select the service component.',
         },
       }),
       rankAtDeath: textUI({
         title: 'Military rank or rating at time of death',
-        hint:
-          'Enter the rank exactly as it should appear on the headstone or marker. For example: Sergeant First Class, Petty Officer Second Class',
+        hint: 'Enter the rank exactly as it should appear on the headstone or marker. Example: Sergeant First Class, Petty Officer Second Class.',
         errorMessages: {
           required: 'Please enter the service member\'s military rank.',
         },
       }),
       serviceNumber: textUI({
         title: 'Service or military ID number (optional)',
-        hint: 'Enter the service number if different from the Social Security number.',
+        hint: 'Enter the service number if different from Social Security number.',
       }),
-      serviceEntryDate: {
-        ...currentOrPastDateUI({
-          title: 'Date military service began',
-          hint:
-            'Enter the date the service member first entered military service.',
-        }),
-        'ui:validations': [validateServiceEntryBeforeDeath],
-      },
+      serviceEntryDate: currentOrPastDateUI({
+        title: 'Date military service began',
+        hint: 'Enter the date the service member first entered active military service.',
+      }),
       serviceEndDate: currentOrPastDateUI({
         title: 'Date military service ended (optional)',
-        hint:
-          'If the service member was still on active duty at death, leave this blank.',
+        hint: 'Leave blank if the service member was still serving at the time of death.',
       }),
     },
   },
@@ -173,7 +135,7 @@ export const decedentServiceInfoSchema = {
           type: 'object',
           required: ['branchOfService', 'component', 'rankAtDeath', 'serviceEntryDate'],
           properties: {
-            branchOfService: selectSchema(Object.keys(BRANCH_LABELS)),
+            branchOfService: selectSchema(BRANCH_KEYS),
             component: radioSchema(['active', 'guard', 'reserve']),
             rankAtDeath: {
               type: 'string',
@@ -193,7 +155,7 @@ export const decedentServiceInfoSchema = {
   },
 };
 
-// ─── Death Information ────────────────────────────────────────────────────────
+// ── Chapter 2 Page 3 — Death Information ──────────────────────────────────────
 
 export const deathInformationUiSchema = {
   decedent: {
@@ -201,15 +163,14 @@ export const deathInformationUiSchema = {
       'ui:title': 'Place of death',
       city: textUI({
         title: 'City or location of death',
-        hint:
-          'Enter the city, base name, or location where the service member died.',
+        hint: 'Enter the city, base name, or location where the service member died.',
         errorMessages: {
           required: 'Please enter the city or location of death.',
         },
       }),
       state: textUI({
-        title: 'State (if death occurred in the United States)',
-        hint: 'Enter the two-letter state abbreviation.',
+        title: 'State (if applicable)',
+        hint: 'Enter the 2-letter state abbreviation, if the service member died in the United States.',
       }),
       country: textUI({
         title: 'Country',
@@ -248,28 +209,5 @@ export const deathInformationSchema = {
         },
       },
     },
-  },
-};
-
-// ─── Chapter pages map ───────────────────────────────────────────────────────
-
-export const deceasedInformationPages = {
-  decedentPersonalInfo: {
-    path: 'deceased-information/personal-info',
-    title: 'Personal information of the deceased service member',
-    uiSchema: decedentPersonalInfoUiSchema,
-    schema: decedentPersonalInfoSchema,
-  },
-  decedentServiceInfo: {
-    path: 'deceased-information/service-info',
-    title: 'Military service information',
-    uiSchema: decedentServiceInfoUiSchema,
-    schema: decedentServiceInfoSchema,
-  },
-  deathInformation: {
-    path: 'deceased-information/death-information',
-    title: 'Place of death',
-    uiSchema: deathInformationUiSchema,
-    schema: deathInformationSchema,
   },
 };

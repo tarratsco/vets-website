@@ -1,10 +1,12 @@
 import React from 'react';
 import { expect } from 'chai';
-import sinon from 'sinon';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { IntroductionPage } from './IntroductionPage';
+import sinon from 'sinon';
+
+import * as uiUtils from 'platform/utilities/ui';
 import formConfig from '../config/form';
+import { IntroductionPage } from './IntroductionPage';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -17,9 +19,9 @@ const createMockStore = (overrides = {}) => ({
         verified: true,
         dob: '1990-01-01',
         claims: { appeals: false },
-        ...((overrides.user || {}).profile || {}),
+        ...overrides.user?.profile,
       },
-      ...(overrides.user || {}),
+      ...overrides.user,
     },
     form: {
       formId: formConfig.formId,
@@ -27,7 +29,7 @@ const createMockStore = (overrides = {}) => ({
       savedStatus: '',
       loadedData: { metadata: {} },
       data: {},
-      ...(overrides.form || {}),
+      ...overrides.form,
     },
     scheduledDowntime: {
       globalDowntime: null,
@@ -42,72 +44,121 @@ const createMockStore = (overrides = {}) => ({
   dispatch: () => {},
 });
 
-const defaultRoute = {
+const mockRoute = {
   formConfig,
-  pageList: [{ path: '/introduction' }],
+  pageList: [{ path: '/introduction' }, { path: '/eligibility-screener' }],
 };
 
 describe('IntroductionPage', () => {
-  let scrollToTopStub;
-  let focusElementStub;
+  let scrollStub;
+  let focusStub;
 
   beforeEach(() => {
-    scrollToTopStub = sinon.stub();
-    focusElementStub = sinon.stub();
+    scrollStub = sinon.stub(uiUtils, 'scrollToTop');
+    focusStub = sinon.stub(uiUtils, 'focusElement');
   });
 
   afterEach(() => {
     sinon.restore();
   });
 
-  it('renders the form title', () => {
+  it('renders without crashing', () => {
     const store = createMockStore();
-    const { getByText } = render(
+
+    const { container } = render(
       <Provider store={store}>
-        <IntroductionPage route={defaultRoute} />
+        <IntroductionPage
+          route={mockRoute}
+          userLoggedIn={false}
+          userIdVerified={false}
+        />
       </Provider>,
     );
 
-    expect(getByText(/Request a Government Headstone or Marker/i)).to.not.be
-      .null;
+    expect(container).to.exist;
   });
 
-  it('renders va-omb-info element', () => {
+  it('renders the form title', () => {
     const store = createMockStore();
+
+    const { getByText } = render(
+      <Provider store={store}>
+        <IntroductionPage
+          route={mockRoute}
+          userLoggedIn={false}
+          userIdVerified={false}
+        />
+      </Provider>,
+    );
+
+    expect(getByText('Request a Government Headstone or Marker')).to.exist;
+  });
+
+  it('renders va-omb-info component', () => {
+    const store = createMockStore();
+
     const { container } = render(
       <Provider store={store}>
-        <IntroductionPage route={defaultRoute} />
+        <IntroductionPage
+          route={mockRoute}
+          userLoggedIn={false}
+          userIdVerified={false}
+        />
       </Provider>,
     );
 
     const ombInfo = container.querySelector('va-omb-info');
-    expect(ombInfo).to.not.be.null;
+    expect(ombInfo).to.exist;
   });
 
-  it('renders a va-alert element', () => {
+  it('calls scrollToTop on mount', () => {
     const store = createMockStore();
-    const { container } = render(
+
+    render(
       <Provider store={store}>
-        <IntroductionPage route={defaultRoute} />
+        <IntroductionPage
+          route={mockRoute}
+          userLoggedIn={false}
+          userIdVerified={false}
+        />
       </Provider>,
     );
 
-    const alert = container.querySelector('va-alert');
-    expect(alert).to.not.be.null;
+    expect(scrollStub.calledOnce).to.be.true;
   });
 
-  it('renders without crashing when userLoggedIn and userIdVerified are provided', () => {
+  it('renders identity warning when logged in but not verified', () => {
     const store = createMockStore();
-    expect(() =>
-      render(
-        <Provider store={store}>
-          <IntroductionPage
-            route={defaultRoute}
-            userLoggedIn
-            userIdVerified
-          />
-        </Provider>,
-      ),
-    ).to.not.throw();
+
+    const { container } = render(
+      <Provider store={store}>
+        <IntroductionPage
+          route={mockRoute}
+          userLoggedIn
+          userIdVerified={false}
+        />
+      </Provider>,
+    );
+
+    const alerts = container.querySelectorAll('va-alert');
+    expect(alerts.length).to.be.greaterThan(0);
+  });
+
+  it('does not render identity warning when verified', () => {
+    const store = createMockStore();
+
+    const { queryByText } = render(
+      <Provider store={store}>
+        <IntroductionPage
+          route={mockRoute}
+          userLoggedIn
+          userIdVerified
+        />
+      </Provider>,
+    );
+
+    expect(
+      queryByText('Verify your identity to save your progress'),
+    ).to.be.null;
   });
 });

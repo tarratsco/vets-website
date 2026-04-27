@@ -3,21 +3,20 @@ import {
   textSchema,
   phoneUI,
   phoneSchema,
-  radioUI,
-  radioSchema,
   addressUI,
   addressSchema,
+  radioUI,
+  radioSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-// ─── Cemetery Info ────────────────────────────────────────────────────────────
+// ── Chapter 3 Page 1 — Cemetery Info ─────────────────────────────────────────
 
 export const cemeteryInfoUiSchema = {
   burialLocation: {
     'ui:title': 'Cemetery information',
     cemeteryName: textUI({
       title: 'Cemetery name',
-      hint:
-        'Enter the full name of the private cemetery where the service member is buried.',
+      hint: 'Enter the full name of the private cemetery where the service member is buried.',
       errorMessages: {
         required: 'Please enter the cemetery name.',
       },
@@ -33,10 +32,9 @@ export const cemeteryInfoUiSchema = {
     }),
     cemeteryContactName: textUI({
       title: 'Cemetery contact person\'s name',
-      hint:
-        'The headstone or marker will be delivered to this cemetery. Provide the name of the person who should receive delivery.',
+      hint: 'The headstone or marker will be delivered to this cemetery. Provide the name of the person who should receive delivery.',
       errorMessages: {
-        required: 'Please enter the cemetery contact name.',
+        required: 'Please enter the cemetery contact person\'s name.',
       },
     }),
     cemeteryContactPhone: phoneUI('Cemetery contact phone number'),
@@ -73,13 +71,11 @@ export const cemeteryInfoSchema = {
   },
 };
 
-// ─── Grave Location ───────────────────────────────────────────────────────────
+// ── Chapter 3 Page 2 — Grave Location ────────────────────────────────────────
 
 export const graveLocationUiSchema = {
   burialLocation: {
     'ui:title': 'Grave location within the cemetery',
-    'ui:description':
-      'Providing the section, lot, and grave number helps ensure accurate delivery and installation. Enter what you know; all fields are optional.',
     graveSection: textUI({
       title: 'Section',
       hint: 'Enter the section of the cemetery where the grave is located, if known.',
@@ -118,7 +114,7 @@ export const graveLocationSchema = {
   },
 };
 
-// ─── Existing Marker ──────────────────────────────────────────────────────────
+// ── Chapter 3 Page 3 — Existing Marker ───────────────────────────────────────
 
 export const existingMarkerUiSchema = {
   burialLocation: {
@@ -132,7 +128,7 @@ export const existingMarkerUiSchema = {
           'Yes — a government-furnished headstone or marker has already been placed',
       },
       errorMessages: {
-        required: 'Please indicate whether there is already a marker at this grave.',
+        required: 'Please indicate whether a marker already exists at this grave.',
       },
     }),
   },
@@ -153,28 +149,5 @@ export const existingMarkerSchema = {
         ]),
       },
     },
-  },
-};
-
-// ─── Chapter pages map ───────────────────────────────────────────────────────
-
-export const burialInformationPages = {
-  cemeteryInfo: {
-    path: 'burial-information/cemetery-info',
-    title: 'Cemetery information',
-    uiSchema: cemeteryInfoUiSchema,
-    schema: cemeteryInfoSchema,
-  },
-  graveLocation: {
-    path: 'burial-information/grave-location',
-    title: 'Grave location',
-    uiSchema: graveLocationUiSchema,
-    schema: graveLocationSchema,
-  },
-  existingMarker: {
-    path: 'burial-information/existing-marker',
-    title: 'Existing headstone or marker',
-    uiSchema: existingMarkerUiSchema,
-    schema: existingMarkerSchema,
   },
 };

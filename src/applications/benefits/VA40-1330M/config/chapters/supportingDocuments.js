@@ -3,26 +3,7 @@ import {
   fileInputSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-// ─── Documents Intro Page ─────────────────────────────────────────────────────
-
-export const documentsIntroUiSchema = {
-  'view:documentsIntro': {
-    'ui:description':
-      'Based on your answers, you will need to upload the required documents listed below. You can save your progress and return later if you do not have all documents ready now.',
-  },
-};
-
-export const documentsIntroSchema = {
-  type: 'object',
-  properties: {
-    'view:documentsIntro': {
-      type: 'object',
-      properties: {},
-    },
-  },
-};
-
-// ─── Death Certificate ────────────────────────────────────────────────────────
+// ── Chapter 5 Page 1 — Death Certificate ──────────────────────────────────────
 
 export const deathCertificateUiSchema = {
   documents: {
@@ -52,7 +33,7 @@ export const deathCertificateSchema = {
   },
 };
 
-// ─── DD Form 1300 (Active Duty path only) ────────────────────────────────────
+// ── Chapter 5 Page 2 — DD Form 1300 (Active Duty) ─────────────────────────────
 
 export const ddForm1300UiSchema = {
   documents: {
@@ -62,7 +43,7 @@ export const ddForm1300UiSchema = {
         'DD Form 1300 is the official report of casualty issued by the service branch. Your Casualty Assistance Officer (CAO) can provide a copy. If you do not have it yet, you can save your progress and return when you have it.',
       required: true,
       errorMessages: {
-        required: 'Please upload DD Form 1300 for an active duty submission.',
+        required: 'Please upload DD Form 1300 (Report of Casualty).',
       },
     }),
   },
@@ -82,7 +63,7 @@ export const ddForm1300Schema = {
   },
 };
 
-// ─── NGB Form 22 (Guard/Reserve path only) ───────────────────────────────────
+// ── Chapter 5 Page 3 — NGB Form 22 (Guard/Reserve) ───────────────────────────
 
 export const ngbForm22UiSchema = {
   documents: {
@@ -92,8 +73,7 @@ export const ngbForm22UiSchema = {
         'For National Guard members, this is NGB Form 22 (Report of Separation and Record of Service). For Reserve members, an equivalent separation record is acceptable.',
       required: true,
       errorMessages: {
-        required:
-          'Please upload the Guard/Reserve service record for a Guard/Reserve submission.',
+        required: 'Please upload the Guard/Reserve separation or service record.',
       },
     }),
   },
@@ -113,16 +93,18 @@ export const ngbForm22Schema = {
   },
 };
 
-// ─── Additional Documents ─────────────────────────────────────────────────────
+// ── Chapter 5 Page 4 — Additional Documents ───────────────────────────────────
 
 export const additionalDocumentsUiSchema = {
   documents: {
     additionalDocuments: fileInputUI({
       title: 'Upload any additional supporting documents (optional)',
       hint:
-        'You may upload up to 5 additional supporting documents such as prior service DD Form 214 or other supporting documentation.',
+        'You may upload additional supporting documentation such as a prior service DD Form 214. Accepted file types: PDF, JPG, PNG. Maximum file size: 20 MB per file.',
       required: false,
-      errorMessages: {},
+      errorMessages: {
+        required: 'Please upload a supporting document or skip this step.',
+      },
     }),
   },
 };
@@ -136,42 +118,5 @@ export const additionalDocumentsSchema = {
         additionalDocuments: fileInputSchema(),
       },
     },
-  },
-};
-
-// ─── Chapter pages map ───────────────────────────────────────────────────────
-
-export const supportingDocumentsPages = {
-  documentsIntro: {
-    path: 'supporting-documents/required-documents-intro',
-    title: 'Documents you need to upload',
-    uiSchema: documentsIntroUiSchema,
-    schema: documentsIntroSchema,
-  },
-  deathCertificate: {
-    path: 'supporting-documents/death-certificate',
-    title: 'Death certificate',
-    uiSchema: deathCertificateUiSchema,
-    schema: deathCertificateSchema,
-  },
-  ddForm1300: {
-    path: 'supporting-documents/dd-form-1300',
-    title: 'Report of Casualty (DD Form 1300)',
-    depends: formData => formData.serviceStatusAtDeath === 'activeDuty',
-    uiSchema: ddForm1300UiSchema,
-    schema: ddForm1300Schema,
-  },
-  ngbForm22: {
-    path: 'supporting-documents/ngb-form-22',
-    title: 'Guard/Reserve service record',
-    depends: formData => formData.serviceStatusAtDeath === 'guardOrReserve',
-    uiSchema: ngbForm22UiSchema,
-    schema: ngbForm22Schema,
-  },
-  additionalDocuments: {
-    path: 'supporting-documents/additional-documents',
-    title: 'Additional documents (optional)',
-    uiSchema: additionalDocumentsUiSchema,
-    schema: additionalDocumentsSchema,
   },
 };

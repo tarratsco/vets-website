@@ -1,18 +1,17 @@
-import React from 'react';
 import {
   radioUI,
   radioSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-// ─── Service Status Page ────────────────────────────────────────────────────
+// ── Eligibility Screener — Service Status ─────────────────────────────────────
 
 export const serviceStatusUiSchema = {
   serviceStatusAtDeath: radioUI({
     title: 'What was this service member\'s status at the time of death?',
     hint:
-      'Your answer determines which form to use. If the service member was discharged from service before death, use VA Form 40-1330 instead.',
+      'Your answer determines which form is used. If the service member was discharged from service before death, use VA Form 40-1330 instead.',
     labels: {
-      activeDuty: 'Active duty (Army, Navy, Air Force, Marine Corps, Space Force, or Coast Guard)',
+      activeDuty: 'Active duty (Army, Navy, Air Force, Marine Corps, Space Force, Coast Guard)',
       guardOrReserve: 'National Guard or Reserve member',
     },
     errorMessages: {
@@ -29,7 +28,7 @@ export const serviceStatusSchema = {
   },
 };
 
-// ─── Guard/Reserve Qualifier Page ───────────────────────────────────────────
+// ── Eligibility Screener — Guard/Reserve Qualifier ───────────────────────────
 
 export const guardReserveQualifierUiSchema = {
   guardReserveQualifyingCircumstance: radioUI({
@@ -41,7 +40,8 @@ export const guardReserveQualifierUiSchema = {
         'Died in the line of duty while on active duty for training',
       diedOnInactiveDutyForTraining:
         'Died in the line of duty while on inactive duty for training',
-      entitledToRetiredPay: 'Was entitled to retired pay at the time of death',
+      entitledToRetiredPay:
+        'Was entitled to retired pay at the time of death',
     },
     errorMessages: {
       required: 'Please select the qualifying circumstance.',
@@ -60,25 +60,3 @@ export const guardReserveQualifierSchema = {
     ]),
   },
 };
-
-// ─── Chapter pages map ───────────────────────────────────────────────────────
-
-export const eligibilityScreenerPages = {
-  serviceStatus: {
-    path: 'eligibility-screener',
-    title: 'Service status at time of death',
-    uiSchema: serviceStatusUiSchema,
-    schema: serviceStatusSchema,
-  },
-  guardReserveQualifier: {
-    path: 'eligibility-screener/guard-reserve-qualifier',
-    title: 'Guard/Reserve qualifying circumstance',
-    depends: formData => formData.serviceStatusAtDeath === 'guardOrReserve',
-    uiSchema: guardReserveQualifierUiSchema,
-    schema: guardReserveQualifierSchema,
-  },
-};
-
-// Legacy named exports for backward compatibility in tests
-export const eligibilityScreenerUiSchema = serviceStatusUiSchema;
-export const eligibilityScreenerSchema = serviceStatusSchema;
