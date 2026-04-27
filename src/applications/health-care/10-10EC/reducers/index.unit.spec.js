@@ -1,22 +1,17 @@
 import { expect } from 'chai';
 import reducers from './index';
 
-describe('reducers/index', () => {
-  it('exports a default object', () => {
-    expect(reducers).to.be.an('object');
+describe('10-10EC reducers', () => {
+  it('should return a non-null object with form slice', () => {
+    const result = reducers;
+    expect(result).to.be.an('object');
+    expect(result).to.have.key('form');
   });
 
-  it('has a form slice', () => {
-    expect(reducers).to.have.property('form');
-  });
-
-  it('form slice is a function (reducer)', () => {
-    expect(reducers.form).to.be.a('function');
-  });
-
-  it('form reducer returns a non-null initial state', () => {
-    const state = reducers.form(undefined, { type: '@@INIT' });
-    expect(state).to.not.be.null;
+  it('should initialize form slice without throwing', () => {
+    const formReducer = reducers.form;
+    expect(formReducer).to.be.a('function');
+    const state = formReducer(undefined, { type: '@@INIT' });
     expect(state).to.be.an('object');
   });
 });

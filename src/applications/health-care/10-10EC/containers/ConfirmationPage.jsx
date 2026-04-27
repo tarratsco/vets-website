@@ -1,33 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { ConfirmationView } from 'platform/forms-system/src/js/components/ConfirmationView';
 
 export const ConfirmationPage = ({ route }) => {
   const form = useSelector(state => state.form || {});
-  const { submission, data } = form;
+  const submission = form?.submission || {};
   const submitDate = submission?.timestamp || '';
   const confirmationNumber =
     submission?.response?.confirmationNumber ||
     submission?.response?.attributes?.confirmationNumber ||
     '';
 
-  const veteranName = data?.veteranFullName || {};
+  const veteranFullName = form?.data?.veteranFullName || {};
 
   const submissionAlertContent = (
-    <div>
+    <>
       <p>
-        Thank you for submitting your application for extended care services.
-        Your VA medical facility will review your submission and contact you
-        with your estimated monthly copayment responsibility.
+        We have received your Application for Extended Care Services. Your local
+        VA medical facility will review your submission and contact you with your
+        estimated monthly copayment responsibility.
       </p>
       {confirmationNumber && (
         <p>
-          <strong>Your confirmation number is:</strong> {confirmationNumber}
+          Your confirmation number is{' '}
+          <strong>{confirmationNumber}</strong>.
         </p>
       )}
-    </div>
+    </>
   );
 
   return (
@@ -35,25 +36,22 @@ export const ConfirmationPage = ({ route }) => {
       formConfig={route?.formConfig}
       submitDate={submitDate}
       confirmationNumber={confirmationNumber}
-      submitterName={veteranName}
+      submitterName={veteranFullName}
       devOnly={{ showButtons: true }}
     >
       <ConfirmationView.SubmissionAlert
         title="Your application has been submitted"
         content={submissionAlertContent}
-        actions={<p />}
       />
       <ConfirmationView.ChapterSectionCollection />
       <ConfirmationView.PrintThisPage />
       <ConfirmationView.WhatsNextProcessList
-        item1Header="Your facility receives your submission"
-        item1Content="Your enrolled VA medical facility will receive your completed 10-10EC application."
-        item1Actions={<p />}
-        item2Header="Staff calculate your copayment"
-        item2Content="VA billing staff will review your financial information and calculate your estimated monthly copayment amount."
-        item2Actions={<p />}
-        item3Header="You are contacted with your copayment amount"
-        item3Content="Your VA medical facility will contact you with your estimated monthly copayment responsibility for extended care services."
+        item1Header="VA facility reviews your submission"
+        item1Content="Your local VA medical facility will receive your application and review your financial information."
+        item2Header="Facility calculates your copayment"
+        item2Content="Facility billing staff will calculate your estimated monthly copayment based on the information you provided."
+        item3Header="You are notified of your copayment amount"
+        item3Content="The facility will contact you with your estimated monthly copayment responsibility for extended care services."
       />
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />
@@ -66,21 +64,6 @@ ConfirmationPage.propTypes = {
   route: PropTypes.shape({
     formConfig: PropTypes.object,
   }),
-  form: PropTypes.shape({
-    data: PropTypes.object,
-    submission: PropTypes.shape({
-      timestamp: PropTypes.string,
-      response: PropTypes.shape({
-        confirmationNumber: PropTypes.string,
-      }),
-    }),
-  }),
 };
 
-function mapStateToProps(state) {
-  return {
-    form: state.form,
-  };
-}
-
-export default connect(mapStateToProps)(ConfirmationPage);
+export default ConfirmationPage;

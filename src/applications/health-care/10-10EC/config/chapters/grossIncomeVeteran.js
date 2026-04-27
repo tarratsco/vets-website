@@ -3,11 +3,9 @@ import {
   currencySchema,
   selectUI,
   selectSchema,
-  titleUI,
-  titleSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const INCOME_FREQUENCY_LABELS = {
+const FREQUENCY_OPTIONS = {
   annually: 'Annually',
   monthly: 'Monthly',
   twice_monthly: 'Twice monthly (24 times per year)',
@@ -15,75 +13,72 @@ const INCOME_FREQUENCY_LABELS = {
   weekly: 'Weekly',
 };
 
-const INCOME_FREQUENCY_KEYS = Object.keys(INCOME_FREQUENCY_LABELS);
+const FREQUENCY_KEYS = Object.keys(FREQUENCY_OPTIONS);
 
-const frequencyRequired = amountKey => formData =>
-  formData[amountKey] !== undefined &&
-  formData[amountKey] !== null &&
-  formData[amountKey] !== '' &&
-  parseFloat(formData[amountKey]) > 0;
+const frequencyRequired = amountKey => formData => {
+  const amount = formData[amountKey];
+  return amount !== null && amount !== undefined && amount !== '' && parseFloat(amount) > 0;
+};
 
 export const grossIncomeVeteranUiSchema = {
-  'view:veteranIncomeTitle': titleUI('Current gross income \u2014 Veteran (Section VII)'),
-  veteranEmploymentIncome: currencyUI({
-    title: 'Gross income from employment \u2014 Veteran',
-    hint: 'Include wages, bonuses, tips, severance pay, and accrued benefits. Enter 0 if none.',
+  employmentIncomeVeteran: currencyUI({
+    title: 'Gross income from employment — Veteran',
+    hint:
+      'Include wages, bonuses, tips, severance pay, and accrued benefits. Enter 0 if none.',
+    required: () => false,
   }),
-  veteranEmploymentIncomeFrequency: selectUI({
-    title: 'How often do you receive this income?',
+  employmentIncomeFrequencyVeteran: selectUI({
+    title: 'How often do you receive this employment income?',
+    required: frequencyRequired('employmentIncomeVeteran'),
     hint: 'Select the frequency that matches how often you are paid',
-    required: frequencyRequired('veteranEmploymentIncome'),
-    labels: INCOME_FREQUENCY_LABELS,
+    labels: FREQUENCY_OPTIONS,
     errorMessages: {
-      required: 'Please select how often you receive your employment income',
+      required:
+        'Please select how often you receive your employment income',
     },
-    hideIf: formData =>
-      !formData.veteranEmploymentIncome ||
-      parseFloat(formData.veteranEmploymentIncome) <= 0,
   }),
-  veteranBusinessIncome: currencyUI({
-    title: 'Net income from farm, ranch, property, or business \u2014 Veteran',
-    hint: 'Enter income from a business minus business expenses. Enter 0 if none.',
+  businessIncomeVeteran: currencyUI({
+    title: 'Net income from farm, ranch, property, or business — Veteran',
+    hint:
+      'Enter income from a business minus business expenses. Enter 0 if none.',
+    required: () => false,
   }),
-  veteranBusinessIncomeFrequency: selectUI({
-    title: 'How often do you receive this income?',
-    hint: 'Select the frequency that matches how often you receive this payment',
-    required: frequencyRequired('veteranBusinessIncome'),
-    labels: INCOME_FREQUENCY_LABELS,
+  businessIncomeFrequencyVeteran: selectUI({
+    title: 'How often do you receive this business income?',
+    required: frequencyRequired('businessIncomeVeteran'),
+    hint: 'Select the frequency that matches how often you receive this income',
+    labels: FREQUENCY_OPTIONS,
     errorMessages: {
-      required: 'Please select how often you receive your business income',
+      required:
+        'Please select how often you receive your business income',
     },
-    hideIf: formData =>
-      !formData.veteranBusinessIncome ||
-      parseFloat(formData.veteranBusinessIncome) <= 0,
   }),
-  veteranOtherIncome: currencyUI({
-    title: 'Other income \u2014 Veteran',
-    hint: 'Include Social Security, retirement, pension, interest, and dividends. Enter 0 if none.',
+  otherIncomeVeteran: currencyUI({
+    title: 'Other income — Veteran',
+    hint:
+      'Include Social Security, retirement, pension, interest, and dividends. Enter 0 if none.',
+    required: () => false,
   }),
-  veteranOtherIncomeFrequency: selectUI({
-    title: 'How often do you receive this income?',
-    hint: 'Select the frequency that matches how often you receive this payment',
-    required: frequencyRequired('veteranOtherIncome'),
-    labels: INCOME_FREQUENCY_LABELS,
+  otherIncomeFrequencyVeteran: selectUI({
+    title: 'How often do you receive this other income?',
+    required: frequencyRequired('otherIncomeVeteran'),
+    hint: 'Select the frequency that matches how often you receive this income',
+    labels: FREQUENCY_OPTIONS,
     errorMessages: {
-      required: 'Please select how often you receive your other income',
+      required:
+        'Please select how often you receive your other income',
     },
-    hideIf: formData =>
-      !formData.veteranOtherIncome ||
-      parseFloat(formData.veteranOtherIncome) <= 0,
   }),
 };
 
 export const grossIncomeVeteranSchema = {
   type: 'object',
   properties: {
-    'view:veteranIncomeTitle': titleSchema,
-    veteranEmploymentIncome: currencySchema,
-    veteranEmploymentIncomeFrequency: selectSchema(INCOME_FREQUENCY_KEYS),
-    veteranBusinessIncome: currencySchema,
-    veteranBusinessIncomeFrequency: selectSchema(INCOME_FREQUENCY_KEYS),
-    veteranOtherIncome: currencySchema,
-    veteranOtherIncomeFrequency: selectSchema(INCOME_FREQUENCY_KEYS),
+    employmentIncomeVeteran: currencySchema,
+    employmentIncomeFrequencyVeteran: selectSchema(FREQUENCY_KEYS),
+    businessIncomeVeteran: currencySchema,
+    businessIncomeFrequencyVeteran: selectSchema(FREQUENCY_KEYS),
+    otherIncomeVeteran: currencySchema,
+    otherIncomeFrequencyVeteran: selectSchema(FREQUENCY_KEYS),
   },
 };

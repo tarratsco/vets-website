@@ -3,11 +3,9 @@ import {
   currencySchema,
   selectUI,
   selectSchema,
-  titleUI,
-  titleSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const INCOME_FREQUENCY_LABELS = {
+const FREQUENCY_OPTIONS = {
   annually: 'Annually',
   monthly: 'Monthly',
   twice_monthly: 'Twice monthly (24 times per year)',
@@ -15,75 +13,72 @@ const INCOME_FREQUENCY_LABELS = {
   weekly: 'Weekly',
 };
 
-const INCOME_FREQUENCY_KEYS = Object.keys(INCOME_FREQUENCY_LABELS);
+const FREQUENCY_KEYS = Object.keys(FREQUENCY_OPTIONS);
 
-const frequencyRequired = amountKey => formData =>
-  formData[amountKey] !== undefined &&
-  formData[amountKey] !== null &&
-  formData[amountKey] !== '' &&
-  parseFloat(formData[amountKey]) > 0;
+const frequencyRequired = amountKey => formData => {
+  const amount = formData[amountKey];
+  return amount !== null && amount !== undefined && amount !== '' && parseFloat(amount) > 0;
+};
 
 export const grossIncomeSpouseUiSchema = {
-  'view:spouseIncomeTitle': titleUI('Current gross income \u2014 Spouse (Section VII)'),
-  spouseEmploymentIncome: currencyUI({
-    title: 'Gross income from employment \u2014 Spouse',
-    hint: 'Include wages, bonuses, tips, severance pay, and accrued benefits. Enter 0 if none.',
+  employmentIncomeSpouse: currencyUI({
+    title: 'Gross income from employment — Spouse',
+    hint:
+      "Include your spouse's wages, bonuses, tips, severance pay, and accrued benefits. Enter 0 if none.",
+    required: () => false,
   }),
-  spouseEmploymentIncomeFrequency: selectUI({
-    title: 'How often does your spouse receive this income?',
+  employmentIncomeFrequencySpouse: selectUI({
+    title: 'How often does your spouse receive this employment income?',
+    required: frequencyRequired('employmentIncomeSpouse'),
     hint: 'Select the frequency that matches how often your spouse is paid',
-    required: frequencyRequired('spouseEmploymentIncome'),
-    labels: INCOME_FREQUENCY_LABELS,
+    labels: FREQUENCY_OPTIONS,
     errorMessages: {
-      required: 'Please select how often your spouse receives employment income',
+      required:
+        "Please select how often your spouse receives employment income",
     },
-    hideIf: formData =>
-      !formData.spouseEmploymentIncome ||
-      parseFloat(formData.spouseEmploymentIncome) <= 0,
   }),
-  spouseBusinessIncome: currencyUI({
-    title: 'Net income from farm, ranch, property, or business \u2014 Spouse',
-    hint: "Enter your spouse's business income minus business expenses. Enter 0 if none.",
+  businessIncomeSpouse: currencyUI({
+    title: 'Net income from farm, ranch, property, or business — Spouse',
+    hint:
+      "Enter your spouse's income from a business minus business expenses. Enter 0 if none.",
+    required: () => false,
   }),
-  spouseBusinessIncomeFrequency: selectUI({
-    title: 'How often does your spouse receive this income?',
-    hint: 'Select the frequency that matches how often your spouse receives this payment',
-    required: frequencyRequired('spouseBusinessIncome'),
-    labels: INCOME_FREQUENCY_LABELS,
+  businessIncomeFrequencySpouse: selectUI({
+    title: 'How often does your spouse receive this business income?',
+    required: frequencyRequired('businessIncomeSpouse'),
+    hint: 'Select the frequency that matches how often your spouse receives this income',
+    labels: FREQUENCY_OPTIONS,
     errorMessages: {
-      required: 'Please select how often your spouse receives business income',
+      required:
+        "Please select how often your spouse receives business income",
     },
-    hideIf: formData =>
-      !formData.spouseBusinessIncome ||
-      parseFloat(formData.spouseBusinessIncome) <= 0,
   }),
-  spouseOtherIncome: currencyUI({
-    title: 'Other income \u2014 Spouse',
-    hint: 'Include Social Security, retirement, pension, interest, and dividends. Enter 0 if none.',
+  otherIncomeSpouse: currencyUI({
+    title: 'Other income — Spouse',
+    hint:
+      "Include your spouse's Social Security, retirement, pension, interest, and dividends. Enter 0 if none.",
+    required: () => false,
   }),
-  spouseOtherIncomeFrequency: selectUI({
-    title: 'How often does your spouse receive this income?',
-    hint: 'Select the frequency that matches how often your spouse receives this payment',
-    required: frequencyRequired('spouseOtherIncome'),
-    labels: INCOME_FREQUENCY_LABELS,
+  otherIncomeFrequencySpouse: selectUI({
+    title: 'How often does your spouse receive this other income?',
+    required: frequencyRequired('otherIncomeSpouse'),
+    hint: 'Select the frequency that matches how often your spouse receives this income',
+    labels: FREQUENCY_OPTIONS,
     errorMessages: {
-      required: 'Please select how often your spouse receives other income',
+      required:
+        "Please select how often your spouse receives other income",
     },
-    hideIf: formData =>
-      !formData.spouseOtherIncome ||
-      parseFloat(formData.spouseOtherIncome) <= 0,
   }),
 };
 
 export const grossIncomeSpouseSchema = {
   type: 'object',
   properties: {
-    'view:spouseIncomeTitle': titleSchema,
-    spouseEmploymentIncome: currencySchema,
-    spouseEmploymentIncomeFrequency: selectSchema(INCOME_FREQUENCY_KEYS),
-    spouseBusinessIncome: currencySchema,
-    spouseBusinessIncomeFrequency: selectSchema(INCOME_FREQUENCY_KEYS),
-    spouseOtherIncome: currencySchema,
-    spouseOtherIncomeFrequency: selectSchema(INCOME_FREQUENCY_KEYS),
+    employmentIncomeSpouse: currencySchema,
+    employmentIncomeFrequencySpouse: selectSchema(FREQUENCY_KEYS),
+    businessIncomeSpouse: currencySchema,
+    businessIncomeFrequencySpouse: selectSchema(FREQUENCY_KEYS),
+    otherIncomeSpouse: currencySchema,
+    otherIncomeFrequencySpouse: selectSchema(FREQUENCY_KEYS),
   },
 };

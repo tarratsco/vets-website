@@ -1,11 +1,9 @@
-import environment from '@department-of-veterans-affairs/platform-utilities/environment';
 import footerContent from 'platform/forms/components/FormFooter';
-import { VA_FORM_IDS } from 'platform/forms/constants';
-
+import environment from 'platform/utilities/environment';
 import manifest from '../manifest.json';
+
 import IntroductionPage from '../containers/IntroductionPage';
 import ConfirmationPage from '../containers/ConfirmationPage';
-import { transform } from './transform';
 
 import {
   veteranInformationUiSchema,
@@ -24,8 +22,6 @@ import {
   spouseInformationSchema,
 } from './chapters/spouseInformation';
 import {
-  dependentSummaryUiSchema,
-  dependentSummarySchema,
   dependentInformationUiSchema,
   dependentInformationSchema,
 } from './chapters/dependentInformation';
@@ -33,14 +29,8 @@ import {
   financialDisclosureUiSchema,
   financialDisclosureSchema,
 } from './chapters/financialDisclosure';
-import {
-  careTypeUiSchema,
-  careTypeSchema,
-} from './chapters/careType';
-import {
-  fixedAssetsUiSchema,
-  fixedAssetsSchema,
-} from './chapters/fixedAssets';
+import { careTypeUiSchema, careTypeSchema } from './chapters/careType';
+import { fixedAssetsUiSchema, fixedAssetsSchema } from './chapters/fixedAssets';
 import {
   liquidAssetsUiSchema,
   liquidAssetsSchema,
@@ -61,6 +51,7 @@ import {
   poaDocumentsUiSchema,
   poaDocumentsSchema,
 } from './chapters/poaDocuments';
+import transformForSubmit from './transform';
 
 const MARRIED_STATUSES = [
   'married_living_with',
@@ -68,36 +59,21 @@ const MARRIED_STATUSES = [
   'married_separate_institutionalized',
 ];
 
-const showSpouseInfoPage = formData =>
-  MARRIED_STATUSES.includes(formData.maritalStatus) ||
-  formData.maritalStatus === 'divorced_separated_widowed_this_year';
-
-const showDependentPages = formData =>
-  formData.maritalStatus !== 'single_no_dependent' &&
-  formData.maritalStatus !== undefined;
-
-const showFinancialPages = formData =>
-  formData.financialDisclosureElection === 'yes';
-
-const showInstitutionalPages = formData =>
-  formData.financialDisclosureElection === 'yes' &&
-  formData.careType === 'institutional';
-
-const showSpouseIncomePage = formData =>
-  formData.financialDisclosureElection === 'yes' &&
-  MARRIED_STATUSES.includes(formData.maritalStatus);
-
 /** @type {FormConfig} */
 const formConfig = {
   rootUrl: manifest.rootUrl,
   urlPrefix: '/',
   submitUrl: `${environment.API_URL}/v0/extended_care_applications`,
-  transformForSubmit: transform,
+  transformForSubmit,
   trackingPrefix: 'hca-extended-care-',
   v3SegmentedProgressBar: true,
   introduction: IntroductionPage,
   confirmation: ConfirmationPage,
   footerContent,
+  dev: {
+    showNavLinks: true,
+    collapsibleNavLinks: true,
+  },
   formId: '10-10EC',
   saveInProgress: {
     messages: {
@@ -111,8 +87,7 @@ const formConfig = {
   version: 0,
   prefillEnabled: true,
   savedFormMessages: {
-    notFound:
-      'Please start over to apply for extended care services.',
+    notFound: 'Please start over to apply for extended care services.',
     noAuth:
       'Please sign in again to continue your application for extended care services.',
   },
@@ -125,7 +100,7 @@ const formConfig = {
       pages: {
         veteranInformation: {
           path: 'veteran-information',
-          title: 'Veteran information (Section I)',
+          title: 'Veteran information',
           uiSchema: veteranInformationUiSchema,
           schema: veteranInformationSchema,
         },
@@ -136,14 +111,14 @@ const formConfig = {
       pages: {
         insuranceInformation: {
           path: 'insurance-information',
-          title: 'Insurance information (Section II)',
+          title: 'Insurance information',
           uiSchema: insuranceInformationUiSchema,
           schema: insuranceInformationSchema,
         },
       },
     },
-    spouseAndDependentsChapter: {
-      title: 'Spouse and dependent information',
+    maritalStatusChapter: {
+      title: 'Marital and dependent status',
       pages: {
         maritalStatus: {
           path: 'marital-status',
@@ -151,19 +126,30 @@ const formConfig = {
           uiSchema: maritalStatusUiSchema,
           schema: maritalStatusSchema,
         },
+      },
+    },
+    spouseInformationChapter: {
+      title: 'Spouse information',
+      pages: {
         spouseInformation: {
           path: 'spouse-information',
-          title: 'Spouse information (Section III)',
-          depends: showSpouseInfoPage,
+          title: 'Spouse information',
+          depends: formData => MARRIED_STATUSES.includes(formData.maritalStatus),
           uiSchema: spouseInformationUiSchema,
           schema: spouseInformationSchema,
         },
+      },
+    },
+    dependentInformationChapter: {
+      title: 'Dependent information',
+      pages: {
         dependentInformation: {
           path: 'dependent-information',
-          title: 'Dependent information (Section III)',
-          depends: showDependentPages,
-          uiSchema: dependentSummaryUiSchema,
-          schema: dependentSummarySchema,
+          title: 'Dependent information',
+          depends: formData =>
+            formData.maritalStatus !== 'single_no_dependent',
+          uiSchema: dependentInformationUiSchema,
+          schema: dependentInformationSchema,
         },
       },
     },
@@ -172,7 +158,7 @@ const formConfig = {
       pages: {
         financialDisclosure: {
           path: 'financial-disclosure-election',
-          title: 'Financial disclosure election (Section IV)',
+          title: 'Financial disclosure election',
           uiSchema: financialDisclosureUiSchema,
           schema: financialDisclosureSchema,
         },
@@ -184,7 +170,8 @@ const formConfig = {
         careType: {
           path: 'care-type',
           title: 'Type of extended care',
-          depends: showFinancialPages,
+          depends: formData =>
+            formData.financialDisclosureElection === 'yes',
           uiSchema: careTypeUiSchema,
           schema: careTypeSchema,
         },
@@ -196,7 +183,9 @@ const formConfig = {
         fixedAssets: {
           path: 'fixed-assets',
           title: 'Fixed assets (Section V)',
-          depends: showInstitutionalPages,
+          depends: formData =>
+            formData.financialDisclosureElection === 'yes' &&
+            formData.careType === 'institutional',
           uiSchema: fixedAssetsUiSchema,
           schema: fixedAssetsSchema,
         },
@@ -208,31 +197,36 @@ const formConfig = {
         liquidAssets: {
           path: 'liquid-assets',
           title: 'Liquid assets (Section VI)',
-          depends: showInstitutionalPages,
+          depends: formData =>
+            formData.financialDisclosureElection === 'yes' &&
+            formData.careType === 'institutional',
           uiSchema: liquidAssetsUiSchema,
           schema: liquidAssetsSchema,
         },
       },
     },
     grossIncomeVeteranChapter: {
-      title: 'Veteran gross income',
+      title: 'Gross income — Veteran',
       pages: {
         grossIncomeVeteran: {
           path: 'gross-income-veteran',
-          title: 'Veteran gross income (Section VII)',
-          depends: showFinancialPages,
+          title: 'Gross income — Veteran (Section VII)',
+          depends: formData =>
+            formData.financialDisclosureElection === 'yes',
           uiSchema: grossIncomeVeteranUiSchema,
           schema: grossIncomeVeteranSchema,
         },
       },
     },
     grossIncomeSpouseChapter: {
-      title: 'Spouse gross income',
+      title: 'Gross income — Spouse',
       pages: {
         grossIncomeSpouse: {
           path: 'gross-income-spouse',
-          title: 'Spouse gross income (Section VII)',
-          depends: showSpouseIncomePage,
+          title: 'Gross income — Spouse (Section VII)',
+          depends: formData =>
+            formData.financialDisclosureElection === 'yes' &&
+            MARRIED_STATUSES.includes(formData.maritalStatus),
           uiSchema: grossIncomeSpouseUiSchema,
           schema: grossIncomeSpouseSchema,
         },
@@ -244,7 +238,8 @@ const formConfig = {
         deductibleExpenses: {
           path: 'deductible-expenses',
           title: 'Deductible expenses (Section VIII)',
-          depends: showFinancialPages,
+          depends: formData =>
+            formData.financialDisclosureElection === 'yes',
           uiSchema: deductibleExpensesUiSchema,
           schema: deductibleExpensesSchema,
         },
@@ -256,6 +251,8 @@ const formConfig = {
         poaDocuments: {
           path: 'poa-document-upload',
           title: 'Power of attorney documents',
+          depends: formData =>
+            formData.submitterType === 'poa_representative',
           uiSchema: poaDocumentsUiSchema,
           schema: poaDocumentsSchema,
         },
