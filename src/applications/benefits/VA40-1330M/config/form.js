@@ -4,10 +4,12 @@ import environment from 'platform/utilities/environment';
 import manifest from '../manifest.json';
 import IntroductionPage from '../containers/IntroductionPage';
 import ConfirmationPage from '../containers/ConfirmationPage';
+import GetFormHelp from '../components/GetFormHelp';
+import DocumentsIntroPage from '../components/DocumentsIntroPage';
 
 import {
-  eligibilityScreenerUiSchema,
-  eligibilityScreenerSchema,
+  serviceStatusUiSchema,
+  serviceStatusSchema,
   guardReserveQualifierUiSchema,
   guardReserveQualifierSchema,
 } from './chapters/eligibilityScreener';
@@ -64,7 +66,7 @@ import {
 import {
   certificationUiSchema,
   certificationSchema,
-} from './chapters/certification';
+} from './chapters/certificationChapter';
 
 /** @type {FormConfig} */
 const formConfig = {
@@ -75,20 +77,26 @@ const formConfig = {
   introduction: IntroductionPage,
   confirmation: ConfirmationPage,
   footerContent,
+  getHelp: GetFormHelp,
   formId: 'VA40-1330M',
+  dev: {
+    showNavLinks: true,
+    collapsibleNavLinks: true,
+  },
   saveInProgress: {
     messages: {
       inProgress:
         'Your headstone or marker request (VA Form 40-1330M) is in progress.',
       expired:
-        'Your saved headstone or marker request (VA Form 40-1330M) has expired. Please start a new request.',
+        'Your saved headstone or marker request (VA Form 40-1330M) has expired. If you want to submit your request, please start a new request.',
       saved: 'Your headstone or marker request has been saved.',
     },
   },
   version: 0,
   prefillEnabled: true,
   savedFormMessages: {
-    notFound: 'Please start over to submit your headstone or marker request.',
+    notFound:
+      'Please start over to submit your headstone or marker request.',
     noAuth:
       'Please sign in again to continue your headstone or marker request.',
   },
@@ -96,25 +104,25 @@ const formConfig = {
   subTitle: 'VA Form 40-1330M',
   defaultDefinitions: {},
   chapters: {
-    eligibilityChapter: {
+    eligibilityScreenerChapter: {
       title: 'Eligibility',
       pages: {
-        eligibilityScreener: {
+        serviceStatus: {
           path: 'eligibility-screener',
           title: 'Service status at time of death',
-          uiSchema: eligibilityScreenerUiSchema,
-          schema: eligibilityScreenerSchema,
+          uiSchema: serviceStatusUiSchema,
+          schema: serviceStatusSchema,
         },
         guardReserveQualifier: {
           path: 'eligibility-screener/guard-reserve-qualifier',
           title: 'Guard/Reserve qualifying circumstance',
-          depends: formData =>
-            formData.serviceStatusAtDeath === 'guardOrReserve',
+          depends: formData => formData.serviceStatusAtDeath === 'guardOrReserve',
           uiSchema: guardReserveQualifierUiSchema,
           schema: guardReserveQualifierSchema,
         },
       },
     },
+
     applicantInformationChapter: {
       title: 'About the applicant',
       pages: {
@@ -145,6 +153,7 @@ const formConfig = {
         },
       },
     },
+
     deceasedInformationChapter: {
       title: 'About the deceased service member',
       pages: {
@@ -168,6 +177,7 @@ const formConfig = {
         },
       },
     },
+
     burialInformationChapter: {
       title: 'Burial information',
       pages: {
@@ -191,6 +201,7 @@ const formConfig = {
         },
       },
     },
+
     markerSelectionChapter: {
       title: 'Headstone or marker selection',
       pages: {
@@ -214,9 +225,18 @@ const formConfig = {
         },
       },
     },
+
     supportingDocumentsChapter: {
       title: 'Supporting documents',
       pages: {
+        documentsIntro: {
+          path: 'supporting-documents/required-documents-intro',
+          title: 'Documents you need to upload',
+          CustomPage: DocumentsIntroPage,
+          CustomPageReview: null,
+          uiSchema: {},
+          schema: { type: 'object', properties: {} },
+        },
         deathCertificate: {
           path: 'supporting-documents/death-certificate',
           title: 'Death certificate',
@@ -246,6 +266,7 @@ const formConfig = {
         },
       },
     },
+
     certificationChapter: {
       title: 'Certification',
       pages: {

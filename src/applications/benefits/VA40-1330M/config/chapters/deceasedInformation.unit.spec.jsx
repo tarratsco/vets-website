@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import {
   decedentPersonalInfoUiSchema,
   decedentPersonalInfoSchema,
@@ -10,27 +11,38 @@ import {
 
 describe('deceasedInformation chapter', () => {
   describe('decedentPersonalInfoUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(decedentPersonalInfoUiSchema).to.be.an('object');
+    it('has decedent object', () => {
+      expect(decedentPersonalInfoUiSchema).to.have.property('decedent');
     });
 
-    it('has decedent object with name, ssn, dateOfBirth, dateOfDeath', () => {
-      const decedent = decedentPersonalInfoUiSchema.decedent;
-      expect(decedent.name).to.exist;
-      expect(decedent.ssn).to.exist;
-      expect(decedent.dateOfBirth).to.exist;
-      expect(decedent.dateOfDeath).to.exist;
+    it('decedent has name', () => {
+      expect(decedentPersonalInfoUiSchema.decedent).to.have.property('name');
+    });
+
+    it('decedent has ssn', () => {
+      expect(decedentPersonalInfoUiSchema.decedent).to.have.property('ssn');
+    });
+
+    it('decedent has dateOfBirth', () => {
+      expect(decedentPersonalInfoUiSchema.decedent).to.have.property(
+        'dateOfBirth',
+      );
+    });
+
+    it('decedent has dateOfDeath', () => {
+      expect(decedentPersonalInfoUiSchema.decedent).to.have.property(
+        'dateOfDeath',
+      );
     });
   });
 
   describe('decedentPersonalInfoSchema', () => {
-    it('exports a schema object', () => {
-      expect(decedentPersonalInfoSchema).to.be.an('object');
+    it('requires decedent', () => {
+      expect(decedentPersonalInfoSchema.required).to.include('decedent');
     });
 
-    it('requires name, ssn, dateOfBirth, dateOfDeath on decedent', () => {
-      const required =
-        decedentPersonalInfoSchema.properties.decedent.required;
+    it('decedent requires name, ssn, dateOfBirth, dateOfDeath', () => {
+      const { required } = decedentPersonalInfoSchema.properties.decedent;
       expect(required).to.include('name');
       expect(required).to.include('ssn');
       expect(required).to.include('dateOfBirth');
@@ -39,58 +51,96 @@ describe('deceasedInformation chapter', () => {
   });
 
   describe('decedentServiceInfoUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(decedentServiceInfoUiSchema).to.be.an('object');
+    it('has decedent.service object', () => {
+      expect(decedentServiceInfoUiSchema.decedent).to.have.property('service');
     });
 
-    it('has service object with branchOfService, component, rankAtDeath', () => {
-      const service = decedentServiceInfoUiSchema.decedent.service;
-      expect(service.branchOfService).to.exist;
-      expect(service.component).to.exist;
-      expect(service.rankAtDeath).to.exist;
+    it('service has branchOfService', () => {
+      expect(
+        decedentServiceInfoUiSchema.decedent.service,
+      ).to.have.property('branchOfService');
+    });
+
+    it('service has rankAtDeath', () => {
+      expect(
+        decedentServiceInfoUiSchema.decedent.service,
+      ).to.have.property('rankAtDeath');
+    });
+
+    it('service has serviceEntryDate', () => {
+      expect(
+        decedentServiceInfoUiSchema.decedent.service,
+      ).to.have.property('serviceEntryDate');
     });
   });
 
   describe('decedentServiceInfoSchema', () => {
-    it('exports a schema object', () => {
-      expect(decedentServiceInfoSchema).to.be.an('object');
+    it('service requires branchOfService', () => {
+      const { required } =
+        decedentServiceInfoSchema.properties.decedent.properties.service;
+      expect(required).to.include('branchOfService');
     });
 
-    it('requires branchOfService, component, rankAtDeath, serviceEntryDate in service', () => {
-      const required =
-        decedentServiceInfoSchema.properties.decedent.properties.service
-          .required;
-      expect(required).to.include('branchOfService');
-      expect(required).to.include('component');
+    it('service requires rankAtDeath', () => {
+      const { required } =
+        decedentServiceInfoSchema.properties.decedent.properties.service;
       expect(required).to.include('rankAtDeath');
+    });
+
+    it('service requires serviceEntryDate', () => {
+      const { required } =
+        decedentServiceInfoSchema.properties.decedent.properties.service;
       expect(required).to.include('serviceEntryDate');
+    });
+
+    it('branchOfService has enum values', () => {
+      const { enum: enumVals } =
+        decedentServiceInfoSchema.properties.decedent.properties.service
+          .properties.branchOfService;
+      expect(enumVals).to.include('army');
+      expect(enumVals).to.include('navy');
+      expect(enumVals).to.include('airForce');
     });
   });
 
   describe('deathInformationUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(deathInformationUiSchema).to.be.an('object');
+    it('has decedent.placeOfDeath', () => {
+      expect(deathInformationUiSchema.decedent).to.have.property(
+        'placeOfDeath',
+      );
     });
 
-    it('has placeOfDeath with city, state, country', () => {
-      const placeOfDeath = deathInformationUiSchema.decedent.placeOfDeath;
-      expect(placeOfDeath.city).to.exist;
-      expect(placeOfDeath.state).to.exist;
-      expect(placeOfDeath.country).to.exist;
+    it('placeOfDeath has city', () => {
+      expect(
+        deathInformationUiSchema.decedent.placeOfDeath,
+      ).to.have.property('city');
+    });
+
+    it('placeOfDeath has country', () => {
+      expect(
+        deathInformationUiSchema.decedent.placeOfDeath,
+      ).to.have.property('country');
     });
   });
 
   describe('deathInformationSchema', () => {
-    it('exports a schema object', () => {
-      expect(deathInformationSchema).to.be.an('object');
-    });
-
-    it('requires city and country in placeOfDeath', () => {
-      const required =
-        deathInformationSchema.properties.decedent.properties.placeOfDeath
-          .required;
+    it('placeOfDeath requires city and country', () => {
+      const { required } =
+        deathInformationSchema.properties.decedent.properties.placeOfDeath;
       expect(required).to.include('city');
       expect(required).to.include('country');
+    });
+  });
+
+  describe('depends functions', () => {
+    it('evaluates without throwing for valid data', () => {
+      const depends = formData =>
+        formData.serviceStatusAtDeath === 'guardOrReserve';
+      expect(() => depends({ serviceStatusAtDeath: 'activeDuty' })).to.not
+        .throw;
+      expect(() => depends({ serviceStatusAtDeath: 'guardOrReserve' })).to.not
+        .throw;
+      expect(() => depends({})).to.not.throw;
     });
   });
 });

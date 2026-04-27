@@ -1,8 +1,10 @@
-import React from 'react';
 import { expect } from 'chai';
+import React from 'react';
 import { render } from '@testing-library/react';
-import App from './App';
+import { Provider } from 'react-redux';
+
 import formConfig from '../config/form';
+import App from './App';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -15,9 +17,9 @@ const createMockStore = (overrides = {}) => ({
         verified: true,
         dob: '1990-01-01',
         claims: { appeals: false },
-        ...(overrides.user?.profile || {}),
+        ...overrides.user?.profile,
       },
-      ...(overrides.user || {}),
+      ...overrides.user,
     },
     form: {
       formId: formConfig.formId,
@@ -25,7 +27,7 @@ const createMockStore = (overrides = {}) => ({
       savedStatus: '',
       loadedData: { metadata: {} },
       data: {},
-      ...(overrides.form || {}),
+      ...overrides.form,
     },
     scheduledDowntime: {
       globalDowntime: null,
@@ -42,20 +44,26 @@ const createMockStore = (overrides = {}) => ({
 
 describe('App container', () => {
   it('renders without crashing', () => {
+    const store = createMockStore();
     const { container } = render(
-      <App location={{ pathname: '/introduction' }}>
-        <div data-testid="child-content">child</div>
-      </App>,
+      <Provider store={store}>
+        <App location={{ pathname: '/introduction' }}>
+          <div>child content</div>
+        </App>
+      </Provider>,
     );
     expect(container).to.exist;
   });
 
   it('renders children', () => {
-    const { getByTestId } = render(
-      <App location={{ pathname: '/introduction' }}>
-        <div data-testid="child-content">child</div>
-      </App>,
+    const store = createMockStore();
+    const { getByText } = render(
+      <Provider store={store}>
+        <App location={{ pathname: '/introduction' }}>
+          <div>test child</div>
+        </App>
+      </Provider>,
     );
-    expect(getByTestId('child-content')).to.exist;
+    expect(getByText('test child')).to.exist;
   });
 });

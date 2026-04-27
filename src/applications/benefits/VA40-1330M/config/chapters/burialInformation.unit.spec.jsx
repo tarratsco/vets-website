@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import {
   cemeteryInfoUiSchema,
   cemeteryInfoSchema,
@@ -10,89 +11,106 @@ import {
 
 describe('burialInformation chapter', () => {
   describe('cemeteryInfoUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(cemeteryInfoUiSchema).to.be.an('object');
+    it('has burialLocation object', () => {
+      expect(cemeteryInfoUiSchema).to.have.property('burialLocation');
     });
 
-    it('has burialLocation with cemeteryName, cemeteryAddress, cemeteryContactName, cemeteryContactPhone', () => {
-      const loc = cemeteryInfoUiSchema.burialLocation;
-      expect(loc.cemeteryName).to.exist;
-      expect(loc.cemeteryAddress).to.exist;
-      expect(loc.cemeteryContactName).to.exist;
-      expect(loc.cemeteryContactPhone).to.exist;
+    it('burialLocation has cemeteryName', () => {
+      expect(cemeteryInfoUiSchema.burialLocation).to.have.property(
+        'cemeteryName',
+      );
+    });
+
+    it('burialLocation has cemeteryAddress', () => {
+      expect(cemeteryInfoUiSchema.burialLocation).to.have.property(
+        'cemeteryAddress',
+      );
+    });
+
+    it('burialLocation has cemeteryContactName', () => {
+      expect(cemeteryInfoUiSchema.burialLocation).to.have.property(
+        'cemeteryContactName',
+      );
+    });
+
+    it('burialLocation has cemeteryContactPhone', () => {
+      expect(cemeteryInfoUiSchema.burialLocation).to.have.property(
+        'cemeteryContactPhone',
+      );
     });
   });
 
   describe('cemeteryInfoSchema', () => {
-    it('exports a schema object', () => {
-      expect(cemeteryInfoSchema).to.be.an('object');
+    it('requires burialLocation', () => {
+      expect(cemeteryInfoSchema.required).to.include('burialLocation');
     });
 
-    it('requires cemeteryName, cemeteryAddress, cemeteryContactName, cemeteryContactPhone', () => {
-      const required = cemeteryInfoSchema.properties.burialLocation.required;
-      expect(required).to.include('cemeteryName');
-      expect(required).to.include('cemeteryAddress');
-      expect(required).to.include('cemeteryContactName');
-      expect(required).to.include('cemeteryContactPhone');
+    it('burialLocation requires cemeteryName', () => {
+      expect(
+        cemeteryInfoSchema.properties.burialLocation.required,
+      ).to.include('cemeteryName');
+    });
+
+    it('burialLocation requires cemeteryContactPhone', () => {
+      expect(
+        cemeteryInfoSchema.properties.burialLocation.required,
+      ).to.include('cemeteryContactPhone');
     });
   });
 
   describe('graveLocationUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(graveLocationUiSchema).to.be.an('object');
+    it('has burialLocation.graveSection', () => {
+      expect(graveLocationUiSchema.burialLocation).to.have.property(
+        'graveSection',
+      );
     });
 
-    it('has graveSection, graveLot, graveNumber on burialLocation', () => {
-      const loc = graveLocationUiSchema.burialLocation;
-      expect(loc.graveSection).to.exist;
-      expect(loc.graveLot).to.exist;
-      expect(loc.graveNumber).to.exist;
+    it('has burialLocation.graveLot', () => {
+      expect(graveLocationUiSchema.burialLocation).to.have.property(
+        'graveLot',
+      );
+    });
+
+    it('has burialLocation.graveNumber', () => {
+      expect(graveLocationUiSchema.burialLocation).to.have.property(
+        'graveNumber',
+      );
     });
   });
 
   describe('graveLocationSchema', () => {
-    it('exports a schema object', () => {
-      expect(graveLocationSchema).to.be.an('object');
-    });
-
-    it('has graveSection, graveLot, graveNumber properties', () => {
-      const props = graveLocationSchema.properties.burialLocation.properties;
-      expect(props.graveSection).to.exist;
-      expect(props.graveLot).to.exist;
-      expect(props.graveNumber).to.exist;
+    it('graveSection has maxLength 20', () => {
+      expect(
+        graveLocationSchema.properties.burialLocation.properties.graveSection
+          .maxLength,
+      ).to.equal(20);
     });
   });
 
   describe('existingMarkerUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(existingMarkerUiSchema).to.be.an('object');
+    it('has burialLocation.existingMarkerPresent', () => {
+      expect(existingMarkerUiSchema.burialLocation).to.have.property(
+        'existingMarkerPresent',
+      );
     });
 
-    it('has existingMarkerPresent field on burialLocation', () => {
+    it('existingMarkerPresent has radio widget', () => {
       expect(
-        existingMarkerUiSchema.burialLocation.existingMarkerPresent,
-      ).to.exist;
+        existingMarkerUiSchema.burialLocation.existingMarkerPresent[
+          'ui:widget'
+        ],
+      ).to.equal('radio');
     });
   });
 
   describe('existingMarkerSchema', () => {
-    it('exports a schema object', () => {
-      expect(existingMarkerSchema).to.be.an('object');
-    });
-
-    it('requires existingMarkerPresent', () => {
-      const required =
-        existingMarkerSchema.properties.burialLocation.required;
-      expect(required).to.include('existingMarkerPresent');
-    });
-
-    it('has correct enum values for existingMarkerPresent', () => {
-      const prop =
+    it('existingMarkerPresent has correct enum values', () => {
+      const { enum: enumVals } =
         existingMarkerSchema.properties.burialLocation.properties
           .existingMarkerPresent;
-      expect(prop.enum).to.include('noExistingMarker');
-      expect(prop.enum).to.include('privateMarkerExists');
-      expect(prop.enum).to.include('governmentMarkerAlreadyPlaced');
+      expect(enumVals).to.include('noExistingMarker');
+      expect(enumVals).to.include('privateMarkerExists');
+      expect(enumVals).to.include('governmentMarkerAlreadyPlaced');
     });
   });
 });

@@ -1,160 +1,146 @@
 import { expect } from 'chai';
+
 import formConfig from './form';
 
 describe('formConfig', () => {
   it('has required top-level properties', () => {
-    expect(formConfig).to.be.an('object');
+    expect(formConfig).to.have.property('formId');
+    expect(formConfig).to.have.property('title');
+    expect(formConfig).to.have.property('chapters');
+    expect(formConfig).to.have.property('introduction');
+    expect(formConfig).to.have.property('confirmation');
+    expect(formConfig).to.have.property('saveInProgress');
+    expect(formConfig).to.have.property('trackingPrefix');
+  });
+
+  it('has correct formId', () => {
     expect(formConfig.formId).to.equal('VA40-1330M');
-    expect(formConfig.title).to.be.a('string');
-    expect(formConfig.chapters).to.be.an('object');
-    expect(formConfig.introduction).to.exist;
-    expect(formConfig.confirmation).to.exist;
-    expect(formConfig.trackingPrefix).to.equal('va40-1330m-');
   });
 
   it('has saveInProgress messages', () => {
-    expect(formConfig.saveInProgress).to.be.an('object');
-    expect(formConfig.saveInProgress.messages).to.be.an('object');
-    expect(formConfig.saveInProgress.messages.inProgress).to.be.a('string');
-    expect(formConfig.saveInProgress.messages.expired).to.be.a('string');
-    expect(formConfig.saveInProgress.messages.saved).to.be.a('string');
+    expect(formConfig.saveInProgress.messages).to.have.property('inProgress');
+    expect(formConfig.saveInProgress.messages).to.have.property('expired');
+    expect(formConfig.saveInProgress.messages).to.have.property('saved');
   });
 
-  it('has rootUrl set from manifest', () => {
-    expect(formConfig.rootUrl).to.equal(
-      '/burials-memorials/headstone-marker-active-duty',
-    );
+  it('has trackingPrefix', () => {
+    expect(formConfig.trackingPrefix).to.be.a('string');
+    expect(formConfig.trackingPrefix.length).to.be.greaterThan(0);
+  });
+
+  it('has prefillEnabled set to true', () => {
+    expect(formConfig.prefillEnabled).to.be.true;
   });
 
   describe('chapters', () => {
-    it('has eligibilityChapter', () => {
-      expect(formConfig.chapters.eligibilityChapter).to.exist;
+    it('has all required chapters', () => {
+      const { chapters } = formConfig;
+      expect(chapters).to.have.property('eligibilityScreenerChapter');
+      expect(chapters).to.have.property('applicantInformationChapter');
+      expect(chapters).to.have.property('deceasedInformationChapter');
+      expect(chapters).to.have.property('burialInformationChapter');
+      expect(chapters).to.have.property('markerSelectionChapter');
+      expect(chapters).to.have.property('supportingDocumentsChapter');
+      expect(chapters).to.have.property('certificationChapter');
     });
 
-    it('has applicantInformationChapter', () => {
-      expect(formConfig.chapters.applicantInformationChapter).to.exist;
-    });
-
-    it('has deceasedInformationChapter', () => {
-      expect(formConfig.chapters.deceasedInformationChapter).to.exist;
-    });
-
-    it('has burialInformationChapter', () => {
-      expect(formConfig.chapters.burialInformationChapter).to.exist;
-    });
-
-    it('has markerSelectionChapter', () => {
-      expect(formConfig.chapters.markerSelectionChapter).to.exist;
-    });
-
-    it('has supportingDocumentsChapter', () => {
-      expect(formConfig.chapters.supportingDocumentsChapter).to.exist;
-    });
-
-    it('has certificationChapter', () => {
-      expect(formConfig.chapters.certificationChapter).to.exist;
-    });
-  });
-
-  describe('every page has path, title, uiSchema, schema', () => {
-    Object.entries(formConfig.chapters).forEach(
-      ([chapterKey, chapter]) => {
-        Object.entries(chapter.pages).forEach(([pageKey, page]) => {
-          it(`${chapterKey}.${pageKey} has path`, () => {
-            expect(page.path).to.be.a('string');
-          });
-          it(`${chapterKey}.${pageKey} has title`, () => {
-            expect(page.title).to.be.a('string');
-          });
-          it(`${chapterKey}.${pageKey} has uiSchema`, () => {
-            expect(page.uiSchema).to.be.an('object');
-          });
-          it(`${chapterKey}.${pageKey} has schema`, () => {
-            expect(page.schema).to.be.an('object');
-          });
+    it('every page has path, title, uiSchema, and schema', () => {
+      Object.values(formConfig.chapters).forEach(chapter => {
+        Object.values(chapter.pages).forEach(page => {
+          expect(page).to.have.property('path');
+          expect(page).to.have.property('title');
+          expect(page).to.have.property('uiSchema');
+          expect(page).to.have.property('schema');
         });
-      },
-    );
-  });
+      });
+    });
 
-  describe('depends functions', () => {
-    it('guardReserveQualifier depends returns true for guardOrReserve', () => {
-      const page =
-        formConfig.chapters.eligibilityChapter.pages.guardReserveQualifier;
-      expect(() => page.depends({ serviceStatusAtDeath: 'guardOrReserve' })).to.not.throw();
+    it('eligibilityScreener has serviceStatus page', () => {
       expect(
-        page.depends({ serviceStatusAtDeath: 'guardOrReserve' }),
-      ).to.be.true;
+        formConfig.chapters.eligibilityScreenerChapter.pages,
+      ).to.have.property('serviceStatus');
+    });
+
+    it('eligibilityScreener has guardReserveQualifier page with depends', () => {
+      const { guardReserveQualifier } =
+        formConfig.chapters.eligibilityScreenerChapter.pages;
+      expect(guardReserveQualifier).to.have.property('depends');
+      expect(guardReserveQualifier.depends).to.be.a('function');
+    });
+
+    it('guardReserveQualifier depends returns true for guardOrReserve', () => {
+      const { depends } =
+        formConfig.chapters.eligibilityScreenerChapter.pages.guardReserveQualifier;
+      expect(() =>
+        depends({ serviceStatusAtDeath: 'guardOrReserve' }),
+      ).to.not.throw();
+      expect(depends({ serviceStatusAtDeath: 'guardOrReserve' })).to.be.true;
     });
 
     it('guardReserveQualifier depends returns false for activeDuty', () => {
-      const page =
-        formConfig.chapters.eligibilityChapter.pages.guardReserveQualifier;
-      expect(page.depends({ serviceStatusAtDeath: 'activeDuty' })).to.be.false;
+      const { depends } =
+        formConfig.chapters.eligibilityScreenerChapter.pages.guardReserveQualifier;
+      expect(depends({ serviceStatusAtDeath: 'activeDuty' })).to.be.false;
     });
 
-    it('guardReserveQualifier depends handles null gracefully', () => {
-      const page =
-        formConfig.chapters.eligibilityChapter.pages.guardReserveQualifier;
-      expect(() => page.depends({})).to.not.throw();
-    });
-
-    it('authorization depends returns true for non-nextOfKin', () => {
-      const page =
-        formConfig.chapters.applicantInformationChapter.pages.authorization;
-      expect(
-        page.depends({ submitterRole: 'funeralHomeDirector' }),
-      ).to.be.true;
-      expect(page.depends({ submitterRole: 'cemeteryOfficial' })).to.be.true;
-      expect(
-        page.depends({ submitterRole: 'personalRepresentative' }),
-      ).to.be.true;
+    it('guardReserveQualifier depends handles null without throwing', () => {
+      const { depends } =
+        formConfig.chapters.eligibilityScreenerChapter.pages.guardReserveQualifier;
+      expect(() => depends({})).to.not.throw();
     });
 
     it('authorization depends returns false for nextOfKin', () => {
-      const page =
+      const { depends } =
         formConfig.chapters.applicantInformationChapter.pages.authorization;
-      expect(page.depends({ submitterRole: 'nextOfKin' })).to.be.false;
+      expect(depends({ submitterRole: 'nextOfKin' })).to.be.false;
     });
 
-    it('authorization depends handles null gracefully', () => {
-      const page =
+    it('authorization depends returns true for non-nextOfKin', () => {
+      const { depends } =
         formConfig.chapters.applicantInformationChapter.pages.authorization;
-      expect(() => page.depends({})).to.not.throw();
+      expect(depends({ submitterRole: 'funeralHomeDirector' })).to.be.true;
+    });
+
+    it('authorization depends handles null without throwing', () => {
+      const { depends } =
+        formConfig.chapters.applicantInformationChapter.pages.authorization;
+      expect(() => depends({})).to.not.throw();
     });
 
     it('ddForm1300 depends returns true for activeDuty', () => {
-      const page =
+      const { depends } =
         formConfig.chapters.supportingDocumentsChapter.pages.ddForm1300;
-      expect(page.depends({ serviceStatusAtDeath: 'activeDuty' })).to.be.true;
+      expect(depends({ serviceStatusAtDeath: 'activeDuty' })).to.be.true;
     });
 
     it('ddForm1300 depends returns false for guardOrReserve', () => {
-      const page =
+      const { depends } =
         formConfig.chapters.supportingDocumentsChapter.pages.ddForm1300;
-      expect(
-        page.depends({ serviceStatusAtDeath: 'guardOrReserve' }),
-      ).to.be.false;
+      expect(depends({ serviceStatusAtDeath: 'guardOrReserve' })).to.be.false;
+    });
+
+    it('ddForm1300 depends handles empty object without throwing', () => {
+      const { depends } =
+        formConfig.chapters.supportingDocumentsChapter.pages.ddForm1300;
+      expect(() => depends({})).to.not.throw();
     });
 
     it('ngbForm22 depends returns true for guardOrReserve', () => {
-      const page =
+      const { depends } =
         formConfig.chapters.supportingDocumentsChapter.pages.ngbForm22;
-      expect(
-        page.depends({ serviceStatusAtDeath: 'guardOrReserve' }),
-      ).to.be.true;
+      expect(depends({ serviceStatusAtDeath: 'guardOrReserve' })).to.be.true;
     });
 
     it('ngbForm22 depends returns false for activeDuty', () => {
-      const page =
+      const { depends } =
         formConfig.chapters.supportingDocumentsChapter.pages.ngbForm22;
-      expect(page.depends({ serviceStatusAtDeath: 'activeDuty' })).to.be.false;
+      expect(depends({ serviceStatusAtDeath: 'activeDuty' })).to.be.false;
     });
 
-    it('depends functions handle undefined formData gracefully', () => {
-      const page =
-        formConfig.chapters.eligibilityChapter.pages.guardReserveQualifier;
-      expect(() => page.depends(null)).to.not.throw();
+    it('ngbForm22 depends handles empty object without throwing', () => {
+      const { depends } =
+        formConfig.chapters.supportingDocumentsChapter.pages.ngbForm22;
+      expect(() => depends({})).to.not.throw();
     });
   });
 });

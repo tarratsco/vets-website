@@ -1,8 +1,10 @@
 import { expect } from 'chai';
+
 import route from './routes';
+import App from './containers/App';
 
 describe('routes', () => {
-  it('exports a route object', () => {
+  it('exports a single route object', () => {
     expect(route).to.be.an('object');
   });
 
@@ -10,16 +12,22 @@ describe('routes', () => {
     expect(route.path).to.equal('/');
   });
 
-  it('has a component property', () => {
-    expect(route.component).to.exist;
+  it('has App as the component', () => {
+    expect(route.component).to.equal(App);
   });
 
-  it('has an indexRoute with onEnter that redirects to /introduction', () => {
+  it('has an indexRoute that redirects', () => {
     expect(route.indexRoute).to.be.an('object');
     expect(route.indexRoute.onEnter).to.be.a('function');
-    const replaceCalls = [];
-    route.indexRoute.onEnter({}, path => replaceCalls.push(path));
-    expect(replaceCalls).to.deep.equal(['/introduction']);
+  });
+
+  it('indexRoute redirects to /introduction', () => {
+    let redirectTarget;
+    const replace = target => {
+      redirectTarget = target;
+    };
+    route.indexRoute.onEnter({}, replace);
+    expect(redirectTarget).to.equal('/introduction');
   });
 
   it('has childRoutes array', () => {

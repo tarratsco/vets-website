@@ -1,74 +1,73 @@
 import { expect } from 'chai';
+
 import {
-  eligibilityScreenerUiSchema,
-  eligibilityScreenerSchema,
+  serviceStatusUiSchema,
+  serviceStatusSchema,
   guardReserveQualifierUiSchema,
   guardReserveQualifierSchema,
 } from './eligibilityScreener';
 
 describe('eligibilityScreener chapter', () => {
-  describe('eligibilityScreenerUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(eligibilityScreenerUiSchema).to.be.an('object');
+  describe('serviceStatusUiSchema', () => {
+    it('has serviceStatusAtDeath field', () => {
+      expect(serviceStatusUiSchema).to.have.property('serviceStatusAtDeath');
     });
 
-    it('has serviceStatusAtDeath field', () => {
-      expect(eligibilityScreenerUiSchema.serviceStatusAtDeath).to.exist;
+    it('has a ui:title', () => {
+      expect(
+        serviceStatusUiSchema.serviceStatusAtDeath['ui:title'],
+      ).to.be.a('string');
+    });
+
+    it('has radio widget', () => {
+      expect(
+        serviceStatusUiSchema.serviceStatusAtDeath['ui:widget'],
+      ).to.equal('radio');
     });
   });
 
-  describe('eligibilityScreenerSchema', () => {
-    it('exports a schema object', () => {
-      expect(eligibilityScreenerSchema).to.be.an('object');
+  describe('serviceStatusSchema', () => {
+    it('has required serviceStatusAtDeath', () => {
+      expect(serviceStatusSchema.required).to.include('serviceStatusAtDeath');
     });
 
-    it('has type object', () => {
-      expect(eligibilityScreenerSchema.type).to.equal('object');
-    });
-
-    it('requires serviceStatusAtDeath', () => {
-      expect(eligibilityScreenerSchema.required).to.include('serviceStatusAtDeath');
-    });
-
-    it('has serviceStatusAtDeath property with correct enum values', () => {
-      const prop =
-        eligibilityScreenerSchema.properties.serviceStatusAtDeath;
-      expect(prop).to.exist;
-      expect(prop.enum).to.include('activeDuty');
-      expect(prop.enum).to.include('guardOrReserve');
+    it('serviceStatusAtDeath has correct enum values', () => {
+      const { enum: enumVals } = serviceStatusSchema.properties
+        .serviceStatusAtDeath;
+      expect(enumVals).to.include('activeDuty');
+      expect(enumVals).to.include('guardOrReserve');
     });
   });
 
   describe('guardReserveQualifierUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(guardReserveQualifierUiSchema).to.be.an('object');
+    it('has guardReserveQualifyingCircumstance field', () => {
+      expect(guardReserveQualifierUiSchema).to.have.property(
+        'guardReserveQualifyingCircumstance',
+      );
     });
 
-    it('has guardReserveQualifyingCircumstance field', () => {
+    it('has a ui:title', () => {
       expect(
-        guardReserveQualifierUiSchema.guardReserveQualifyingCircumstance,
-      ).to.exist;
+        guardReserveQualifierUiSchema.guardReserveQualifyingCircumstance[
+          'ui:title'
+        ],
+      ).to.be.a('string');
     });
   });
 
   describe('guardReserveQualifierSchema', () => {
-    it('exports a schema object', () => {
-      expect(guardReserveQualifierSchema).to.be.an('object');
-    });
-
-    it('requires guardReserveQualifyingCircumstance', () => {
+    it('has required guardReserveQualifyingCircumstance', () => {
       expect(guardReserveQualifierSchema.required).to.include(
         'guardReserveQualifyingCircumstance',
       );
     });
 
     it('has correct enum values', () => {
-      const prop =
-        guardReserveQualifierSchema.properties
-          .guardReserveQualifyingCircumstance;
-      expect(prop.enum).to.include('diedOnActiveDutyForTraining');
-      expect(prop.enum).to.include('diedOnInactiveDutyForTraining');
-      expect(prop.enum).to.include('entitledToRetiredPay');
+      const { enum: enumVals } = guardReserveQualifierSchema.properties
+        .guardReserveQualifyingCircumstance;
+      expect(enumVals).to.include('diedOnActiveDutyForTraining');
+      expect(enumVals).to.include('diedOnInactiveDutyForTraining');
+      expect(enumVals).to.include('entitledToRetiredPay');
     });
   });
 });

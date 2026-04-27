@@ -1,22 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { ConfirmationView } from 'platform/forms-system/src/js/components/ConfirmationView';
 
-const alertContent = (
-  <p>
-    We have received your request for a government headstone or marker. The
-    National Cemetery Administration (NCA) will review your request and contact
-    you if additional information is needed. Please keep your confirmation
-    number for your records.
-  </p>
-);
-
-export const ConfirmationPage = props => {
+export const ConfirmationPage = ({ route }) => {
   const form = useSelector(state => state.form || {});
-  const { submission } = form;
-  const submitDate = submission?.timestamp;
+  const submission = form?.submission || {};
+  const submitDate = submission?.timestamp || '';
   const confirmationNumber =
     submission?.response?.confirmationNumber ||
     submission?.response?.attributes?.confirmationNumber ||
@@ -24,9 +15,17 @@ export const ConfirmationPage = props => {
 
   const applicantName = form?.data?.applicant?.name || {};
 
+  const submissionAlertContent = (
+    <p>
+      Thank you for submitting your request for a government headstone or
+      marker. We will review your request and contact you if we need additional
+      information. Processing times vary; NCA will contact you with an update.
+    </p>
+  );
+
   return (
     <ConfirmationView
-      formConfig={props.route?.formConfig}
+      formConfig={route?.formConfig}
       submitDate={submitDate}
       confirmationNumber={confirmationNumber}
       submitterName={applicantName}
@@ -34,16 +33,17 @@ export const ConfirmationPage = props => {
     >
       <ConfirmationView.SubmissionAlert
         title="Your headstone or marker request has been submitted"
-        content={alertContent}
+        content={submissionAlertContent}
       />
-      <ConfirmationView.ChapterSectionCollection />
+      <div data-dd-privacy="mask" data-dd-action-name="confirmation summary">
+        <ConfirmationView.ChapterSectionCollection />
+      </div>
       <ConfirmationView.PrintThisPage />
       <ConfirmationView.WhatsNextProcessList
-        item1Header="NCA will review your request"
-        item1Content="The National Cemetery Administration will review your request and contact you if they need additional information."
-        item1Actions={<p />}
-        item2Header="Your headstone or marker will be fabricated and shipped"
-        item2Content="After NCA approves your request, it will be sent to a fabrication contractor. Delivery to the cemetery will follow."
+        item1Header="We'll review your request"
+        item1Content="NCA will review your request. If we need more information, we'll contact you using the contact information you provided."
+        item2Header="Your headstone or marker will be fabricated and delivered"
+        item2Content="After NCA approves your request, it will be sent to a fabrication contractor. Delivery to the cemetery typically takes additional weeks. NCA will notify the cemetery when delivery is expected."
       />
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />
@@ -58,10 +58,4 @@ ConfirmationPage.propTypes = {
   }),
 };
 
-function mapStateToProps(state) {
-  return {
-    form: state.form,
-  };
-}
-
-export default connect(mapStateToProps)(ConfirmationPage);
+export default ConfirmationPage;

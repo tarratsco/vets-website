@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import {
   deathCertificateUiSchema,
   deathCertificateSchema,
@@ -12,88 +13,95 @@ import {
 
 describe('supportingDocuments chapter', () => {
   describe('deathCertificateUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(deathCertificateUiSchema).to.be.an('object');
+    it('has documents.deathCertificate', () => {
+      expect(deathCertificateUiSchema.documents).to.have.property(
+        'deathCertificate',
+      );
     });
 
-    it('has deathCertificate field on documents', () => {
-      expect(deathCertificateUiSchema.documents.deathCertificate).to.exist;
+    it('deathCertificate has a title', () => {
+      expect(
+        deathCertificateUiSchema.documents.deathCertificate['ui:title'],
+      ).to.be.a('string');
     });
   });
 
   describe('deathCertificateSchema', () => {
-    it('exports a schema object', () => {
-      expect(deathCertificateSchema).to.be.an('object');
-    });
-
-    it('requires deathCertificate', () => {
-      const required = deathCertificateSchema.properties.documents.required;
-      expect(required).to.include('deathCertificate');
+    it('documents requires deathCertificate', () => {
+      expect(
+        deathCertificateSchema.properties.documents.required,
+      ).to.include('deathCertificate');
     });
   });
 
   describe('ddForm1300UiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(ddForm1300UiSchema).to.be.an('object');
-    });
-
-    it('has ddForm1300 field on documents', () => {
-      expect(ddForm1300UiSchema.documents.ddForm1300).to.exist;
+    it('has documents.ddForm1300', () => {
+      expect(ddForm1300UiSchema.documents).to.have.property('ddForm1300');
     });
   });
 
   describe('ddForm1300Schema', () => {
-    it('exports a schema object', () => {
-      expect(ddForm1300Schema).to.be.an('object');
-    });
-
-    it('requires ddForm1300', () => {
-      const required = ddForm1300Schema.properties.documents.required;
-      expect(required).to.include('ddForm1300');
+    it('documents requires ddForm1300', () => {
+      expect(ddForm1300Schema.properties.documents.required).to.include(
+        'ddForm1300',
+      );
     });
   });
 
   describe('ngbForm22UiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(ngbForm22UiSchema).to.be.an('object');
-    });
-
-    it('has ngbForm22 field on documents', () => {
-      expect(ngbForm22UiSchema.documents.ngbForm22).to.exist;
+    it('has documents.ngbForm22', () => {
+      expect(ngbForm22UiSchema.documents).to.have.property('ngbForm22');
     });
   });
 
   describe('ngbForm22Schema', () => {
-    it('exports a schema object', () => {
-      expect(ngbForm22Schema).to.be.an('object');
-    });
-
-    it('requires ngbForm22', () => {
-      const required = ngbForm22Schema.properties.documents.required;
-      expect(required).to.include('ngbForm22');
+    it('documents requires ngbForm22', () => {
+      expect(ngbForm22Schema.properties.documents.required).to.include(
+        'ngbForm22',
+      );
     });
   });
 
   describe('additionalDocumentsUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(additionalDocumentsUiSchema).to.be.an('object');
-    });
-
-    it('has additionalDocuments field on documents', () => {
-      expect(
-        additionalDocumentsUiSchema.documents.additionalDocuments,
-      ).to.exist;
+    it('has documents.additionalDocuments', () => {
+      expect(additionalDocumentsUiSchema.documents).to.have.property(
+        'additionalDocuments',
+      );
     });
   });
 
   describe('additionalDocumentsSchema', () => {
-    it('exports a schema object', () => {
-      expect(additionalDocumentsSchema).to.be.an('object');
+    it('has documents.additionalDocuments property', () => {
+      expect(
+        additionalDocumentsSchema.properties.documents.properties,
+      ).to.have.property('additionalDocuments');
     });
 
-    it('has additionalDocuments in documents properties', () => {
-      const props = additionalDocumentsSchema.properties.documents.properties;
-      expect(props.additionalDocuments).to.exist;
+    it('additionalDocuments is not required', () => {
+      const { required } = additionalDocumentsSchema.properties.documents;
+      expect(required).to.not.exist;
+    });
+  });
+
+  describe('depends functions', () => {
+    it('ddForm1300 depends function evaluates correctly', () => {
+      const depends = formData =>
+        formData.serviceStatusAtDeath === 'activeDuty';
+      expect(() => depends({ serviceStatusAtDeath: 'activeDuty' })).to.not
+        .throw;
+      expect(depends({ serviceStatusAtDeath: 'activeDuty' })).to.be.true;
+      expect(depends({ serviceStatusAtDeath: 'guardOrReserve' })).to.be.false;
+      expect(() => depends({})).to.not.throw;
+    });
+
+    it('ngbForm22 depends function evaluates correctly', () => {
+      const depends = formData =>
+        formData.serviceStatusAtDeath === 'guardOrReserve';
+      expect(() => depends({ serviceStatusAtDeath: 'guardOrReserve' })).to.not
+        .throw;
+      expect(depends({ serviceStatusAtDeath: 'guardOrReserve' })).to.be.true;
+      expect(depends({ serviceStatusAtDeath: 'activeDuty' })).to.be.false;
+      expect(() => depends(null)).to.throw;
     });
   });
 });

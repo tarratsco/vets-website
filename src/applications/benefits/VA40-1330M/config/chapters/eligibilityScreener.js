@@ -3,14 +3,15 @@ import {
   radioSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-export const eligibilityScreenerUiSchema = {
+// ── Service Status at Time of Death ─────────────────────────────────────────
+
+export const serviceStatusUiSchema = {
   serviceStatusAtDeath: radioUI({
     title: 'What was this service member\'s status at the time of death?',
     hint:
       'Your answer determines which form is used. If the service member was discharged from service before death, use VA Form 40-1330 instead.',
     labels: {
-      activeDuty:
-        'Active duty (Army, Navy, Air Force, Marine Corps, Space Force, Coast Guard)',
+      activeDuty: 'Active duty (Army, Navy, Air Force, Marine Corps, Space Force, Coast Guard)',
       guardOrReserve: 'National Guard or Reserve member',
     },
     errorMessages: {
@@ -19,13 +20,15 @@ export const eligibilityScreenerUiSchema = {
   }),
 };
 
-export const eligibilityScreenerSchema = {
+export const serviceStatusSchema = {
   type: 'object',
   required: ['serviceStatusAtDeath'],
   properties: {
     serviceStatusAtDeath: radioSchema(['activeDuty', 'guardOrReserve']),
   },
 };
+
+// ── Guard/Reserve Qualifying Circumstance ────────────────────────────────────
 
 export const guardReserveQualifierUiSchema = {
   guardReserveQualifyingCircumstance: radioUI({
@@ -38,10 +41,11 @@ export const guardReserveQualifierUiSchema = {
         'Died in the line of duty while on active duty for training',
       diedOnInactiveDutyForTraining:
         'Died in the line of duty while on inactive duty for training',
-      entitledToRetiredPay: 'Was entitled to retired pay at the time of death',
+      entitledToRetiredPay:
+        'Was entitled to retired pay at the time of death',
     },
     errorMessages: {
-      required: 'Please select a qualifying circumstance.',
+      required: 'Please select the qualifying circumstance.',
     },
   }),
 };

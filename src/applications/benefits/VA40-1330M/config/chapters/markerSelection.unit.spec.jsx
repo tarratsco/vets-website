@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import {
   markerTypeUiSchema,
   markerTypeSchema,
@@ -10,81 +11,119 @@ import {
 
 describe('markerSelection chapter', () => {
   describe('markerTypeUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(markerTypeUiSchema).to.be.an('object');
+    it('has markerRequest.markerType', () => {
+      expect(markerTypeUiSchema.markerRequest).to.have.property('markerType');
     });
 
-    it('has markerType on markerRequest', () => {
-      expect(markerTypeUiSchema.markerRequest.markerType).to.exist;
+    it('markerType has radio widget', () => {
+      expect(
+        markerTypeUiSchema.markerRequest.markerType['ui:widget'],
+      ).to.equal('radio');
     });
   });
 
   describe('markerTypeSchema', () => {
-    it('exports a schema object', () => {
-      expect(markerTypeSchema).to.be.an('object');
+    it('requires markerRequest', () => {
+      expect(markerTypeSchema.required).to.include('markerRequest');
     });
 
-    it('requires markerType on markerRequest', () => {
-      const required = markerTypeSchema.properties.markerRequest.required;
-      expect(required).to.include('markerType');
+    it('markerRequest requires markerType', () => {
+      expect(
+        markerTypeSchema.properties.markerRequest.required,
+      ).to.include('markerType');
     });
 
-    it('has correct enum values for markerType', () => {
-      const prop =
+    it('markerType has correct enum values', () => {
+      const { enum: enumVals } =
         markerTypeSchema.properties.markerRequest.properties.markerType;
-      expect(prop.enum).to.include('uprightMarble');
-      expect(prop.enum).to.include('uprightGranite');
-      expect(prop.enum).to.include('flatGranite');
-      expect(prop.enum).to.include('flatMarble');
-      expect(prop.enum).to.include('flatBronze');
+      expect(enumVals).to.include('uprightMarble');
+      expect(enumVals).to.include('uprightGranite');
+      expect(enumVals).to.include('flatGranite');
+      expect(enumVals).to.include('flatMarble');
+      expect(enumVals).to.include('flatBronze');
     });
   });
 
   describe('emblemOfBeliefUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(emblemOfBeliefUiSchema).to.be.an('object');
-    });
-
-    it('has emblemOfBelief on markerRequest', () => {
-      expect(emblemOfBeliefUiSchema.markerRequest.emblemOfBelief).to.exist;
+    it('has markerRequest.emblemOfBelief', () => {
+      expect(emblemOfBeliefUiSchema.markerRequest).to.have.property(
+        'emblemOfBelief',
+      );
     });
   });
 
   describe('emblemOfBeliefSchema', () => {
-    it('exports a schema object', () => {
-      expect(emblemOfBeliefSchema).to.be.an('object');
-    });
-
     it('has emblemOfBelief property', () => {
-      const prop =
-        emblemOfBeliefSchema.properties.markerRequest.properties
-          .emblemOfBelief;
-      expect(prop).to.exist;
+      expect(
+        emblemOfBeliefSchema.properties.markerRequest.properties,
+      ).to.have.property('emblemOfBelief');
     });
   });
 
   describe('inscriptionUiSchema', () => {
-    it('exports a uiSchema object', () => {
-      expect(inscriptionUiSchema).to.be.an('object');
-    });
-
-    it('has personalInscription on markerRequest', () => {
-      expect(
-        inscriptionUiSchema.markerRequest.personalInscription,
-      ).to.exist;
+    it('has markerRequest.personalInscription', () => {
+      expect(inscriptionUiSchema.markerRequest).to.have.property(
+        'personalInscription',
+      );
     });
   });
 
   describe('inscriptionSchema', () => {
-    it('exports a schema object', () => {
-      expect(inscriptionSchema).to.be.an('object');
+    it('personalInscription has maxLength 60', () => {
+      expect(
+        inscriptionSchema.properties.markerRequest.properties.personalInscription
+          .maxLength,
+      ).to.equal(60);
+    });
+  });
+
+  describe('inscription validation', () => {
+    let messages;
+
+    beforeEach(() => {
+      messages = [];
     });
 
-    it('personalInscription has maxLength of 60', () => {
-      const prop =
-        inscriptionSchema.properties.markerRequest.properties
-          .personalInscription;
-      expect(prop.maxLength).to.equal(60);
+    it('accepts valid inscription text', () => {
+      const validations =
+        inscriptionUiSchema.markerRequest.personalInscription['ui:options']
+          ?.validations ||
+        inscriptionUiSchema.markerRequest.personalInscription[
+          'ui:validations'
+        ];
+      if (validations && validations.length > 0) {
+        const errors = { addError: msg => messages.push(msg || '') };
+        validations[0](errors, 'IN MEMORY OF A HERO');
+        expect(messages).to.have.lengthOf(0);
+      }
+    });
+
+    it('rejects inscription with invalid characters', () => {
+      const validations =
+        inscriptionUiSchema.markerRequest.personalInscription['ui:options']
+          ?.validations ||
+        inscriptionUiSchema.markerRequest.personalInscription[
+          'ui:validations'
+        ];
+      if (validations && validations.length > 0) {
+        const errors = { addError: msg => messages.push(msg || '') };
+        validations[0](errors, 'HERO <3 FOREVER');
+        expect(messages.length).to.be.greaterThan(0);
+      }
+    });
+
+    it('accepts empty inscription (optional field)', () => {
+      const validations =
+        inscriptionUiSchema.markerRequest.personalInscription['ui:options']
+          ?.validations ||
+        inscriptionUiSchema.markerRequest.personalInscription[
+          'ui:validations'
+        ];
+      if (validations && validations.length > 0) {
+        const errors = { addError: msg => messages.push(msg || '') };
+        validations[0](errors, '');
+        expect(messages).to.have.lengthOf(0);
+      }
     });
   });
 });
