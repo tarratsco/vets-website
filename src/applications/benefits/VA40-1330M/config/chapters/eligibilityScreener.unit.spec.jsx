@@ -1,59 +1,74 @@
 import { expect } from 'chai';
-
 import {
-  serviceStatusUiSchema,
-  serviceStatusSchema,
+  eligibilityScreenerUiSchema,
+  eligibilityScreenerSchema,
   guardReserveQualifierUiSchema,
   guardReserveQualifierSchema,
 } from './eligibilityScreener';
 
 describe('eligibilityScreener chapter', () => {
-  describe('serviceStatus page', () => {
-    it('exports uiSchema and schema', () => {
-      expect(serviceStatusUiSchema).to.be.an('object');
-      expect(serviceStatusSchema).to.be.an('object');
+  describe('eligibilityScreenerUiSchema', () => {
+    it('exports a uiSchema object', () => {
+      expect(eligibilityScreenerUiSchema).to.be.an('object');
     });
 
-    it('uiSchema has serviceStatusAtDeath field', () => {
-      expect(serviceStatusUiSchema).to.have.property('serviceStatusAtDeath');
-    });
-
-    it('schema requires serviceStatusAtDeath', () => {
-      expect(serviceStatusSchema.required).to.include('serviceStatusAtDeath');
-    });
-
-    it('schema enum includes activeDuty and guardOrReserve', () => {
-      const enumVals =
-        serviceStatusSchema.properties.serviceStatusAtDeath.enum;
-      expect(enumVals).to.include('activeDuty');
-      expect(enumVals).to.include('guardOrReserve');
+    it('has serviceStatusAtDeath field', () => {
+      expect(eligibilityScreenerUiSchema.serviceStatusAtDeath).to.exist;
     });
   });
 
-  describe('guardReserveQualifier page', () => {
-    it('exports uiSchema and schema', () => {
+  describe('eligibilityScreenerSchema', () => {
+    it('exports a schema object', () => {
+      expect(eligibilityScreenerSchema).to.be.an('object');
+    });
+
+    it('has type object', () => {
+      expect(eligibilityScreenerSchema.type).to.equal('object');
+    });
+
+    it('requires serviceStatusAtDeath', () => {
+      expect(eligibilityScreenerSchema.required).to.include('serviceStatusAtDeath');
+    });
+
+    it('has serviceStatusAtDeath property with correct enum values', () => {
+      const prop =
+        eligibilityScreenerSchema.properties.serviceStatusAtDeath;
+      expect(prop).to.exist;
+      expect(prop.enum).to.include('activeDuty');
+      expect(prop.enum).to.include('guardOrReserve');
+    });
+  });
+
+  describe('guardReserveQualifierUiSchema', () => {
+    it('exports a uiSchema object', () => {
       expect(guardReserveQualifierUiSchema).to.be.an('object');
+    });
+
+    it('has guardReserveQualifyingCircumstance field', () => {
+      expect(
+        guardReserveQualifierUiSchema.guardReserveQualifyingCircumstance,
+      ).to.exist;
+    });
+  });
+
+  describe('guardReserveQualifierSchema', () => {
+    it('exports a schema object', () => {
       expect(guardReserveQualifierSchema).to.be.an('object');
     });
 
-    it('uiSchema has guardReserveQualifyingCircumstance field', () => {
-      expect(guardReserveQualifierUiSchema).to.have.property(
-        'guardReserveQualifyingCircumstance',
-      );
-    });
-
-    it('schema requires guardReserveQualifyingCircumstance', () => {
+    it('requires guardReserveQualifyingCircumstance', () => {
       expect(guardReserveQualifierSchema.required).to.include(
         'guardReserveQualifyingCircumstance',
       );
     });
 
-    it('schema enum includes three qualifying circumstances', () => {
-      const enumVals =
-        guardReserveQualifierSchema.properties.guardReserveQualifyingCircumstance.enum;
-      expect(enumVals).to.include('diedOnActiveDutyForTraining');
-      expect(enumVals).to.include('diedOnInactiveDutyForTraining');
-      expect(enumVals).to.include('entitledToRetiredPay');
+    it('has correct enum values', () => {
+      const prop =
+        guardReserveQualifierSchema.properties
+          .guardReserveQualifyingCircumstance;
+      expect(prop.enum).to.include('diedOnActiveDutyForTraining');
+      expect(prop.enum).to.include('diedOnInactiveDutyForTraining');
+      expect(prop.enum).to.include('entitledToRetiredPay');
     });
   });
 });

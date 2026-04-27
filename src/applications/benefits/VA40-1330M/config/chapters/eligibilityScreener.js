@@ -3,15 +3,14 @@ import {
   radioSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-// ── Eligibility Screener — Service Status ─────────────────────────────────────
-
-export const serviceStatusUiSchema = {
+export const eligibilityScreenerUiSchema = {
   serviceStatusAtDeath: radioUI({
     title: 'What was this service member\'s status at the time of death?',
     hint:
       'Your answer determines which form is used. If the service member was discharged from service before death, use VA Form 40-1330 instead.',
     labels: {
-      activeDuty: 'Active duty (Army, Navy, Air Force, Marine Corps, Space Force, Coast Guard)',
+      activeDuty:
+        'Active duty (Army, Navy, Air Force, Marine Corps, Space Force, Coast Guard)',
       guardOrReserve: 'National Guard or Reserve member',
     },
     errorMessages: {
@@ -20,7 +19,7 @@ export const serviceStatusUiSchema = {
   }),
 };
 
-export const serviceStatusSchema = {
+export const eligibilityScreenerSchema = {
   type: 'object',
   required: ['serviceStatusAtDeath'],
   properties: {
@@ -28,11 +27,10 @@ export const serviceStatusSchema = {
   },
 };
 
-// ── Eligibility Screener — Guard/Reserve Qualifier ───────────────────────────
-
 export const guardReserveQualifierUiSchema = {
   guardReserveQualifyingCircumstance: radioUI({
-    title: 'How did this National Guard or Reserve member qualify for this benefit?',
+    title:
+      'How did this National Guard or Reserve member qualify for this benefit?',
     hint:
       'Select the statement that best describes the service member\'s situation. If you\'re unsure, contact NCA or a Veterans Service Organization for help.',
     labels: {
@@ -40,11 +38,10 @@ export const guardReserveQualifierUiSchema = {
         'Died in the line of duty while on active duty for training',
       diedOnInactiveDutyForTraining:
         'Died in the line of duty while on inactive duty for training',
-      entitledToRetiredPay:
-        'Was entitled to retired pay at the time of death',
+      entitledToRetiredPay: 'Was entitled to retired pay at the time of death',
     },
     errorMessages: {
-      required: 'Please select the qualifying circumstance.',
+      required: 'Please select a qualifying circumstance.',
     },
   }),
 };

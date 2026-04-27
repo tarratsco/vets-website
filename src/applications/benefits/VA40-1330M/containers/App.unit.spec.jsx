@@ -1,10 +1,8 @@
 import React from 'react';
 import { expect } from 'chai';
 import { render } from '@testing-library/react';
-import { Provider } from 'react-redux';
-
-import formConfig from '../config/form';
 import App from './App';
+import formConfig from '../config/form';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -17,9 +15,9 @@ const createMockStore = (overrides = {}) => ({
         verified: true,
         dob: '1990-01-01',
         claims: { appeals: false },
-        ...overrides.user?.profile,
+        ...(overrides.user?.profile || {}),
       },
-      ...overrides.user,
+      ...(overrides.user || {}),
     },
     form: {
       formId: formConfig.formId,
@@ -27,7 +25,7 @@ const createMockStore = (overrides = {}) => ({
       savedStatus: '',
       loadedData: { metadata: {} },
       data: {},
-      ...overrides.form,
+      ...(overrides.form || {}),
     },
     scheduledDowntime: {
       globalDowntime: null,
@@ -44,48 +42,20 @@ const createMockStore = (overrides = {}) => ({
 
 describe('App container', () => {
   it('renders without crashing', () => {
-    const store = createMockStore();
-    const location = { pathname: '/introduction' };
-
     const { container } = render(
-      <Provider store={store}>
-        <App location={location}>
-          <div>Child content</div>
-        </App>
-      </Provider>,
+      <App location={{ pathname: '/introduction' }}>
+        <div data-testid="child-content">child</div>
+      </App>,
     );
-
     expect(container).to.exist;
   });
 
   it('renders children', () => {
-    const store = createMockStore();
-    const location = { pathname: '/introduction' };
-
-    const { getByText } = render(
-      <Provider store={store}>
-        <App location={location}>
-          <div>Test child</div>
-        </App>
-      </Provider>,
+    const { getByTestId } = render(
+      <App location={{ pathname: '/introduction' }}>
+        <div data-testid="child-content">child</div>
+      </App>,
     );
-
-    expect(getByText('Test child')).to.exist;
-  });
-
-  it('does not import or use feature toggles', () => {
-    // App.jsx should not break when no toggle is registered
-    const store = createMockStore();
-    const location = { pathname: '/introduction' };
-
-    expect(() =>
-      render(
-        <Provider store={store}>
-          <App location={location}>
-            <span />
-          </App>
-        </Provider>,
-      ),
-    ).to.not.throw();
+    expect(getByTestId('child-content')).to.exist;
   });
 });

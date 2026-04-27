@@ -1,5 +1,5 @@
 {
-  "appName": "VA Form 40-1330M - Headstone or Marker for Active Duty",
+  "appName": "Request a Government Headstone or Marker",
   "entryFile": "./app-entry.jsx",
   "entryName": "VA40-1330M-headstone-marker",
   "rootUrl": "/burials-memorials/headstone-marker-active-duty",

@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-
 import {
   cemeteryInfoUiSchema,
   cemeteryInfoSchema,
@@ -10,18 +9,27 @@ import {
 } from './burialInformation';
 
 describe('burialInformation chapter', () => {
-  describe('cemeteryInfo page', () => {
-    it('exports uiSchema and schema', () => {
+  describe('cemeteryInfoUiSchema', () => {
+    it('exports a uiSchema object', () => {
       expect(cemeteryInfoUiSchema).to.be.an('object');
+    });
+
+    it('has burialLocation with cemeteryName, cemeteryAddress, cemeteryContactName, cemeteryContactPhone', () => {
+      const loc = cemeteryInfoUiSchema.burialLocation;
+      expect(loc.cemeteryName).to.exist;
+      expect(loc.cemeteryAddress).to.exist;
+      expect(loc.cemeteryContactName).to.exist;
+      expect(loc.cemeteryContactPhone).to.exist;
+    });
+  });
+
+  describe('cemeteryInfoSchema', () => {
+    it('exports a schema object', () => {
       expect(cemeteryInfoSchema).to.be.an('object');
     });
 
-    it('schema requires burialLocation', () => {
-      expect(cemeteryInfoSchema.required).to.include('burialLocation');
-    });
-
-    it('burialLocation schema requires cemetery fields', () => {
-      const { required } = cemeteryInfoSchema.properties.burialLocation;
+    it('requires cemeteryName, cemeteryAddress, cemeteryContactName, cemeteryContactPhone', () => {
+      const required = cemeteryInfoSchema.properties.burialLocation.required;
       expect(required).to.include('cemeteryName');
       expect(required).to.include('cemeteryAddress');
       expect(required).to.include('cemeteryContactName');
@@ -29,38 +37,62 @@ describe('burialInformation chapter', () => {
     });
   });
 
-  describe('graveLocation page', () => {
-    it('exports uiSchema and schema', () => {
+  describe('graveLocationUiSchema', () => {
+    it('exports a uiSchema object', () => {
       expect(graveLocationUiSchema).to.be.an('object');
-      expect(graveLocationSchema).to.be.an('object');
     });
 
-    it('schema has graveSection, graveLot, graveNumber properties', () => {
-      const { properties } = graveLocationSchema.properties.burialLocation;
-      expect(properties).to.have.property('graveSection');
-      expect(properties).to.have.property('graveLot');
-      expect(properties).to.have.property('graveNumber');
+    it('has graveSection, graveLot, graveNumber on burialLocation', () => {
+      const loc = graveLocationUiSchema.burialLocation;
+      expect(loc.graveSection).to.exist;
+      expect(loc.graveLot).to.exist;
+      expect(loc.graveNumber).to.exist;
     });
   });
 
-  describe('existingMarker page', () => {
-    it('exports uiSchema and schema', () => {
+  describe('graveLocationSchema', () => {
+    it('exports a schema object', () => {
+      expect(graveLocationSchema).to.be.an('object');
+    });
+
+    it('has graveSection, graveLot, graveNumber properties', () => {
+      const props = graveLocationSchema.properties.burialLocation.properties;
+      expect(props.graveSection).to.exist;
+      expect(props.graveLot).to.exist;
+      expect(props.graveNumber).to.exist;
+    });
+  });
+
+  describe('existingMarkerUiSchema', () => {
+    it('exports a uiSchema object', () => {
       expect(existingMarkerUiSchema).to.be.an('object');
+    });
+
+    it('has existingMarkerPresent field on burialLocation', () => {
+      expect(
+        existingMarkerUiSchema.burialLocation.existingMarkerPresent,
+      ).to.exist;
+    });
+  });
+
+  describe('existingMarkerSchema', () => {
+    it('exports a schema object', () => {
       expect(existingMarkerSchema).to.be.an('object');
     });
 
-    it('schema requires existingMarkerPresent', () => {
-      const { required } = existingMarkerSchema.properties.burialLocation;
+    it('requires existingMarkerPresent', () => {
+      const required =
+        existingMarkerSchema.properties.burialLocation.required;
       expect(required).to.include('existingMarkerPresent');
     });
 
-    it('existingMarkerPresent enum has three values', () => {
-      const enumVals =
+    it('has correct enum values for existingMarkerPresent', () => {
+      const prop =
         existingMarkerSchema.properties.burialLocation.properties
-          .existingMarkerPresent.enum;
-      expect(enumVals).to.include('noExistingMarker');
-      expect(enumVals).to.include('privateMarkerExists');
-      expect(enumVals).to.include('governmentMarkerAlreadyPlaced');
+          .existingMarkerPresent;
+      expect(prop.enum).to.include('noExistingMarker');
+      expect(prop.enum).to.include('privateMarkerExists');
+      expect(prop.enum).to.include('governmentMarkerAlreadyPlaced');
     });
   });
 });

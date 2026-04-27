@@ -1,16 +1,16 @@
 import {
   fileInputUI,
   fileInputSchema,
+  fileInputMultipleUI,
+  fileInputMultipleSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
-
-// ── Chapter 5 Page 1 — Death Certificate ──────────────────────────────────────
 
 export const deathCertificateUiSchema = {
   documents: {
     deathCertificate: fileInputUI({
       title: 'Upload a copy of the death certificate',
       hint:
-        'Upload an official copy of the death certificate. Accepted file types: PDF, JPG, PNG. Maximum file size: 20 MB. If you have a paper certificate, you can take a clear photo with your phone.',
+        'Upload an official copy of the death certificate. Accepted file types: PDF, JPG, PNG. Maximum file size: 20MB.',
       required: true,
       errorMessages: {
         required: 'Please upload the death certificate.',
@@ -21,7 +21,6 @@ export const deathCertificateUiSchema = {
 
 export const deathCertificateSchema = {
   type: 'object',
-  required: ['documents'],
   properties: {
     documents: {
       type: 'object',
@@ -33,17 +32,16 @@ export const deathCertificateSchema = {
   },
 };
 
-// ── Chapter 5 Page 2 — DD Form 1300 (Active Duty) ─────────────────────────────
-
 export const ddForm1300UiSchema = {
   documents: {
     ddForm1300: fileInputUI({
       title: 'Upload the Report of Casualty (DD Form 1300)',
       hint:
-        'DD Form 1300 is the official report of casualty issued by the service branch. Your Casualty Assistance Officer (CAO) can provide a copy. If you do not have it yet, you can save your progress and return when you have it.',
+        'DD Form 1300 is the official report of casualty issued by the service branch. Your Casualty Assistance Officer (CAO) can provide a copy. Accepted file types: PDF, JPG, PNG. Maximum file size: 20MB.',
       required: true,
       errorMessages: {
-        required: 'Please upload DD Form 1300 (Report of Casualty).',
+        required:
+          'Please upload DD Form 1300. If you don\'t have it yet, you can save your progress and return when you have it.',
       },
     }),
   },
@@ -51,7 +49,6 @@ export const ddForm1300UiSchema = {
 
 export const ddForm1300Schema = {
   type: 'object',
-  required: ['documents'],
   properties: {
     documents: {
       type: 'object',
@@ -63,17 +60,16 @@ export const ddForm1300Schema = {
   },
 };
 
-// ── Chapter 5 Page 3 — NGB Form 22 (Guard/Reserve) ───────────────────────────
-
 export const ngbForm22UiSchema = {
   documents: {
     ngbForm22: fileInputUI({
       title: 'Upload the Guard/Reserve separation or service record',
       hint:
-        'For National Guard members, this is NGB Form 22 (Report of Separation and Record of Service). For Reserve members, an equivalent separation record is acceptable.',
+        'For National Guard members, this is NGB Form 22 (Report of Separation and Record of Service). For Reserve members, an equivalent separation record is acceptable. Accepted file types: PDF, JPG, PNG. Maximum file size: 20MB.',
       required: true,
       errorMessages: {
-        required: 'Please upload the Guard/Reserve separation or service record.',
+        required:
+          'Please upload the Guard/Reserve service record. If you don\'t have it yet, you can save your progress and return when you have it.',
       },
     }),
   },
@@ -81,7 +77,6 @@ export const ngbForm22UiSchema = {
 
 export const ngbForm22Schema = {
   type: 'object',
-  required: ['documents'],
   properties: {
     documents: {
       type: 'object',
@@ -93,18 +88,13 @@ export const ngbForm22Schema = {
   },
 };
 
-// ── Chapter 5 Page 4 — Additional Documents ───────────────────────────────────
-
 export const additionalDocumentsUiSchema = {
   documents: {
-    additionalDocuments: fileInputUI({
+    additionalDocuments: fileInputMultipleUI({
       title: 'Upload any additional supporting documents (optional)',
       hint:
-        'You may upload additional supporting documentation such as a prior service DD Form 214. Accepted file types: PDF, JPG, PNG. Maximum file size: 20 MB per file.',
+        'You may upload additional supporting documents such as a prior service DD Form 214. Accepted file types: PDF, JPG, PNG. Maximum file size: 20MB per file. Maximum 5 files.',
       required: false,
-      errorMessages: {
-        required: 'Please upload a supporting document or skip this step.',
-      },
     }),
   },
 };
@@ -115,7 +105,7 @@ export const additionalDocumentsSchema = {
     documents: {
       type: 'object',
       properties: {
-        additionalDocuments: fileInputSchema(),
+        additionalDocuments: fileInputMultipleSchema(),
       },
     },
   },

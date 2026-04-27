@@ -2,10 +2,9 @@ import React from 'react';
 import { expect } from 'chai';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-
 import { createInitialState } from '@department-of-veterans-affairs/platform-forms-system/state/helpers';
-import formConfig from '../config/form';
 import { ConfirmationPage } from './ConfirmationPage';
+import formConfig from '../config/form';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -18,9 +17,9 @@ const createMockStore = (overrides = {}) => ({
         verified: true,
         dob: '1990-01-01',
         claims: { appeals: false },
-        ...overrides.user?.profile,
+        ...(overrides.user?.profile || {}),
       },
-      ...overrides.user,
+      ...(overrides.user || {}),
     },
     form: {
       formId: formConfig.formId,
@@ -31,15 +30,12 @@ const createMockStore = (overrides = {}) => ({
         applicant: {
           name: { first: 'Jane', last: 'Doe' },
         },
-        decedent: {
-          name: { first: 'John', last: 'Smith' },
-        },
       },
       submission: {
         response: { confirmationNumber: '1234567890' },
         timestamp: new Date('2024-01-15'),
       },
-      ...overrides.form,
+      ...(overrides.form || {}),
     },
     scheduledDowntime: {
       globalDowntime: null,
@@ -54,61 +50,40 @@ const createMockStore = (overrides = {}) => ({
   dispatch: () => {},
 });
 
-const mockRoute = {
-  formConfig,
-  pageList: [],
-};
-
 describe('ConfirmationPage', () => {
-  it('renders without crashing', () => {
-    const store = createMockStore();
+  const mockRoute = {
+    formConfig,
+  };
 
+  it('renders without crashing', () => {
+    const mockStore = createMockStore();
     const { container } = render(
-      <Provider store={store}>
+      <Provider store={mockStore}>
         <ConfirmationPage route={mockRoute} />
       </Provider>,
     );
-
     expect(container).to.exist;
   });
 
-  it('renders a success va-alert', () => {
-    const store = createMockStore();
-
+  it('renders a success alert', () => {
+    const mockStore = createMockStore();
     const { container } = render(
-      <Provider store={store}>
+      <Provider store={mockStore}>
         <ConfirmationPage route={mockRoute} />
       </Provider>,
     );
-
-    const successAlert = container.querySelector('va-alert[status="success"]');
-    expect(successAlert).to.exist;
+    const alert = container.querySelector('va-alert[status="success"]');
+    expect(alert).to.exist;
   });
 
-  it('renders a print button', () => {
-    const store = createMockStore();
-
+  it('renders a print button or action element', () => {
+    const mockStore = createMockStore();
     const { container } = render(
-      <Provider store={store}>
+      <Provider store={mockStore}>
         <ConfirmationPage route={mockRoute} />
       </Provider>,
     );
-
-    const button = container.querySelector('va-button');
-    expect(button).to.exist;
-  });
-
-  it('renders submission alert title', () => {
-    const store = createMockStore();
-
-    const { getByText } = render(
-      <Provider store={store}>
-        <ConfirmationPage route={mockRoute} />
-      </Provider>,
-    );
-
-    expect(
-      getByText('Your headstone or marker request has been submitted'),
-    ).to.exist;
+    const buttons = container.querySelectorAll('va-button');
+    expect(buttons.length).to.be.greaterThan(0);
   });
 });

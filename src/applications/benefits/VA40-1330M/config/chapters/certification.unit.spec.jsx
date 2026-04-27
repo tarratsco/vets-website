@@ -1,31 +1,39 @@
 import { expect } from 'chai';
-
 import {
   certificationUiSchema,
   certificationSchema,
 } from './certification';
 
 describe('certification chapter', () => {
-  it('exports uiSchema and schema', () => {
-    expect(certificationUiSchema).to.be.an('object');
-    expect(certificationSchema).to.be.an('object');
+  describe('certificationUiSchema', () => {
+    it('exports a uiSchema object', () => {
+      expect(certificationUiSchema).to.be.an('object');
+    });
+
+    it('has certificationAttestation field', () => {
+      expect(certificationUiSchema.certificationAttestation).to.exist;
+    });
+
+    it('has a ui:title', () => {
+      expect(certificationUiSchema['ui:title']).to.be.a('string');
+    });
   });
 
-  it('schema requires certificationGroup', () => {
-    expect(certificationSchema.required).to.include('certificationGroup');
-  });
+  describe('certificationSchema', () => {
+    it('exports a schema object', () => {
+      expect(certificationSchema).to.be.an('object');
+    });
 
-  it('certificationGroup schema is a valid object', () => {
-    const { certificationGroup } = certificationSchema.properties;
-    expect(certificationGroup).to.be.an('object');
-    expect(certificationGroup.type).to.equal('object');
-  });
+    it('requires certificationAttestation', () => {
+      expect(certificationSchema.required).to.include(
+        'certificationAttestation',
+      );
+    });
 
-  it('certificationGroup uiSchema field is present', () => {
-    expect(certificationUiSchema).to.have.property('certificationGroup');
-  });
-
-  it('uiSchema has a ui:title', () => {
-    expect(certificationUiSchema['ui:title']).to.be.a('string').that.is.not.empty;
+    it('has certificationAttestation as boolean type', () => {
+      expect(
+        certificationSchema.properties.certificationAttestation.type,
+      ).to.equal('boolean');
+    });
   });
 });

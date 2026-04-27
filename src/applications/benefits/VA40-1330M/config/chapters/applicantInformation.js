@@ -2,19 +2,18 @@ import {
   radioUI,
   radioSchema,
   textUI,
-  fullNameUI,
-  fullNameSchema,
-  phoneUI,
-  phoneSchema,
+  textSchema,
   emailUI,
   emailSchema,
+  phoneUI,
+  phoneSchema,
   addressUI,
   addressSchema,
+  fullNameUI,
+  fullNameSchema,
   fileInputUI,
   fileInputSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
-
-// ── Chapter 1 Page 1 — Who Is Applying ───────────────────────────────────────
 
 export const whoIsApplyingUiSchema = {
   submitterRole: radioUI({
@@ -47,14 +46,10 @@ export const whoIsApplyingSchema = {
   },
 };
 
-// ── Chapter 1 Page 2 — Applicant Personal Info ────────────────────────────────
-
 export const applicantPersonalInfoUiSchema = {
   applicant: {
-    'ui:title': 'Your name and contact information',
-    name: {
-      ...fullNameUI(title => `Your ${title}`),
-    },
+    'ui:title': 'Your personal information',
+    name: fullNameUI(title => `Your ${title}`),
     daytimePhone: phoneUI('Daytime phone number'),
     email: emailUI(),
     address: addressUI({
@@ -65,7 +60,6 @@ export const applicantPersonalInfoUiSchema = {
 
 export const applicantPersonalInfoSchema = {
   type: 'object',
-  required: ['applicant'],
   properties: {
     applicant: {
       type: 'object',
@@ -79,8 +73,6 @@ export const applicantPersonalInfoSchema = {
     },
   },
 };
-
-// ── Chapter 1 Page 3 — Relationship to Decedent ───────────────────────────────
 
 export const relationshipToDecedentUiSchema = {
   'ui:title': 'Your relationship to the deceased service member',
@@ -98,44 +90,24 @@ export const relationshipToDecedentUiSchema = {
         required: 'Please select your relationship to the deceased service member.',
       },
     }),
-    relationshipDescription: {
-      ...textUI({
-        title: 'Please describe your relationship',
-        hint: 'Required when "Other family member" is selected.',
-      }),
-      'ui:options': {
-        expandUnder: 'relationshipToDecedent',
-        expandUnderCondition: 'otherFamilyMember',
-      },
-    },
-    organizationName: {
-      ...textUI({
-        title: 'Organization name',
-        hint: 'Name of your funeral home or cemetery organization.',
-      }),
-      'ui:options': {
-        hideIf: formData => formData.submitterRole === 'nextOfKin',
-      },
-    },
-    organizationRole: {
-      ...textUI({
-        title: 'Your title or role within the organization',
-        hint: 'For example: Funeral Director, Cemetery Manager.',
-      }),
-      'ui:options': {
-        hideIf: formData => formData.submitterRole === 'nextOfKin',
-      },
-    },
-    legalAuthorityDescription: {
-      ...textUI({
-        title: 'Describe your legal authority to submit this request',
-        hint: 'For example: Power of attorney, executor of estate.',
-      }),
-      'ui:options': {
-        hideIf: formData =>
-          formData.submitterRole !== 'personalRepresentative',
-      },
-    },
+    relationshipDescription: textUI({
+      title: 'Please describe your relationship',
+      hint: 'Required when "Other family member" is selected',
+      expandUnder: 'relationshipToDecedent',
+      expandUnderCondition: 'otherFamilyMember',
+    }),
+    organizationName: textUI({
+      title: 'Organization or funeral home name',
+      hint: 'Enter the name of your organization',
+    }),
+    organizationRole: textUI({
+      title: 'Your title or role within the organization',
+      hint: 'For example: Funeral Director, Cemetery Manager',
+    }),
+    legalAuthorityDescription: textUI({
+      title: 'Describe your legal authority to submit',
+      hint: 'For example: Power of Attorney, Court-appointed representative',
+    }),
   },
 };
 
@@ -173,15 +145,15 @@ export const relationshipToDecedentSchema = {
   },
 };
 
-// ── Chapter 1 Page 4 — Authorization Document ─────────────────────────────────
-
 export const authorizationUiSchema = {
-  'ui:title': 'Authorization to submit this claim',
-  documents: {
+  'ui:title': 'Authorization to submit',
+  'ui:description':
+    'Because you are submitting on behalf of the next of kin, you must provide documentation of your authorization.',
+  applicant: {
     authorizationDocument: fileInputUI({
       title: 'Upload your authorization document',
       hint:
-        'If you are not the next of kin, you must provide written authorization showing you have the right to submit this request. Accepted formats: PDF, JPG, PNG. Maximum file size: 20 MB.',
+        'Upload a document showing you have the right to submit this request. Accepted formats: PDF, JPG, PNG. Maximum file size: 20MB.',
       required: true,
       errorMessages: {
         required: 'Please upload your authorization document.',
@@ -193,7 +165,7 @@ export const authorizationUiSchema = {
 export const authorizationSchema = {
   type: 'object',
   properties: {
-    documents: {
+    applicant: {
       type: 'object',
       properties: {
         authorizationDocument: fileInputSchema(),

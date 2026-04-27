@@ -1,13 +1,13 @@
-import environment from 'platform/utilities/environment';
 import footerContent from 'platform/forms/components/FormFooter';
+import environment from 'platform/utilities/environment';
 
 import manifest from '../manifest.json';
 import IntroductionPage from '../containers/IntroductionPage';
 import ConfirmationPage from '../containers/ConfirmationPage';
 
 import {
-  serviceStatusUiSchema,
-  serviceStatusSchema,
+  eligibilityScreenerUiSchema,
+  eligibilityScreenerSchema,
   guardReserveQualifierUiSchema,
   guardReserveQualifierSchema,
 } from './chapters/eligibilityScreener';
@@ -71,7 +71,7 @@ const formConfig = {
   rootUrl: manifest.rootUrl,
   urlPrefix: '/',
   submitUrl: `${environment.API_URL}/v0/burial_forms/headstone_marker`,
-  trackingPrefix: 'va40-1330m-headstone-marker-',
+  trackingPrefix: 'va40-1330m-',
   introduction: IntroductionPage,
   confirmation: ConfirmationPage,
   footerContent,
@@ -79,36 +79,31 @@ const formConfig = {
   saveInProgress: {
     messages: {
       inProgress:
-        'Your headstone or marker request (VA40-1330M) is in progress.',
+        'Your headstone or marker request (VA Form 40-1330M) is in progress.',
       expired:
-        'Your saved headstone or marker request (VA40-1330M) has expired. If you want to submit your request, please start a new request.',
+        'Your saved headstone or marker request (VA Form 40-1330M) has expired. Please start a new request.',
       saved: 'Your headstone or marker request has been saved.',
     },
   },
   version: 0,
   prefillEnabled: true,
   savedFormMessages: {
-    notFound:
-      'Please start over to submit your headstone or marker request.',
+    notFound: 'Please start over to submit your headstone or marker request.',
     noAuth:
       'Please sign in again to continue your headstone or marker request.',
   },
   title: 'Request a Government Headstone or Marker',
   subTitle: 'VA Form 40-1330M',
   defaultDefinitions: {},
-  dev: {
-    showNavLinks: true,
-    collapsibleNavLinks: true,
-  },
   chapters: {
-    eligibilityScreenerChapter: {
+    eligibilityChapter: {
       title: 'Eligibility',
       pages: {
-        serviceStatus: {
+        eligibilityScreener: {
           path: 'eligibility-screener',
           title: 'Service status at time of death',
-          uiSchema: serviceStatusUiSchema,
-          schema: serviceStatusSchema,
+          uiSchema: eligibilityScreenerUiSchema,
+          schema: eligibilityScreenerSchema,
         },
         guardReserveQualifier: {
           path: 'eligibility-screener/guard-reserve-qualifier',
@@ -120,7 +115,6 @@ const formConfig = {
         },
       },
     },
-
     applicantInformationChapter: {
       title: 'About the applicant',
       pages: {
@@ -144,14 +138,13 @@ const formConfig = {
         },
         authorization: {
           path: 'applicant-information/authorization',
-          title: 'Authorization to submit this claim',
+          title: 'Authorization to submit',
           depends: formData => formData.submitterRole !== 'nextOfKin',
           uiSchema: authorizationUiSchema,
           schema: authorizationSchema,
         },
       },
     },
-
     deceasedInformationChapter: {
       title: 'About the deceased service member',
       pages: {
@@ -175,7 +168,6 @@ const formConfig = {
         },
       },
     },
-
     burialInformationChapter: {
       title: 'Burial information',
       pages: {
@@ -199,7 +191,6 @@ const formConfig = {
         },
       },
     },
-
     markerSelectionChapter: {
       title: 'Headstone or marker selection',
       pages: {
@@ -223,7 +214,6 @@ const formConfig = {
         },
       },
     },
-
     supportingDocumentsChapter: {
       title: 'Supporting documents',
       pages: {
@@ -256,13 +246,12 @@ const formConfig = {
         },
       },
     },
-
     certificationChapter: {
       title: 'Certification',
       pages: {
         certify: {
           path: 'certify',
-          title: 'Certify and review',
+          title: 'Certify your information',
           uiSchema: certificationUiSchema,
           schema: certificationSchema,
         },
