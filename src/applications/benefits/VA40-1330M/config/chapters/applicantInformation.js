@@ -1,8 +1,10 @@
 import {
-  fullNameUI,
-  fullNameSchema,
   radioUI,
   radioSchema,
+  fullNameUI,
+  fullNameSchema,
+  textUI,
+  textSchema,
   emailUI,
   emailSchema,
   phoneUI,
@@ -11,7 +13,6 @@ import {
   addressSchema,
   fileInputUI,
   fileInputSchema,
-  textUI,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 // ── Who Is Applying ──────────────────────────────────────────────────────────
@@ -29,7 +30,7 @@ export const whoIsApplyingUiSchema = {
         'I am a personal representative or attorney-in-fact',
     },
     errorMessages: {
-      required: 'Please select your role.',
+      required: 'Please select your role',
     },
   }),
 };
@@ -47,19 +48,32 @@ export const whoIsApplyingSchema = {
   },
 };
 
-// ── Applicant Personal Info ──────────────────────────────────────────────────
+// ── Applicant Personal Info ───────────────────────────────────────────────────
 
 export const applicantPersonalInfoUiSchema = {
   applicant: {
-    name: fullNameUI(title => `Your ${title}`),
+    'ui:title': 'Your name and contact information',
+    name: {
+      ...fullNameUI(title => `Your ${title}`),
+    },
     daytimePhone: phoneUI({
       title: 'Daytime phone number',
-      hint:
-        'We may use this to follow up about your request. Enter a 10-digit U.S. phone number.',
+      hint: 'We may use this to follow up about your request. Enter a 10-digit U.S. phone number.',
     }),
-    email: emailUI(),
+    email: emailUI({
+      title: 'Email address',
+      hint: "We'll send a confirmation to this email when we receive your request.",
+    }),
     address: addressUI({
-      omit: ['isMilitary'],
+      labels: {
+        street: 'Street address',
+        street2: 'Apartment or unit number',
+        city: 'City',
+        state: 'State',
+        postalCode: 'ZIP code',
+      },
+      hint:
+        'Enter the address where NCA should mail correspondence about this request.',
     }),
   },
 };
@@ -81,7 +95,7 @@ export const applicantPersonalInfoSchema = {
   },
 };
 
-// ── Relationship To Decedent ─────────────────────────────────────────────────
+// ── Relationship To Decedent ──────────────────────────────────────────────────
 
 export const relationshipToDecedentUiSchema = {
   applicant: {
@@ -95,29 +109,25 @@ export const relationshipToDecedentUiSchema = {
         otherFamilyMember: 'Other family member',
       },
       errorMessages: {
-        required: 'Please select your relationship.',
+        required: 'Please select your relationship',
       },
     }),
     relationshipDescription: textUI({
       title: 'Please describe your relationship',
-      hint: 'Since you selected "Other family member," please describe your relationship.',
-      'ui:options': {
-        expandUnder: 'relationshipToDecedent',
-        expandUnderCondition: 'otherFamilyMember',
-      },
+      hint: 'Required when you select "Other family member"',
+      expandUnder: 'relationshipToDecedent',
+      expandUnderCondition: 'otherFamilyMember',
     }),
     organizationName: textUI({
-      title: 'Organization name',
-      hint: 'Enter the name of the funeral home or cemetery organization.',
+      title: 'Funeral home or organization name',
+      hint: 'Enter the full name of your organization',
     }),
     organizationRole: textUI({
-      title: 'Your title or role',
-      hint: 'Enter your title or role within the organization.',
+      title: 'Your title or role within the organization',
     }),
     legalAuthorityDescription: textUI({
-      title: 'Describe your legal authority',
-      hint:
-        'Describe the legal authority that allows you to submit this request on behalf of the next of kin.',
+      title: 'Describe your legal authority to submit this request',
+      hint: 'For example: Power of attorney, court-appointed executor',
     }),
   },
 };
@@ -156,17 +166,21 @@ export const relationshipToDecedentSchema = {
   },
 };
 
-// ── Authorization Document Upload ────────────────────────────────────────────
+// ── Authorization ─────────────────────────────────────────────────────────────
 
 export const authorizationUiSchema = {
+  'view:authorizationInfo': {
+    'ui:description':
+      'Because you are submitting on behalf of the next of kin, you must provide documentation of your authorization.',
+  },
   applicant: {
     authorizationDocument: fileInputUI({
       title: 'Upload your authorization document',
       hint:
-        'If you are not the next of kin, you must provide written authorization showing you have the right to submit this request. Accepted formats: PDF, JPG, PNG. Maximum file size: 20 MB.',
+        'Accepted formats: PDF, JPG, PNG. Maximum file size: 20 MB. Provide written authorization showing you have the right to submit this request.',
       required: true,
       errorMessages: {
-        required: 'Please upload your authorization document.',
+        required: 'Please upload your authorization document',
       },
     }),
   },
@@ -175,8 +189,13 @@ export const authorizationUiSchema = {
 export const authorizationSchema = {
   type: 'object',
   properties: {
+    'view:authorizationInfo': {
+      type: 'object',
+      properties: {},
+    },
     applicant: {
       type: 'object',
+      required: ['authorizationDocument'],
       properties: {
         authorizationDocument: fileInputSchema(),
       },

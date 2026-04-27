@@ -1,9 +1,9 @@
 {
-  "appName": "VA Form 40-1330M - Claim for Standard Government Headstone or Marker",
+  "appName": "Request a Government Headstone or Marker",
   "entryFile": "./app-entry.jsx",
-  "entryName": "VA40-1330M-headstone-marker",
+  "entryName": "va40-1330m-headstone-marker",
   "rootUrl": "/burials-memorials/headstone-marker-active-duty",
-  "productId": "b3c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e",
+  "productId": "b2c4e8f1-3a7d-4e9b-8c2f-1d5a6e0f4b3c",
   "template": {
     "vagovprod": false,
     "layout": "page-react.html",

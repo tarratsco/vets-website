@@ -1,59 +1,55 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export const DocumentsIntroPage = ({ formData, goForward }) => {
+const DocumentsIntroPage = ({ formData, goForward }) => {
   const isActiveDuty = formData?.serviceStatusAtDeath === 'activeDuty';
-  const isGuardReserve = formData?.serviceStatusAtDeath === 'guardOrReserve';
 
   return (
     <div>
-      <h2>Documents you need to upload</h2>
+      <h3>Documents you will need to upload</h3>
       <p>
-        Based on your answers, you will need to upload the following documents.
-        You can save your progress and return later if you don't have them
-        ready.
+        Based on your answers, you will need to upload the following documents
+        to complete your request.
       </p>
 
-      {isActiveDuty && (
-        <va-alert status="info" uswds>
-          <h3 slot="headline">Required documents for active duty</h3>
+      {isActiveDuty ? (
+        <div>
+          <h4>Required documents for Active Duty</h4>
           <ul>
             <li>Official death certificate</li>
-            <li>
-              DD Form 1300 (Report of Casualty) — available from your Casualty
-              Assistance Officer
-            </li>
+            <li>DD Form 1300 (Report of Casualty)</li>
           </ul>
-        </va-alert>
-      )}
-
-      {isGuardReserve && (
-        <va-alert status="info" uswds>
-          <h3 slot="headline">Required documents for National Guard or Reserve</h3>
+        </div>
+      ) : (
+        <div>
+          <h4>
+            {`Required documents for National Guard or Reserve`}
+          </h4>
           <ul>
             <li>Official death certificate</li>
-            <li>
-              NGB Form 22 or equivalent Guard/Reserve service record — available
-              from your state Adjutant General office or Reserve unit
-            </li>
+            <li>NGB Form 22 or equivalent Guard/Reserve service record</li>
           </ul>
-        </va-alert>
+        </div>
       )}
 
-      <va-accordion uswds>
-        <va-accordion-item header="What if I don't have these documents yet?" uswds>
-          <p>
-            You can save your progress and return when you have the documents
-            ready. Your information will be saved for 60 days.
-          </p>
-        </va-accordion-item>
-        <va-accordion-item header="What file formats are accepted?" uswds>
-          <p>
-            We accept PDF, JPG, and PNG files up to 20 MB each. If you have a
-            paper document, you can take a clear photo with your phone.
-          </p>
-        </va-accordion-item>
-      </va-accordion>
+      <va-additional-info
+        trigger="What if I don't have these documents yet?"
+        uswds
+      >
+        <p>
+          You can save your progress and return to this form when you have the
+          required documents. Use the Save and finish later option on any page
+          to save your work.
+        </p>
+      </va-additional-info>
+
+      <va-alert status="info" visible>
+        <p slot="headline">You can save and return later</p>
+        <p>
+          If you do not have all your documents ready, you can save your
+          progress and return when you have them.
+        </p>
+      </va-alert>
 
       <div className="vads-u-margin-top--4">
         <va-button

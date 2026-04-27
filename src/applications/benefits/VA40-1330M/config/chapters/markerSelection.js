@@ -1,13 +1,14 @@
 import {
-  textUI,
-  textareaUI,
   radioUI,
   radioSchema,
   selectUI,
   selectSchema,
+  textUI,
+  textareaUI,
+  textareaSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-// ── Marker Type Selection ────────────────────────────────────────────────────
+// ── Marker Type ───────────────────────────────────────────────────────────────
 
 const MARKER_TYPE_LABELS = {
   uprightMarble: 'Upright marble headstone',
@@ -15,16 +16,6 @@ const MARKER_TYPE_LABELS = {
   flatGranite: 'Flat granite grave marker',
   flatMarble: 'Flat marble grave marker',
   flatBronze: 'Flat bronze grave marker',
-};
-
-const MARKER_TYPE_DESCRIPTIONS = {
-  uprightMarble:
-    'Traditional upright white marble, approximately 42 inches tall.',
-  uprightGranite:
-    'Traditional upright gray granite, approximately 42 inches tall.',
-  flatGranite: 'Flat gray granite marker, set flush with the ground.',
-  flatMarble: 'Flat white marble marker, set flush with the ground.',
-  flatBronze: 'Flat bronze marker, set flush with the ground or on a base.',
 };
 
 const MARKER_TYPE_KEYS = Object.keys(MARKER_TYPE_LABELS);
@@ -36,9 +27,17 @@ export const markerTypeUiSchema = {
       hint:
         'The government provides several types of headstones and markers at no charge. All types include standard inscription. Availability may vary.',
       labels: MARKER_TYPE_LABELS,
-      descriptions: MARKER_TYPE_DESCRIPTIONS,
+      descriptions: {
+        uprightMarble:
+          'Traditional upright white marble, approximately 42 inches tall',
+        uprightGranite:
+          'Traditional upright gray granite, approximately 42 inches tall',
+        flatGranite: 'Flat gray granite marker for ground-level installation',
+        flatMarble: 'Flat white marble marker for ground-level installation',
+        flatBronze: 'Flat bronze marker, may be mounted on granite base',
+      },
       errorMessages: {
-        required: 'Please select a marker type.',
+        required: 'Please select a marker type',
       },
     }),
   },
@@ -58,20 +57,21 @@ export const markerTypeSchema = {
   },
 };
 
-// ── Emblem of Belief ─────────────────────────────────────────────────────────
+// ── Emblem of Belief ──────────────────────────────────────────────────────────
 
-// NOTE: This list is a placeholder. The authoritative NCA-approved emblem list
-// must be obtained from NCA and used to populate this constant before launch.
 const EMBLEM_LABELS = {
   '': 'No emblem of belief',
-  latinCross: 'Latin Cross',
-  starOfDavid: 'Star of David',
-  crescentAndStar: 'Crescent and Star',
-  buddhistWheel: 'Buddhist Wheel',
-  nativeAmericanChurch: 'Native American Church',
-  mormOn: 'Angel Moroni (Church of Jesus Christ of Latter-day Saints)',
-  orthodox: 'Greek Cross (Eastern Orthodox)',
+  latinCross: 'Latin Cross (Christian)',
+  starOfDavid: 'Star of David (Jewish)',
+  crescentAndStar: 'Crescent and Star (Islamic)',
+  buddhaWheel: "Wheel of Righteousness (Buddhist)",
+  hinduOm: 'Om (Hindu)',
   atheist: 'Atomic Whirl (Atheist)',
+  pentacle: 'Pentacle (Wiccan)',
+  nativeAmerican: 'Medicine Wheel (Native American)',
+  mormonAngel: 'Angel Moroni (Latter-day Saints)',
+  presbyterian: 'Presbyterian Cross',
+  lutheran: 'Luther Rose (Lutheran)',
 };
 
 const EMBLEM_KEYS = Object.keys(EMBLEM_LABELS);
@@ -81,7 +81,7 @@ export const emblemOfBeliefUiSchema = {
     emblemOfBelief: selectUI({
       title: 'Emblem of belief (optional)',
       hint:
-        'You may request one emblem of belief to be inscribed on the headstone or marker. Only NCA-approved emblems are available. If you do not want an emblem, select "No emblem of belief."',
+        "You may request one emblem of belief to be inscribed on the headstone or marker. Only NCA-approved emblems are available. If you do not want an emblem, select 'No emblem of belief.'",
       labels: EMBLEM_LABELS,
     }),
   },
@@ -99,17 +99,7 @@ export const emblemOfBeliefSchema = {
   },
 };
 
-// ── Inscription ──────────────────────────────────────────────────────────────
-
-function validateInscriptionCharacters(errors, value) {
-  if (!value) return;
-  const pattern = /^[A-Za-z0-9 \-.,'"]*$/;
-  if (!pattern.test(value)) {
-    errors.addError(
-      'Your inscription contains characters that are not allowed. Please use only letters, numbers, spaces, hyphens, periods, apostrophes, and commas.',
-    );
-  }
-}
+// ── Inscription ───────────────────────────────────────────────────────────────
 
 export const inscriptionUiSchema = {
   markerRequest: {
@@ -118,7 +108,6 @@ export const inscriptionUiSchema = {
       hint:
         'You may add a brief personal message. Maximum 60 characters. Only letters, numbers, spaces, hyphens, periods, apostrophes, and commas are permitted. NCA will review your inscription for compliance with VA inscription standards.',
       charcount: true,
-      validations: [validateInscriptionCharacters],
     }),
   },
 };

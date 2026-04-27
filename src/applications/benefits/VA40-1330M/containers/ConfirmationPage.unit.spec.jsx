@@ -3,7 +3,6 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createInitialState } from '@department-of-veterans-affairs/platform-forms-system/state/helpers';
-
 import formConfig from '../config/form';
 import { ConfirmationPage } from './ConfirmationPage';
 
@@ -18,26 +17,22 @@ const createMockStore = (overrides = {}) => ({
         verified: true,
         dob: '1990-01-01',
         claims: { appeals: false },
-        ...overrides.user?.profile,
+        ...((overrides.user || {}).profile || {}),
       },
-      ...overrides.user,
+      ...(overrides.user || {}),
     },
     form: {
+      ...createInitialState(formConfig),
       formId: formConfig.formId,
       loadedStatus: 'success',
       savedStatus: '',
       loadedData: { metadata: {} },
-      data: {
-        applicant: {
-          name: { first: 'Jane', last: 'Doe' },
-        },
-      },
+      data: {},
       submission: {
         response: { confirmationNumber: '1234567890' },
         timestamp: new Date('2024-01-15'),
       },
-      ...createInitialState(formConfig),
-      ...overrides.form,
+      ...(overrides.form || {}),
     },
     scheduledDowntime: {
       globalDowntime: null,
@@ -62,7 +57,7 @@ describe('ConfirmationPage', () => {
         <ConfirmationPage route={mockRoute} />
       </Provider>,
     );
-    expect(container).to.exist;
+    expect(container).to.not.be.null;
   });
 
   it('renders a success alert', () => {
@@ -72,7 +67,8 @@ describe('ConfirmationPage', () => {
         <ConfirmationPage route={mockRoute} />
       </Provider>,
     );
-    expect(container.querySelector('va-alert[status="success"]')).to.exist;
+    const alert = container.querySelector('va-alert[status="success"]');
+    expect(alert).to.not.be.null;
   });
 
   it('renders a print button', () => {
@@ -82,6 +78,7 @@ describe('ConfirmationPage', () => {
         <ConfirmationPage route={mockRoute} />
       </Provider>,
     );
-    expect(container.querySelector('va-button')).to.exist;
+    const button = container.querySelector('va-button');
+    expect(button).to.not.be.null;
   });
 });

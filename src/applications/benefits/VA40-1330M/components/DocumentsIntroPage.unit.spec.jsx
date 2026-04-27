@@ -1,28 +1,29 @@
 import { expect } from 'chai';
 import React from 'react';
 import { render } from '@testing-library/react';
-
-import { DocumentsIntroPage } from './DocumentsIntroPage';
+import DocumentsIntroPage from './DocumentsIntroPage';
 
 describe('DocumentsIntroPage', () => {
   it('renders without crashing', () => {
     const { container } = render(
       <DocumentsIntroPage formData={{}} goForward={() => {}} />,
     );
-    expect(container).to.exist;
+    expect(container).to.not.be.null;
   });
 
-  it('renders active duty document list when serviceStatusAtDeath is activeDuty', () => {
+  it('renders active duty documents when serviceStatusAtDeath is activeDuty', () => {
     const { getByText } = render(
       <DocumentsIntroPage
         formData={{ serviceStatusAtDeath: 'activeDuty' }}
         goForward={() => {}}
       />,
     );
-    expect(getByText('Required documents for active duty')).to.exist;
+    expect(
+      getByText('Required documents for Active Duty'),
+    ).to.exist;
   });
 
-  it('renders guard/reserve document list when serviceStatusAtDeath is guardOrReserve', () => {
+  it('renders Guard/Reserve documents when serviceStatusAtDeath is guardOrReserve', () => {
     const { getByText } = render(
       <DocumentsIntroPage
         formData={{ serviceStatusAtDeath: 'guardOrReserve' }}
@@ -34,17 +35,11 @@ describe('DocumentsIntroPage', () => {
     ).to.exist;
   });
 
-  it('renders continue button', () => {
+  it('renders a Continue button', () => {
     const { container } = render(
       <DocumentsIntroPage formData={{}} goForward={() => {}} />,
     );
-    expect(container.querySelector('va-button')).to.exist;
-  });
-
-  it('renders accordions for help content', () => {
-    const { container } = render(
-      <DocumentsIntroPage formData={{}} goForward={() => {}} />,
-    );
-    expect(container.querySelector('va-accordion')).to.exist;
+    const button = container.querySelector('va-button');
+    expect(button).to.not.be.null;
   });
 });

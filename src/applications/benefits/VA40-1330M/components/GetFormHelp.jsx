@@ -4,22 +4,24 @@ export const GetFormHelp = () => (
   <div className="help-footer-box">
     <h2 className="help-heading">Need help?</h2>
     <p>
-      For help with this form, contact the National Cemetery Administration
-      (NCA):
+      If you have questions about this form or need help, contact the National
+      Cemetery Administration (NCA).
     </p>
-    <ul>
-      <li>
-        <strong>Phone:</strong> Call NCA at{' '}
-        <va-telephone contact="18005351117" uswds /> (TTY:{' '}
-        <va-telephone contact="18008294833" uswds />)
-      </li>
-      <li>
-        <strong>Online:</strong>{' '}
-        <a href="https://www.va.gov/burials-memorials/memorial-items/headstones-markers-medallions/">
-          Learn more about headstones and markers
-        </a>
-      </li>
-    </ul>
+    <p>
+      <strong>By phone:</strong>
+      <br />
+      <va-telephone contact="8005351117" />
+      <br />
+      Monday through Friday, 8:00 a.m. to 5:00 p.m. ET
+    </p>
+    <p>
+      <strong>Online:</strong>
+      <br />
+      <va-link
+        href="https://www.va.gov/burials-memorials/"
+        text="VA Burials and Memorials"
+      />
+    </p>
   </div>
 );
 

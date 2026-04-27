@@ -6,7 +6,7 @@ import { ConfirmationView } from 'platform/forms-system/src/js/components/Confir
 
 export const ConfirmationPage = ({ route }) => {
   const form = useSelector(state => state.form || {});
-  const submission = form?.submission || {};
+  const { submission } = form;
   const submitDate = submission?.timestamp || '';
   const confirmationNumber =
     submission?.response?.confirmationNumber ||
@@ -15,11 +15,12 @@ export const ConfirmationPage = ({ route }) => {
 
   const applicantName = form?.data?.applicant?.name || {};
 
-  const submissionAlertContent = (
+  const alertContent = (
     <p>
       Thank you for submitting your request for a government headstone or
       marker. We will review your request and contact you if we need additional
-      information. Processing times vary; NCA will contact you with an update.
+      information. NCA will process your request and notify you when it has been
+      approved.
     </p>
   );
 
@@ -33,17 +34,15 @@ export const ConfirmationPage = ({ route }) => {
     >
       <ConfirmationView.SubmissionAlert
         title="Your headstone or marker request has been submitted"
-        content={submissionAlertContent}
+        content={alertContent}
       />
-      <div data-dd-privacy="mask" data-dd-action-name="confirmation summary">
-        <ConfirmationView.ChapterSectionCollection />
-      </div>
+      <ConfirmationView.ChapterSectionCollection />
       <ConfirmationView.PrintThisPage />
       <ConfirmationView.WhatsNextProcessList
-        item1Header="We'll review your request"
-        item1Content="NCA will review your request. If we need more information, we'll contact you using the contact information you provided."
-        item2Header="Your headstone or marker will be fabricated and delivered"
-        item2Content="After NCA approves your request, it will be sent to a fabrication contractor. Delivery to the cemetery typically takes additional weeks. NCA will notify the cemetery when delivery is expected."
+        item1Header="NCA will review your request"
+        item1Content="The National Cemetery Administration will review your request. If they need more information, they will contact you using the information you provided."
+        item2Header="Your headstone or marker will be fabricated"
+        item2Content="After NCA approves your request, it will be sent to a fabrication contractor. Delivery to the cemetery typically takes several weeks after approval."
       />
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />

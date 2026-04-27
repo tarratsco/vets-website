@@ -1,15 +1,15 @@
 import footerContent from 'platform/forms/components/FormFooter';
 import environment from 'platform/utilities/environment';
-
 import manifest from '../manifest.json';
+
 import IntroductionPage from '../containers/IntroductionPage';
 import ConfirmationPage from '../containers/ConfirmationPage';
 import GetFormHelp from '../components/GetFormHelp';
 import DocumentsIntroPage from '../components/DocumentsIntroPage';
 
 import {
-  serviceStatusUiSchema,
-  serviceStatusSchema,
+  serviceStatusAtDeathUiSchema,
+  serviceStatusAtDeathSchema,
   guardReserveQualifierUiSchema,
   guardReserveQualifierSchema,
 } from './chapters/eligibilityScreener';
@@ -64,8 +64,8 @@ import {
 } from './chapters/supportingDocuments';
 
 import {
-  certificationUiSchema,
-  certificationSchema,
+  certifyUiSchema,
+  certifySchema,
 } from './chapters/certificationChapter';
 
 /** @type {FormConfig} */
@@ -73,22 +73,18 @@ const formConfig = {
   rootUrl: manifest.rootUrl,
   urlPrefix: '/',
   submitUrl: `${environment.API_URL}/v0/burial_forms/headstone_marker`,
-  trackingPrefix: 'va40-1330m-',
+  trackingPrefix: 'va40-1330m-headstone-marker-',
   introduction: IntroductionPage,
   confirmation: ConfirmationPage,
   footerContent,
   getHelp: GetFormHelp,
   formId: 'VA40-1330M',
-  dev: {
-    showNavLinks: true,
-    collapsibleNavLinks: true,
-  },
   saveInProgress: {
     messages: {
       inProgress:
-        'Your headstone or marker request (VA Form 40-1330M) is in progress.',
+        'Your headstone or marker request (VA40-1330M) is in progress.',
       expired:
-        'Your saved headstone or marker request (VA Form 40-1330M) has expired. If you want to submit your request, please start a new request.',
+        'Your saved headstone or marker request (VA40-1330M) has expired. If you want to submit your request, please start a new request.',
       saved: 'Your headstone or marker request has been saved.',
     },
   },
@@ -96,27 +92,32 @@ const formConfig = {
   prefillEnabled: true,
   savedFormMessages: {
     notFound:
-      'Please start over to submit your headstone or marker request.',
+      'Please start over to request a government headstone or marker.',
     noAuth:
       'Please sign in again to continue your headstone or marker request.',
   },
   title: 'Request a Government Headstone or Marker',
   subTitle: 'VA Form 40-1330M',
   defaultDefinitions: {},
+  dev: {
+    showNavLinks: true,
+    collapsibleNavLinks: true,
+  },
   chapters: {
-    eligibilityScreenerChapter: {
+    eligibilityChapter: {
       title: 'Eligibility',
       pages: {
         serviceStatus: {
           path: 'eligibility-screener',
           title: 'Service status at time of death',
-          uiSchema: serviceStatusUiSchema,
-          schema: serviceStatusSchema,
+          uiSchema: serviceStatusAtDeathUiSchema,
+          schema: serviceStatusAtDeathSchema,
         },
         guardReserveQualifier: {
           path: 'eligibility-screener/guard-reserve-qualifier',
           title: 'Guard/Reserve qualifying circumstance',
-          depends: formData => formData.serviceStatusAtDeath === 'guardOrReserve',
+          depends: formData =>
+            formData.serviceStatusAtDeath === 'guardOrReserve',
           uiSchema: guardReserveQualifierUiSchema,
           schema: guardReserveQualifierSchema,
         },
@@ -252,7 +253,7 @@ const formConfig = {
         },
         ngbForm22: {
           path: 'supporting-documents/ngb-form-22',
-          title: 'Guard/Reserve service record',
+          title: 'Guard/Reserve service record (NGB Form 22)',
           depends: formData =>
             formData.serviceStatusAtDeath === 'guardOrReserve',
           uiSchema: ngbForm22UiSchema,
@@ -272,9 +273,9 @@ const formConfig = {
       pages: {
         certify: {
           path: 'certify',
-          title: 'Certify your information',
-          uiSchema: certificationUiSchema,
-          schema: certificationSchema,
+          title: 'Certify and review',
+          uiSchema: certifyUiSchema,
+          schema: certifySchema,
         },
       },
     },

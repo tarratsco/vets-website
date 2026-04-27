@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import React from 'react';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-
 import formConfig from '../config/form';
 import App from './App';
 
@@ -17,9 +16,9 @@ const createMockStore = (overrides = {}) => ({
         verified: true,
         dob: '1990-01-01',
         claims: { appeals: false },
-        ...overrides.user?.profile,
+        ...((overrides.user || {}).profile || {}),
       },
-      ...overrides.user,
+      ...(overrides.user || {}),
     },
     form: {
       formId: formConfig.formId,
@@ -27,7 +26,7 @@ const createMockStore = (overrides = {}) => ({
       savedStatus: '',
       loadedData: { metadata: {} },
       data: {},
-      ...overrides.form,
+      ...(overrides.form || {}),
     },
     scheduledDowntime: {
       globalDowntime: null,
@@ -35,6 +34,7 @@ const createMockStore = (overrides = {}) => ({
       isPending: false,
       serviceMap: { get() {} },
       dismissedDowntimeWarnings: [],
+      ...(overrides.scheduledDowntime || {}),
     },
     ...overrides,
   }),
@@ -45,21 +45,23 @@ const createMockStore = (overrides = {}) => ({
 describe('App container', () => {
   it('renders without crashing', () => {
     const store = createMockStore();
+    const location = { pathname: '/introduction' };
     const { container } = render(
       <Provider store={store}>
-        <App location={{ pathname: '/introduction' }}>
+        <App location={location}>
           <div>child content</div>
         </App>
       </Provider>,
     );
-    expect(container).to.exist;
+    expect(container).to.not.be.null;
   });
 
   it('renders children', () => {
     const store = createMockStore();
+    const location = { pathname: '/introduction' };
     const { getByText } = render(
       <Provider store={store}>
-        <App location={{ pathname: '/introduction' }}>
+        <App location={location}>
           <div>test child</div>
         </App>
       </Provider>,

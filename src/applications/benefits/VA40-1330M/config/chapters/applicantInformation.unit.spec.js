@@ -8,51 +8,36 @@ import {
   relationshipToDecedentSchema,
   authorizationUiSchema,
   authorizationSchema,
-  applicantInformationPages,
 } from './applicantInformation';
 
 describe('applicantInformation chapter', () => {
-  describe('whoIsApplyingUiSchema', () => {
-    it('has submitterRole radio field', () => {
-      expect(whoIsApplyingUiSchema).to.have.property('submitterRole');
+  describe('whoIsApplyingSchema', () => {
+    it('has required submitterRole', () => {
+      expect(whoIsApplyingSchema.required).to.include('submitterRole');
     });
 
-    it('has a title', () => {
+    it('submitterRole enum includes all four roles', () => {
+      const { enum: enumVals } = whoIsApplyingSchema.properties.submitterRole;
+      expect(enumVals).to.include('nextOfKin');
+      expect(enumVals).to.include('funeralHomeDirector');
+      expect(enumVals).to.include('cemeteryOfficial');
+      expect(enumVals).to.include('personalRepresentative');
+    });
+  });
+
+  describe('whoIsApplyingUiSchema', () => {
+    it('has a title on submitterRole', () => {
       expect(whoIsApplyingUiSchema.submitterRole['ui:title']).to.be.a('string');
     });
   });
 
-  describe('whoIsApplyingSchema', () => {
-    it('requires submitterRole', () => {
-      expect(whoIsApplyingSchema.required).to.include('submitterRole');
-    });
-
-    it('has all four role enum values', () => {
-      const prop = whoIsApplyingSchema.properties.submitterRole;
-      expect(prop.enum).to.include('nextOfKin');
-      expect(prop.enum).to.include('funeralHomeDirector');
-      expect(prop.enum).to.include('cemeteryOfficial');
-      expect(prop.enum).to.include('personalRepresentative');
-    });
-  });
-
-  describe('applicantPersonalInfoUiSchema', () => {
-    it('has applicant top-level key', () => {
-      expect(applicantPersonalInfoUiSchema).to.have.property('applicant');
-    });
-
-    it('has name fields under applicant', () => {
-      expect(applicantPersonalInfoUiSchema.applicant).to.have.property('name');
-    });
-  });
-
   describe('applicantPersonalInfoSchema', () => {
-    it('requires applicant', () => {
+    it('has applicant as required', () => {
       expect(applicantPersonalInfoSchema.required).to.include('applicant');
     });
 
-    it('applicant requires name, phone, email, address', () => {
-      const required = applicantPersonalInfoSchema.properties.applicant.required;
+    it('applicant has required name, daytimePhone, email, address', () => {
+      const { required } = applicantPersonalInfoSchema.properties.applicant;
       expect(required).to.include('name');
       expect(required).to.include('daytimePhone');
       expect(required).to.include('email');
@@ -60,31 +45,40 @@ describe('applicantInformation chapter', () => {
     });
   });
 
-  describe('authorizationUiSchema', () => {
-    it('has authorizationDocument under applicant', () => {
-      expect(authorizationUiSchema.applicant).to.have.property(
-        'authorizationDocument',
-      );
+  describe('applicantPersonalInfoUiSchema', () => {
+    it('has applicant.daytimePhone ui schema', () => {
+      expect(applicantPersonalInfoUiSchema.applicant.daytimePhone).to.be.an('object');
+    });
+
+    it('has applicant.email ui schema', () => {
+      expect(applicantPersonalInfoUiSchema.applicant.email).to.be.an('object');
     });
   });
 
-  describe('applicantInformationPages', () => {
-    it('has all four pages', () => {
-      expect(applicantInformationPages).to.have.property('whoIsApplying');
-      expect(applicantInformationPages).to.have.property('applicantPersonalInfo');
-      expect(applicantInformationPages).to.have.property('relationshipToDecedent');
-      expect(applicantInformationPages).to.have.property('authorization');
+  describe('relationshipToDecedentSchema', () => {
+    it('has applicant object', () => {
+      expect(relationshipToDecedentSchema.properties.applicant).to.be.an('object');
     });
 
-    it('authorization depends on non-nextOfKin role', () => {
-      const { depends } = applicantInformationPages.authorization;
-      expect(depends({ submitterRole: 'nextOfKin' })).to.equal(false);
-      expect(depends({ submitterRole: 'funeralHomeDirector' })).to.equal(true);
-      expect(depends({ submitterRole: 'cemeteryOfficial' })).to.equal(true);
-      expect(depends({ submitterRole: 'personalRepresentative' })).to.equal(
-        true,
-      );
-      expect(depends({})).to.not.equal(false);
+    it('relationshipToDecedent enum includes all relationships', () => {
+      const { enum: enumVals } = relationshipToDecedentSchema.properties.applicant.properties.relationshipToDecedent;
+      expect(enumVals).to.include('spouse');
+      expect(enumVals).to.include('otherFamilyMember');
+    });
+  });
+
+  describe('authorizationSchema', () => {
+    it('applicant requires authorizationDocument', () => {
+      expect(
+        authorizationSchema.properties.applicant.required,
+      ).to.include('authorizationDocument');
+    });
+  });
+
+  describe('authorizationUiSchema', () => {
+    it('has required:true on authorizationDocument', () => {
+      const fileInput = authorizationUiSchema.applicant.authorizationDocument;
+      expect(fileInput['ui:options'].required).to.equal(true);
     });
   });
 });

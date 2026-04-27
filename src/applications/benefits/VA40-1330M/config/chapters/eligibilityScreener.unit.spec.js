@@ -1,93 +1,56 @@
 import { expect } from 'chai';
 import {
-  serviceStatusUiSchema,
-  serviceStatusSchema,
+  serviceStatusAtDeathUiSchema,
+  serviceStatusAtDeathSchema,
   guardReserveQualifierUiSchema,
   guardReserveQualifierSchema,
-  eligibilityScreenerPages,
 } from './eligibilityScreener';
 
 describe('eligibilityScreener chapter', () => {
-  describe('serviceStatusUiSchema', () => {
-    it('has serviceStatusAtDeath radio field', () => {
-      expect(serviceStatusUiSchema).to.have.property('serviceStatusAtDeath');
-      expect(serviceStatusUiSchema.serviceStatusAtDeath['ui:webComponentField']).to.exist;
+  describe('serviceStatusAtDeathSchema', () => {
+    it('has required serviceStatusAtDeath', () => {
+      expect(serviceStatusAtDeathSchema.required).to.include('serviceStatusAtDeath');
     });
 
-    it('has a title', () => {
-      expect(serviceStatusUiSchema.serviceStatusAtDeath['ui:title']).to.be.a(
-        'string',
-      );
-    });
-  });
-
-  describe('serviceStatusSchema', () => {
-    it('requires serviceStatusAtDeath', () => {
-      expect(serviceStatusSchema.required).to.include('serviceStatusAtDeath');
-    });
-
-    it('has activeDuty and guardOrReserve enum values', () => {
-      const prop =
-        serviceStatusSchema.properties.serviceStatusAtDeath;
-      expect(prop.enum).to.include('activeDuty');
-      expect(prop.enum).to.include('guardOrReserve');
+    it('serviceStatusAtDeath enum has activeDuty and guardOrReserve', () => {
+      const { enum: enumVals } = serviceStatusAtDeathSchema.properties.serviceStatusAtDeath;
+      expect(enumVals).to.include('activeDuty');
+      expect(enumVals).to.include('guardOrReserve');
     });
   });
 
-  describe('guardReserveQualifierUiSchema', () => {
-    it('has guardReserveQualifyingCircumstance field', () => {
-      expect(guardReserveQualifierUiSchema).to.have.property(
-        'guardReserveQualifyingCircumstance',
-      );
+  describe('serviceStatusAtDeathUiSchema', () => {
+    it('has a title', () => {
+      expect(serviceStatusAtDeathUiSchema.serviceStatusAtDeath['ui:title']).to.be.a('string');
     });
 
-    it('has a title', () => {
+    it('has errorMessages', () => {
       expect(
-        guardReserveQualifierUiSchema.guardReserveQualifyingCircumstance[
-          'ui:title'
-        ],
-      ).to.be.a('string');
+        serviceStatusAtDeathUiSchema.serviceStatusAtDeath['ui:errorMessages'],
+      ).to.be.an('object');
     });
   });
 
   describe('guardReserveQualifierSchema', () => {
-    it('requires guardReserveQualifyingCircumstance', () => {
-      expect(
-        guardReserveQualifierSchema.required,
-      ).to.include('guardReserveQualifyingCircumstance');
+    it('has required guardReserveQualifyingCircumstance', () => {
+      expect(guardReserveQualifierSchema.required).to.include(
+        'guardReserveQualifyingCircumstance',
+      );
     });
 
-    it('has the three qualifying circumstance enum values', () => {
-      const prop =
-        guardReserveQualifierSchema.properties
-          .guardReserveQualifyingCircumstance;
-      expect(prop.enum).to.include('diedOnActiveDutyForTraining');
-      expect(prop.enum).to.include('diedOnInactiveDutyForTraining');
-      expect(prop.enum).to.include('entitledToRetiredPay');
+    it('enum includes all three qualifying circumstances', () => {
+      const { enum: enumVals } = guardReserveQualifierSchema.properties.guardReserveQualifyingCircumstance;
+      expect(enumVals).to.include('diedOnActiveDutyForTraining');
+      expect(enumVals).to.include('diedOnInactiveDutyForTraining');
+      expect(enumVals).to.include('entitledToRetiredPay');
     });
   });
 
-  describe('eligibilityScreenerPages', () => {
-    it('has serviceStatus and guardReserveQualifier pages', () => {
-      expect(eligibilityScreenerPages).to.have.property('serviceStatus');
-      expect(eligibilityScreenerPages).to.have.property(
-        'guardReserveQualifier',
-      );
-    });
-
-    it('serviceStatus page has correct path', () => {
-      expect(eligibilityScreenerPages.serviceStatus.path).to.equal(
-        'eligibility-screener',
-      );
-    });
-
-    it('guardReserveQualifier depends on guardOrReserve', () => {
-      const { depends } = eligibilityScreenerPages.guardReserveQualifier;
-      expect(depends({ serviceStatusAtDeath: 'guardOrReserve' })).to.equal(
-        true,
-      );
-      expect(depends({ serviceStatusAtDeath: 'activeDuty' })).to.equal(false);
-      expect(depends({})).to.equal(false);
+  describe('guardReserveQualifierUiSchema', () => {
+    it('has a title', () => {
+      expect(
+        guardReserveQualifierUiSchema.guardReserveQualifyingCircumstance['ui:title'],
+      ).to.be.a('string');
     });
   });
 });

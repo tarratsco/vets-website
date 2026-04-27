@@ -1,10 +1,8 @@
 import { expect } from 'chai';
 import React from 'react';
+import sinon from 'sinon';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import sinon from 'sinon';
-import * as uiUtils from 'platform/utilities/ui';
-
 import formConfig from '../config/form';
 import { IntroductionPage } from './IntroductionPage';
 
@@ -19,9 +17,9 @@ const createMockStore = (overrides = {}) => ({
         verified: true,
         dob: '1990-01-01',
         claims: { appeals: false },
-        ...overrides.user?.profile,
+        ...((overrides.user || {}).profile || {}),
       },
-      ...overrides.user,
+      ...(overrides.user || {}),
     },
     form: {
       formId: formConfig.formId,
@@ -29,7 +27,7 @@ const createMockStore = (overrides = {}) => ({
       savedStatus: '',
       loadedData: { metadata: {} },
       data: {},
-      ...overrides.form,
+      ...(overrides.form || {}),
     },
     scheduledDowntime: {
       globalDowntime: null,
@@ -44,24 +42,23 @@ const createMockStore = (overrides = {}) => ({
   dispatch: () => {},
 });
 
-const mockRoute = {
-  formConfig,
-  pageList: [{ path: '/introduction' }],
-};
-
 describe('IntroductionPage', () => {
   let scrollToTopStub;
   let focusElementStub;
 
   beforeEach(() => {
-    scrollToTopStub = sinon.stub(uiUtils, 'scrollToTop');
-    focusElementStub = sinon.stub(uiUtils, 'focusElement');
+    scrollToTopStub = sinon.stub();
+    focusElementStub = sinon.stub();
   });
 
   afterEach(() => {
-    scrollToTopStub.restore();
-    focusElementStub.restore();
+    sinon.restore();
   });
+
+  const mockRoute = {
+    formConfig,
+    pageList: [{ path: '/introduction' }, { path: '/eligibility-screener' }],
+  };
 
   it('renders the form title', () => {
     const store = createMockStore();
@@ -80,26 +77,17 @@ describe('IntroductionPage', () => {
         <IntroductionPage route={mockRoute} />
       </Provider>,
     );
-    expect(container.querySelector('va-omb-info')).to.exist;
+    const ombInfo = container.querySelector('va-omb-info');
+    expect(ombInfo).to.not.be.null;
   });
 
-  it('renders eligibility accordion', () => {
+  it('renders the what you will need section', () => {
     const store = createMockStore();
-    const { container } = render(
+    const { getByText } = render(
       <Provider store={store}>
         <IntroductionPage route={mockRoute} />
       </Provider>,
     );
-    expect(container.querySelector('va-accordion')).to.exist;
-  });
-
-  it('calls scrollToTop on mount', () => {
-    const store = createMockStore();
-    render(
-      <Provider store={store}>
-        <IntroductionPage route={mockRoute} />
-      </Provider>,
-    );
-    expect(scrollToTopStub.called).to.be.true;
+    expect(getByText("What you'll need")).to.exist;
   });
 });

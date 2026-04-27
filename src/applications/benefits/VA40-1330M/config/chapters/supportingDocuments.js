@@ -3,7 +3,7 @@ import {
   fileInputSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-// ── Death Certificate ────────────────────────────────────────────────────────
+// ── Death Certificate ─────────────────────────────────────────────────────────
 
 export const deathCertificateUiSchema = {
   documents: {
@@ -13,7 +13,7 @@ export const deathCertificateUiSchema = {
         'Upload an official copy of the death certificate. Accepted file types: PDF, JPG, PNG. Maximum file size: 20 MB. If you have a paper certificate, you can take a clear photo with your phone.',
       required: true,
       errorMessages: {
-        required: 'Please upload the death certificate.',
+        required: 'Please upload the death certificate',
       },
     }),
   },
@@ -21,6 +21,7 @@ export const deathCertificateUiSchema = {
 
 export const deathCertificateSchema = {
   type: 'object',
+  required: ['documents'],
   properties: {
     documents: {
       type: 'object',
@@ -32,7 +33,7 @@ export const deathCertificateSchema = {
   },
 };
 
-// ── DD Form 1300 (Active Duty Path) ──────────────────────────────────────────
+// ── DD Form 1300 ──────────────────────────────────────────────────────────────
 
 export const ddForm1300UiSchema = {
   documents: {
@@ -42,7 +43,7 @@ export const ddForm1300UiSchema = {
         'DD Form 1300 is the official report of casualty issued by the service branch. Your Casualty Assistance Officer (CAO) can provide a copy. If you do not have it yet, you can save your progress and return when you have it.',
       required: true,
       errorMessages: {
-        required: 'Please upload DD Form 1300.',
+        required: 'Please upload DD Form 1300',
       },
     }),
   },
@@ -50,6 +51,7 @@ export const ddForm1300UiSchema = {
 
 export const ddForm1300Schema = {
   type: 'object',
+  required: ['documents'],
   properties: {
     documents: {
       type: 'object',
@@ -61,7 +63,7 @@ export const ddForm1300Schema = {
   },
 };
 
-// ── NGB Form 22 (Guard/Reserve Path) ─────────────────────────────────────────
+// ── NGB Form 22 ───────────────────────────────────────────────────────────────
 
 export const ngbForm22UiSchema = {
   documents: {
@@ -71,7 +73,7 @@ export const ngbForm22UiSchema = {
         'For National Guard members, this is NGB Form 22 (Report of Separation and Record of Service). For Reserve members, an equivalent separation record is acceptable.',
       required: true,
       errorMessages: {
-        required: 'Please upload the Guard/Reserve service record.',
+        required: 'Please upload NGB Form 22 or equivalent',
       },
     }),
   },
@@ -79,6 +81,7 @@ export const ngbForm22UiSchema = {
 
 export const ngbForm22Schema = {
   type: 'object',
+  required: ['documents'],
   properties: {
     documents: {
       type: 'object',
@@ -90,16 +93,18 @@ export const ngbForm22Schema = {
   },
 };
 
-// ── Additional Documents (Optional) ─────────────────────────────────────────
+// ── Additional Documents ──────────────────────────────────────────────────────
 
 export const additionalDocumentsUiSchema = {
   documents: {
     additionalDocuments: fileInputUI({
       title: 'Upload any additional supporting documents (optional)',
       hint:
-        'You may upload up to 5 additional supporting documents such as a prior service DD Form 214 or other relevant documentation. This is optional.',
+        'You may upload additional supporting documents such as prior service DD Form 214 or other documentation. Accepted file types: PDF, JPG, PNG. Maximum file size: 20 MB.',
       required: false,
-      errorMessages: {},
+      errorMessages: {
+        required: 'Please upload a document or skip this step',
+      },
     }),
   },
 };
