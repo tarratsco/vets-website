@@ -1,0 +1,12 @@
+{
+  "appName": "Application for Extended Care Services",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "10-10EC-extended-care",
+  "rootUrl": "/health-care/extended-care/apply-form-10-10ec",
+  "productId": "a3f7c821-d4e9-4b2f-8c1a-5e6f0d9b3c42",
+  "template": {
+    "vagovprod": false,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
