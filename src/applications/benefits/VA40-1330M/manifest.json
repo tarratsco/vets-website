@@ -1,0 +1,12 @@
+{
+  "appName": "VA40-1330M Headstone or Marker for Active Duty",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "VA40-1330M-headstone-marker",
+  "rootUrl": "/burials-memorials/headstone-marker-active-duty",
+  "productId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "template": {
+    "vagovprod": false,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
