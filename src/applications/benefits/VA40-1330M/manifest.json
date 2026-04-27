@@ -1,0 +1,12 @@
+{
+  "appName": "Request a Government Headstone or Marker",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "va40-1330m-headstone-marker",
+  "rootUrl": "/burials-memorials/headstone-marker-active-duty",
+  "productId": "b2c4e8f1-3a7d-4e9b-8c2f-1d5a6e0f4b3c",
+  "template": {
+    "vagovprod": false,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
