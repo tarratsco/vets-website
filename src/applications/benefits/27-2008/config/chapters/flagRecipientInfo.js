@@ -43,32 +43,22 @@ export const flagRecipientInfoUiSchema = {
     }),
     recipientRelationshipOther: textUI({
       title: 'Describe the relationship (optional)',
-      hint: 'Please describe the relationship to the deceased Veteran.',
-      'ui:options': {
-        expandUnder: 'recipientRelationship',
-        expandUnderCondition: 'other',
-      },
+      hint: 'Please describe the relationship if you selected "Other" above.',
     }),
   },
 };
 
 export const flagRecipientInfoSchema = {
   type: 'object',
+  required: ['flagRecipient'],
   properties: {
     flagRecipient: {
       type: 'object',
       required: ['recipientFullName', 'recipientRelationship'],
       properties: {
-        recipientFullName: {
-          type: 'string',
-          minLength: 1,
-          maxLength: 80,
-        },
+        recipientFullName: { type: 'string', minLength: 1, maxLength: 80 },
         recipientRelationship: selectSchema(RELATIONSHIP_KEYS),
-        recipientRelationshipOther: {
-          type: 'string',
-          maxLength: 100,
-        },
+        recipientRelationshipOther: { type: 'string', maxLength: 100 },
       },
     },
   },

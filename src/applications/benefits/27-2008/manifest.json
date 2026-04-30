@@ -1,7 +1,7 @@
 {
-  "appName": "Apply for Burial Flag",
+  "appName": "Apply for a United States Burial Flag",
   "entryFile": "./app-entry.jsx",
-  "entryName": "burial-flag-27-2008",
+  "entryName": "27-2008-burial-flag",
   "rootUrl": "/burials-memorials/memorial-items/burial-flag",
   "productId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "template": {

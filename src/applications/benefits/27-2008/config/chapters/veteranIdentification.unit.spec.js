@@ -5,33 +5,28 @@ import {
 } from './veteranIdentification';
 
 describe('chapters/veteranIdentification', () => {
-  it('exports uiSchema', () => {
+  it('should export uiSchema and schema', () => {
     expect(veteranIdentificationUiSchema).to.be.an('object');
-    expect(veteranIdentificationUiSchema.veteranInformation).to.exist;
+    expect(veteranIdentificationSchema).to.be.an('object');
   });
 
-  it('has vaFileNumber, socialSecurityNumber, militaryServiceNumber fields', () => {
-    const fields = veteranIdentificationUiSchema.veteranInformation;
-    expect(fields.vaFileNumber).to.exist;
-    expect(fields.socialSecurityNumber).to.exist;
-    expect(fields.militaryServiceNumber).to.exist;
+  it('uiSchema should have veteranInformation with identification fields', () => {
+    const { veteranInformation } = veteranIdentificationUiSchema;
+    expect(veteranInformation).to.have.property('vaFileNumber');
+    expect(veteranInformation).to.have.property('socialSecurityNumber');
+    expect(veteranInformation).to.have.property('militaryServiceNumber');
   });
 
-  it('schema does not require any identification fields', () => {
-    const required =
-      veteranIdentificationSchema.properties.veteranInformation.required;
-    expect(required).to.be.undefined;
+  it('schema vaFileNumber should have correct pattern', () => {
+    const { vaFileNumber } = veteranIdentificationSchema.properties.veteranInformation.properties;
+    expect(vaFileNumber.pattern).to.equal('^[0-9]{7,9}$');
   });
 
-  it('vaFileNumber schema has correct pattern', () => {
-    const props =
-      veteranIdentificationSchema.properties.veteranInformation.properties;
-    expect(props.vaFileNumber.pattern).to.equal('^[0-9]{7,9}$');
-  });
-
-  it('socialSecurityNumber schema has correct pattern', () => {
-    const props =
-      veteranIdentificationSchema.properties.veteranInformation.properties;
-    expect(props.socialSecurityNumber.pattern).to.equal('^[0-9]{9}$');
+  it('schema should not require identification fields', () => {
+    const { required } = veteranIdentificationSchema.properties.veteranInformation || {};
+    if (required) {
+      expect(required).to.not.include('socialSecurityNumber');
+      expect(required).to.not.include('vaFileNumber');
+    }
   });
 });

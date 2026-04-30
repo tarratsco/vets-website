@@ -5,30 +5,31 @@ import {
 } from './flagRecipientInfo';
 
 describe('chapters/flagRecipientInfo', () => {
-  it('exports uiSchema and schema', () => {
+  it('should export uiSchema and schema', () => {
     expect(flagRecipientInfoUiSchema).to.be.an('object');
     expect(flagRecipientInfoSchema).to.be.an('object');
   });
 
-  it('has recipientFullName and recipientRelationship in uiSchema', () => {
-    const fields = flagRecipientInfoUiSchema.flagRecipient;
-    expect(fields.recipientFullName).to.exist;
-    expect(fields.recipientRelationship).to.exist;
+  it('uiSchema should have recipientFullName and recipientRelationship', () => {
+    const { flagRecipient } = flagRecipientInfoUiSchema;
+    expect(flagRecipient).to.have.property('recipientFullName');
+    expect(flagRecipient).to.have.property('recipientRelationship');
   });
 
-  it('schema requires recipientFullName and recipientRelationship', () => {
-    const required =
-      flagRecipientInfoSchema.properties.flagRecipient.required;
+  it('schema should require recipientFullName and recipientRelationship', () => {
+    const { required } = flagRecipientInfoSchema.properties.flagRecipient;
     expect(required).to.include('recipientFullName');
     expect(required).to.include('recipientRelationship');
   });
 
-  it('schema has friend in recipientRelationship enum', () => {
-    const enumValues =
-      flagRecipientInfoSchema.properties.flagRecipient.properties
-        .recipientRelationship.enum;
-    expect(enumValues).to.include('friend');
-    expect(enumValues).to.include('survivingSpouse');
-    expect(enumValues).to.include('other');
+  it('recipientRelationship enum should include survivingSpouse and friend', () => {
+    const { recipientRelationship } = flagRecipientInfoSchema.properties.flagRecipient.properties;
+    expect(recipientRelationship.enum).to.include('survivingSpouse');
+    expect(recipientRelationship.enum).to.include('friend');
+  });
+
+  it('recipientFullName maxLength should be 80', () => {
+    const { recipientFullName } = flagRecipientInfoSchema.properties.flagRecipient.properties;
+    expect(recipientFullName.maxLength).to.equal(80);
   });
 });

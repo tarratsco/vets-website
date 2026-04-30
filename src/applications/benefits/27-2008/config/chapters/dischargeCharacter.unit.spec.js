@@ -5,26 +5,25 @@ import {
 } from './dischargeCharacter';
 
 describe('chapters/dischargeCharacter', () => {
-  it('exports uiSchema and schema', () => {
+  it('should export uiSchema and schema', () => {
     expect(dischargeCharacterUiSchema).to.be.an('object');
     expect(dischargeCharacterSchema).to.be.an('object');
   });
 
-  it('has dischargeCharacter field in uiSchema', () => {
-    expect(dischargeCharacterUiSchema.eligibility.dischargeCharacter).to.exist;
+  it('uiSchema should have dischargeCharacter field', () => {
+    const { eligibility } = dischargeCharacterUiSchema;
+    expect(eligibility).to.have.property('dischargeCharacter');
   });
 
-  it('schema requires dischargeCharacter', () => {
-    const required = dischargeCharacterSchema.properties.eligibility.required;
+  it('schema should require dischargeCharacter', () => {
+    const { required } = dischargeCharacterSchema.properties.eligibility;
     expect(required).to.include('dischargeCharacter');
   });
 
-  it('schema enum has honorable, dishonorable, unknown', () => {
-    const enumValues =
-      dischargeCharacterSchema.properties.eligibility.properties
-        .dischargeCharacter.enum;
-    expect(enumValues).to.include('honorable');
-    expect(enumValues).to.include('dishonorable');
-    expect(enumValues).to.include('unknown');
+  it('dischargeCharacter enum should include honorable, dishonorable, unknown', () => {
+    const { dischargeCharacter } = dischargeCharacterSchema.properties.eligibility.properties;
+    expect(dischargeCharacter.enum).to.include('honorable');
+    expect(dischargeCharacter.enum).to.include('dishonorable');
+    expect(dischargeCharacter.enum).to.include('unknown');
   });
 });

@@ -11,23 +11,31 @@ export function burialFlagTransform(formConfig, form) {
       veteranLastName: formData.veteranInformation?.lastName,
       veteranMaidenOrOtherName: formData.veteranInformation?.maidenOrOtherName,
       vaFileNumber: formData.veteranInformation?.vaFileNumber,
-      veteranSocialSecurityNumber: formData.veteranInformation?.socialSecurityNumber,
+      veteranSocialSecurityNumber:
+        formData.veteranInformation?.socialSecurityNumber,
       militaryServiceNumber: formData.veteranInformation?.militaryServiceNumber,
       branchOfService: formData.serviceInformation?.branchOfService,
-      dateEnteredActiveDuty: formData.serviceInformation?.dateEnteredActiveDuty,
-      dateReleasedFromActiveDuty: formData.serviceInformation?.dateReleasedFromActiveDuty,
+      dateEnteredActiveDuty:
+        formData.serviceInformation?.dateEnteredActiveDuty,
+      dateReleasedFromActiveDuty:
+        formData.serviceInformation?.dateReleasedFromActiveDuty,
       veteranDateOfBirth: formData.veteranInformation?.dateOfBirth,
       veteranDateOfDeath: formData.veteranInformation?.dateOfDeath,
       dateOfBurial: formData.veteranInformation?.dateOfBurial,
-      placeOfBurialCemeteryName: formData.veteranInformation?.placeOfBurialCemeteryName,
+      placeOfBurialCemeteryName:
+        formData.veteranInformation?.placeOfBurialCemeteryName,
       placeOfBurialCity: formData.veteranInformation?.placeOfBurialCity,
       placeOfBurialState: formData.veteranInformation?.placeOfBurialState,
       documentationAvailable: formData.eligibility?.documentationAvailable,
       flagRecipientFullName: formData.flagRecipient?.recipientFullName,
-      flagRecipientRelationship: formData.flagRecipient?.recipientRelationship,
-      flagRecipientRelationshipOther: formData.flagRecipient?.recipientRelationshipOther,
-      flagRecipientAddressLine1: formData.flagRecipient?.recipientAddressLine1,
-      flagRecipientAddressLine2: formData.flagRecipient?.recipientAddressLine2,
+      flagRecipientRelationship:
+        formData.flagRecipient?.recipientRelationship,
+      flagRecipientRelationshipOther:
+        formData.flagRecipient?.recipientRelationshipOther,
+      flagRecipientAddressLine1:
+        formData.flagRecipient?.recipientAddressLine1,
+      flagRecipientAddressLine2:
+        formData.flagRecipient?.recipientAddressLine2,
       flagRecipientCity: formData.flagRecipient?.recipientCity,
       flagRecipientState: formData.flagRecipient?.recipientState,
       flagRecipientZip: formData.flagRecipient?.recipientZip,
@@ -41,14 +49,17 @@ export function burialFlagTransform(formConfig, form) {
       applicantCity: formData.applicant?.city,
       applicantState: formData.applicant?.state,
       applicantZip: formData.applicant?.zip,
-      applicantRelationshipToVeteran: formData.applicant?.relationshipToVeteran,
-      applicantRelationshipOther: formData.applicant?.relationshipToVeteranOther,
+      applicantRelationshipToVeteran:
+        formData.applicant?.relationshipToVeteran,
+      applicantRelationshipOther:
+        formData.applicant?.relationshipToVeteranOther,
       dateSigned: formData.dateSigned,
       applicantType: formData.applicantType,
       dischargeCharacter: formData.eligibility?.dischargeCharacter,
       reserveGuardCriteria: formData.eligibility?.reserveGuardCriteria,
       ineligibilityFlagged: formData.metadata?.ineligibilityFlagged,
-      reserveGuardIneligibilityWarning: formData.metadata?.reserveGuardIneligibilityWarning,
+      reserveGuardIneligibilityWarning:
+        formData.metadata?.reserveGuardIneligibilityWarning,
       documentUploads: formData.documents?.dd214Upload,
     },
   });

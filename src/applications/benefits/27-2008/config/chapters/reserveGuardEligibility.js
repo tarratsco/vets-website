@@ -15,10 +15,11 @@ const RESERVE_CRITERIA_LABELS = {
 
 const RESERVE_CRITERIA_KEYS = Object.keys(RESERVE_CRITERIA_LABELS);
 
-function validateAtLeastOneCriterion(errors, fieldData) {
-  if (!fieldData || !Array.isArray(fieldData) || fieldData.length === 0) {
-    errors.addError(
-      "Please select at least one criterion that applies to the Veteran's Selected Reserve service.",
+function validateReserveGuardCriteria(errors, pageData) {
+  const criteria = pageData?.eligibility?.reserveGuardCriteria;
+  if (!criteria || criteria.length === 0) {
+    errors.eligibility.reserveGuardCriteria.addError(
+      'Please select at least one criterion that applies to the Veteran\'s Selected Reserve service.',
     );
   }
 }
@@ -26,21 +27,18 @@ function validateAtLeastOneCriterion(errors, fieldData) {
 export const reserveGuardEligibilityUiSchema = {
   eligibility: {
     'ui:title': 'Selected Reserve eligibility',
-    reserveGuardCriteria: {
-      ...checkboxGroupUI({
-        title:
-          "Which of the following applies to the Veteran's Selected Reserve service?",
-        hint:
-          'Select all that apply. The Veteran must meet at least one of these criteria to be eligible for a burial flag through Selected Reserve service, per Section C(2) and C(3) of VA Form 27-2008 instructions.',
-        required: true,
-        labels: RESERVE_CRITERIA_LABELS,
-        errorMessages: {
-          required:
-            "Please select at least one criterion that applies to the Veteran's Selected Reserve service.",
-        },
-      }),
-      'ui:validations': [validateAtLeastOneCriterion],
-    },
+    reserveGuardCriteria: checkboxGroupUI({
+      title:
+        "Which of the following applies to the Veteran's Selected Reserve service?",
+      hint:
+        'Select all that apply. The Veteran must meet at least one of these criteria to be eligible for a burial flag through Selected Reserve service, per Section C(2) and C(3) of VA Form 27-2008 instructions.',
+      required: true,
+      labels: RESERVE_CRITERIA_LABELS,
+      errorMessages: {
+        required:
+          "Please select at least one criterion that applies to the Veteran's Selected Reserve service.",
+      },
+    }),
   },
 };
 

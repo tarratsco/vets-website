@@ -10,18 +10,16 @@ export const veteranNameUiSchema = {
       "Enter the name exactly as it appears on the Veteran's discharge documents.",
     firstName: textUI({
       title: "Veteran's first name",
-      autocomplete: 'off',
       errorMessages: {
         required: "Please enter the Veteran's first name.",
       },
     }),
     middleName: textUI({
       title: "Veteran's middle name (optional)",
-      autocomplete: 'off',
+      required: false,
     }),
     lastName: textUI({
       title: "Veteran's last name",
-      autocomplete: 'off',
       errorMessages: {
         required: "Please enter the Veteran's last name.",
       },
@@ -31,36 +29,23 @@ export const veteranNameUiSchema = {
         'Maiden name or other name the Veteran used while on active duty (optional)',
       hint:
         'Include any name the Veteran used during military service that differs from their legal name at death. This helps VA match service records.',
-      autocomplete: 'off',
+      required: false,
     }),
   },
 };
 
 export const veteranNameSchema = {
   type: 'object',
+  required: ['veteranInformation'],
   properties: {
     veteranInformation: {
       type: 'object',
       required: ['firstName', 'lastName'],
       properties: {
-        firstName: {
-          type: 'string',
-          minLength: 1,
-          maxLength: 30,
-        },
-        middleName: {
-          type: 'string',
-          maxLength: 30,
-        },
-        lastName: {
-          type: 'string',
-          minLength: 1,
-          maxLength: 30,
-        },
-        maidenOrOtherName: {
-          type: 'string',
-          maxLength: 60,
-        },
+        firstName: { type: 'string', minLength: 1, maxLength: 30 },
+        middleName: { type: 'string', maxLength: 30 },
+        lastName: { type: 'string', minLength: 1, maxLength: 30 },
+        maidenOrOtherName: { type: 'string', maxLength: 60 },
       },
     },
   },

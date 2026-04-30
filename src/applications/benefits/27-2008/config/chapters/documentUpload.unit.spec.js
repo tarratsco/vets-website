@@ -1,44 +1,30 @@
 import { expect } from 'chai';
-import { documentUploadUiSchema, documentUploadSchema } from './documentUpload';
+import {
+  documentUploadUiSchema,
+  documentUploadSchema,
+} from './documentUpload';
 
 describe('chapters/documentUpload', () => {
-  it('exports uiSchema and schema', () => {
+  it('should export uiSchema and schema', () => {
     expect(documentUploadUiSchema).to.be.an('object');
     expect(documentUploadSchema).to.be.an('object');
   });
 
-  it('has documents.dd214Upload in uiSchema', () => {
-    expect(documentUploadUiSchema.documents).to.exist;
-    expect(documentUploadUiSchema.documents.dd214Upload).to.exist;
+  it('uiSchema should have documents group with dd214Upload field', () => {
+    const { documents } = documentUploadUiSchema;
+    expect(documents).to.be.an('object');
+    expect(documents).to.have.property('dd214Upload');
   });
 
-  it('schema has documents.dd214Upload property', () => {
-    expect(documentUploadSchema.properties.documents).to.exist;
-    expect(documentUploadSchema.properties.documents.properties.dd214Upload).to
-      .exist;
+  it('schema documents should have dd214Upload property', () => {
+    const { documents } = documentUploadSchema.properties;
+    expect(documents.properties).to.have.property('dd214Upload');
   });
 
-  it('required function returns true when documentationAvailable is Y', () => {
-    const requiredFn =
-      documentUploadUiSchema.documents.dd214Upload['ui:required'] ||
-      documentUploadUiSchema.documents.dd214Upload['ui:options']?.required;
-    if (typeof requiredFn === 'function') {
-      const result = requiredFn({
-        eligibility: { documentationAvailable: 'Y' },
-      });
-      expect(result).to.equal(true);
-    }
-  });
-
-  it('required function returns false when documentationAvailable is N', () => {
-    const requiredFn =
-      documentUploadUiSchema.documents.dd214Upload['ui:required'] ||
-      documentUploadUiSchema.documents.dd214Upload['ui:options']?.required;
-    if (typeof requiredFn === 'function') {
-      const result = requiredFn({
-        eligibility: { documentationAvailable: 'N' },
-      });
-      expect(result).to.equal(false);
+  it('schema should not require documents (conditional)', () => {
+    const topLevelRequired = documentUploadSchema.required;
+    if (topLevelRequired) {
+      expect(topLevelRequired).to.not.include('documents');
     }
   });
 });

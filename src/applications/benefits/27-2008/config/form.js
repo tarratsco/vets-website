@@ -10,99 +10,92 @@ import {
   applicantTypeUiSchema,
   applicantTypeSchema,
 } from './chapters/applicantType';
-
 import {
   veteranNameUiSchema,
   veteranNameSchema,
 } from './chapters/veteranName';
-
 import {
   veteranIdentificationUiSchema,
   veteranIdentificationSchema,
 } from './chapters/veteranIdentification';
-
 import {
   serviceInformationUiSchema,
   serviceInformationSchema,
 } from './chapters/serviceInformation';
-
 import {
   veteranDatesUiSchema,
   veteranDatesSchema,
 } from './chapters/veteranDates';
-
 import {
   burialPlaceUiSchema,
   burialPlaceSchema,
 } from './chapters/burialPlace';
-
 import {
-  documentationCheckUiSchema,
-  documentationCheckSchema,
-} from './chapters/documentationCheck';
-
+  eligibilityDocumentationUiSchema,
+  eligibilityDocumentationSchema,
+} from './chapters/eligibilityDocumentation';
 import {
   dischargeCharacterUiSchema,
   dischargeCharacterSchema,
 } from './chapters/dischargeCharacter';
-
 import {
-  reserveGuardCheckUiSchema,
-  reserveGuardCheckSchema,
-} from './chapters/reserveGuardCheck';
-
+  reserveGuardEligibilityUiSchema,
+  reserveGuardEligibilitySchema,
+} from './chapters/reserveGuardEligibility';
 import {
   flagRecipientInfoUiSchema,
   flagRecipientInfoSchema,
 } from './chapters/flagRecipientInfo';
-
 import {
   flagRecipientAddressUiSchema,
   flagRecipientAddressSchema,
 } from './chapters/flagRecipientAddress';
-
 import {
   applicantInfoUiSchema,
   applicantInfoSchema,
 } from './chapters/applicantInfo';
-
 import {
   documentUploadUiSchema,
   documentUploadSchema,
 } from './chapters/documentUpload';
+import { remarksUiSchema, remarksSchema } from './chapters/remarks';
 
-import {
-  remarksUiSchema,
-  remarksSchema,
-} from './chapters/remarks';
+function hasSelectedReserve(formData) {
+  return (
+    Array.isArray(formData?.serviceInformation?.branchOfService) &&
+    formData.serviceInformation.branchOfService.includes('selectedReserve')
+  );
+}
 
 /** @type {FormConfig} */
 const formConfig = {
   rootUrl: manifest.rootUrl,
   urlPrefix: '/',
   submitUrl: `${environment.API_URL}/v0/burial_flag_applications`,
-  transformForSubmit: burialFlagTransform,
   trackingPrefix: 'burial-flag-27-2008-',
+  transformForSubmit: burialFlagTransform,
   introduction: IntroductionPage,
   confirmation: ConfirmationPage,
   footerContent,
   formId: '27-2008',
   saveInProgress: {
     messages: {
-      inProgress: 'Your burial flag application is in progress.',
+      inProgress:
+        'Your burial flag application (27-2008) is in progress.',
       expired:
-        'Your saved burial flag application has expired. Please start over.',
+        'Your saved burial flag application (27-2008) has expired. If you want to apply, please start a new application.',
       saved: 'Your burial flag application has been saved.',
     },
   },
   version: 0,
   prefillEnabled: true,
   savedFormMessages: {
-    notFound: 'Please start over to apply for a burial flag.',
+    notFound:
+      'Please start over to apply for a United States burial flag.',
     noAuth:
       'Please sign in again to continue your burial flag application.',
   },
-  title: 'Apply for a burial flag',
+  title: 'Apply for a United States burial flag',
   subTitle: 'VA Form 27-2008',
   defaultDefinitions: {},
   chapters: {
@@ -128,7 +121,7 @@ const formConfig = {
         },
         veteranIdentification: {
           path: 'veteran-information/identification',
-          title: "Veteran's identification",
+          title: "Veteran's identification numbers",
           uiSchema: veteranIdentificationUiSchema,
           schema: veteranIdentificationSchema,
         },
@@ -151,7 +144,7 @@ const formConfig = {
       pages: {
         serviceInformation: {
           path: 'veteran-information/service',
-          title: "Veteran's service information",
+          title: 'Military service information',
           uiSchema: serviceInformationUiSchema,
           schema: serviceInformationSchema,
         },
@@ -160,11 +153,11 @@ const formConfig = {
     eligibilityChapter: {
       title: 'Eligibility',
       pages: {
-        documentationCheck: {
+        eligibilityDocumentation: {
           path: 'eligibility/documentation-check',
           title: 'Documentation check',
-          uiSchema: documentationCheckUiSchema,
-          schema: documentationCheckSchema,
+          uiSchema: eligibilityDocumentationUiSchema,
+          schema: eligibilityDocumentationSchema,
         },
         dischargeCharacter: {
           path: 'eligibility/discharge-character',
@@ -172,16 +165,12 @@ const formConfig = {
           uiSchema: dischargeCharacterUiSchema,
           schema: dischargeCharacterSchema,
         },
-        reserveGuardCheck: {
+        reserveGuardEligibility: {
           path: 'eligibility/reserve-guard-check',
-          title: 'Selected Reserve eligibility',
-          depends: formData =>
-            Array.isArray(formData?.serviceInformation?.branchOfService) &&
-            formData.serviceInformation.branchOfService.includes(
-              'selectedReserve',
-            ),
-          uiSchema: reserveGuardCheckUiSchema,
-          schema: reserveGuardCheckSchema,
+          title: 'Selected Reserve service criteria',
+          depends: formData => hasSelectedReserve(formData),
+          uiSchema: reserveGuardEligibilityUiSchema,
+          schema: reserveGuardEligibilitySchema,
         },
       },
     },
@@ -207,7 +196,7 @@ const formConfig = {
       pages: {
         applicantInfo: {
           path: 'applicant/applicant-info',
-          title: 'Your information',
+          title: 'Your personal information',
           uiSchema: applicantInfoUiSchema,
           schema: applicantInfoSchema,
         },

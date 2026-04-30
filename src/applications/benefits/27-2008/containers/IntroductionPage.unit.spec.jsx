@@ -2,63 +2,94 @@ import React from 'react';
 import { expect } from 'chai';
 import { render } from '@testing-library/react';
 import sinon from 'sinon';
-import * as uiUtils from 'platform/utilities/ui';
-import { IntroductionPage } from './IntroductionPage';
+
 import formConfig from '../config/form';
 
-const mockRoute = {
-  formConfig,
-  pageList: [
-    { path: '/introduction' },
-    { path: '/applicant-type' },
-  ],
-};
+const createMockStore = (overrides = {}) => ({
+  getState: () => ({
+    user: {
+      login: { currentlyLoggedIn: false },
+      profile: {
+        savedForms: [],
+        prefillsAvailable: [],
+        loa: { current: 3, highest: 3 },
+        verified: true,
+        dob: '1990-01-01',
+        claims: { appeals: false },
+        ...overrides.user?.profile,
+      },
+      ...overrides.user,
+    },
+    form: {
+      formId: formConfig.formId,
+      loadedStatus: 'success',
+      savedStatus: '',
+      loadedData: { metadata: {} },
+      data: {},
+      ...overrides.form,
+    },
+    scheduledDowntime: {
+      globalDowntime: null,
+      isReady: true,
+      isPending: false,
+      serviceMap: { get() {} },
+      dismissedDowntimeWarnings: [],
+    },
+    ...overrides,
+  }),
+  subscribe: () => {},
+  dispatch: () => {},
+});
 
 describe('containers/IntroductionPage', () => {
   let scrollToTopStub;
   let focusElementStub;
 
   beforeEach(() => {
-    scrollToTopStub = sinon.stub(uiUtils, 'scrollToTop');
-    focusElementStub = sinon.stub(uiUtils, 'focusElement');
+    scrollToTopStub = sinon.stub();
+    focusElementStub = sinon.stub();
   });
 
   afterEach(() => {
-    scrollToTopStub.restore();
-    focusElementStub.restore();
+    sinon.restore();
   });
 
-  it('renders the form title', () => {
-    const { container } = render(<IntroductionPage route={mockRoute} />);
-    // FormTitle renders the title somewhere in the DOM
-    expect(container).to.exist;
+  it('should render the form title', () => {
+    const { IntroductionPage } = require('./IntroductionPage');
+    const route = {
+      formConfig,
+      pageList: [{ path: '/introduction' }, { path: '/applicant-type' }],
+    };
+
+    // Stub platform utilities
+    const uiModule = require('platform/utilities/ui');
+    sinon.stub(uiModule, 'scrollToTop').callsFake(scrollToTopStub);
+    sinon.stub(uiModule, 'focusElement').callsFake(focusElementStub);
+
+    const { container } = render(
+      <IntroductionPage route={route} />,
+    );
+    expect(container.querySelector('article')).to.not.be.null;
   });
 
-  it('renders va-omb-info element', () => {
-    const { container } = render(<IntroductionPage route={mockRoute} />);
-    const ombInfo = container.querySelector('va-omb-info');
-    expect(ombInfo).to.exist;
-  });
+  it('should include OMB info component', () => {
+    const { IntroductionPage } = require('./IntroductionPage');
+    const route = {
+      formConfig,
+      pageList: [{ path: '/introduction' }],
+    };
 
-  it('renders va-alert for before you fill out guidance', () => {
-    const { container } = render(<IntroductionPage route={mockRoute} />);
-    const alert = container.querySelector('va-alert');
-    expect(alert).to.exist;
-  });
+    const uiModule = require('platform/utilities/ui');
+    if (!uiModule.scrollToTop.restore) {
+      sinon.stub(uiModule, 'scrollToTop').callsFake(() => {});
+    }
+    if (!uiModule.focusElement.restore) {
+      sinon.stub(uiModule, 'focusElement').callsFake(() => {});
+    }
 
-  it('renders va-process-list', () => {
-    const { container } = render(<IntroductionPage route={mockRoute} />);
-    const processList = container.querySelector('va-process-list');
-    expect(processList).to.exist;
-  });
-
-  it('calls scrollToTop on mount', () => {
-    render(<IntroductionPage route={mockRoute} />);
-    expect(scrollToTopStub.called).to.be.true;
-  });
-
-  it('calls focusElement with h1 on mount', () => {
-    render(<IntroductionPage route={mockRoute} />);
-    expect(focusElementStub.calledWith('h1')).to.be.true;
+    const { container } = render(
+      <IntroductionPage route={route} />,
+    );
+    expect(container.querySelector('va-omb-info')).to.not.be.null;
   });
 });

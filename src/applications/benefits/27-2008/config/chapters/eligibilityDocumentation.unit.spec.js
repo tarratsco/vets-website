@@ -4,21 +4,24 @@ import {
   eligibilityDocumentationSchema,
 } from './eligibilityDocumentation';
 
-describe('eligibilityDocumentation page', () => {
-  it('uiSchema has eligibility.documentationAvailable', () => {
-    expect(eligibilityDocumentationUiSchema.eligibility).to.have.property(
-      'documentationAvailable',
-    );
+describe('chapters/eligibilityDocumentation', () => {
+  it('should export uiSchema and schema', () => {
+    expect(eligibilityDocumentationUiSchema).to.be.an('object');
+    expect(eligibilityDocumentationSchema).to.be.an('object');
   });
 
-  it('schema requires documentationAvailable', () => {
-    const elg = eligibilityDocumentationSchema.properties.eligibility;
-    expect(elg.required).to.include('documentationAvailable');
+  it('uiSchema should have documentationAvailable field', () => {
+    const { eligibility } = eligibilityDocumentationUiSchema;
+    expect(eligibility).to.have.property('documentationAvailable');
   });
 
-  it('schema has yes/no enum values', () => {
-    const props = eligibilityDocumentationSchema.properties.eligibility.properties;
-    expect(props.documentationAvailable.enum).to.include('yes');
-    expect(props.documentationAvailable.enum).to.include('no');
+  it('schema should require documentationAvailable', () => {
+    const { required } = eligibilityDocumentationSchema.properties.eligibility;
+    expect(required).to.include('documentationAvailable');
+  });
+
+  it('documentationAvailable schema type should be boolean', () => {
+    const { documentationAvailable } = eligibilityDocumentationSchema.properties.eligibility.properties;
+    expect(documentationAvailable.type).to.equal('boolean');
   });
 });

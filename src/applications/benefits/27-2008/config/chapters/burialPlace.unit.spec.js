@@ -2,30 +2,28 @@ import { expect } from 'chai';
 import { burialPlaceUiSchema, burialPlaceSchema } from './burialPlace';
 
 describe('chapters/burialPlace', () => {
-  it('exports uiSchema and schema', () => {
+  it('should export uiSchema and schema', () => {
     expect(burialPlaceUiSchema).to.be.an('object');
     expect(burialPlaceSchema).to.be.an('object');
   });
 
-  it('has placeOfBurialCemeteryName, placeOfBurialCity, placeOfBurialState in uiSchema', () => {
-    const fields = burialPlaceUiSchema.veteranInformation;
-    expect(fields.placeOfBurialCemeteryName).to.exist;
-    expect(fields.placeOfBurialCity).to.exist;
-    expect(fields.placeOfBurialState).to.exist;
+  it('uiSchema should have cemetery name, city, and state fields', () => {
+    const { veteranInformation } = burialPlaceUiSchema;
+    expect(veteranInformation).to.have.property('placeOfBurialCemeteryName');
+    expect(veteranInformation).to.have.property('placeOfBurialCity');
+    expect(veteranInformation).to.have.property('placeOfBurialState');
   });
 
-  it('schema requires all three burial place fields', () => {
-    const required =
-      burialPlaceSchema.properties.veteranInformation.required;
+  it('schema should require all three burial place fields', () => {
+    const { required } = burialPlaceSchema.properties.veteranInformation;
     expect(required).to.include('placeOfBurialCemeteryName');
     expect(required).to.include('placeOfBurialCity');
     expect(required).to.include('placeOfBurialState');
   });
 
-  it('placeOfBurialState schema has OUTSIDE_US enum value', () => {
-    const stateSchema =
-      burialPlaceSchema.properties.veteranInformation.properties
-        .placeOfBurialState;
-    expect(stateSchema.enum).to.include('OUTSIDE_US');
+  it('placeOfBurialState schema should include OUTSIDE_US', () => {
+    const { placeOfBurialState } = burialPlaceSchema.properties.veteranInformation.properties;
+    expect(placeOfBurialState).to.be.an('object');
+    expect(placeOfBurialState.enum).to.include('OUTSIDE_US');
   });
 });

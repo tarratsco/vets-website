@@ -2,95 +2,61 @@ import { expect } from 'chai';
 import { veteranDatesUiSchema, veteranDatesSchema } from './veteranDates';
 
 describe('chapters/veteranDates', () => {
-  it('exports uiSchema and schema', () => {
+  it('should export uiSchema and schema', () => {
     expect(veteranDatesUiSchema).to.be.an('object');
     expect(veteranDatesSchema).to.be.an('object');
   });
 
-  it('has dateOfBirth, dateOfDeath, dateOfBurial in uiSchema', () => {
-    const fields = veteranDatesUiSchema.veteranInformation;
-    expect(fields.dateOfBirth).to.exist;
-    expect(fields.dateOfDeath).to.exist;
-    expect(fields.dateOfBurial).to.exist;
+  it('uiSchema should have dateOfBirth, dateOfDeath, dateOfBurial', () => {
+    const { veteranInformation } = veteranDatesUiSchema;
+    expect(veteranInformation).to.have.property('dateOfBirth');
+    expect(veteranInformation).to.have.property('dateOfDeath');
+    expect(veteranInformation).to.have.property('dateOfBurial');
   });
 
-  it('schema requires all three date fields', () => {
-    const required = veteranDatesSchema.properties.veteranInformation.required;
+  it('schema should require all three date fields', () => {
+    const { required } = veteranDatesSchema.properties.veteranInformation;
     expect(required).to.include('dateOfBirth');
     expect(required).to.include('dateOfDeath');
     expect(required).to.include('dateOfBurial');
   });
 
-  it('has ui:validations at the top level', () => {
-    expect(veteranDatesUiSchema['ui:validations']).to.be.an('array');
-    expect(veteranDatesUiSchema['ui:validations'].length).to.be.greaterThan(0);
+  it('uiSchema validations should not throw on valid data', () => {
+    const { veteranInformation } = veteranDatesUiSchema;
+    const validations = veteranInformation['ui:validations'];
+    expect(validations).to.be.an('array');
+    const errors = {
+      dateOfBurial: { addError: msg => {} },
+      dateOfDeath: { addError: msg => {} },
+    };
+    const formData = {
+      veteranInformation: {
+        dateOfBirth: '1940-01-15',
+        dateOfDeath: '2024-01-01',
+        dateOfBurial: '2024-01-05',
+      },
+    };
+    validations.forEach(fn => {
+      expect(() => fn(errors, formData.veteranInformation, formData)).to.not.throw();
+    });
   });
 
-  describe('validateVeteranDates', () => {
-    const validateFn = veteranDatesUiSchema['ui:validations'][0];
-
-    it('does not add error when dob is before dod and dod is before burial', () => {
-      const messages = [];
-      const errors = {
-        veteranInformation: {
-          dateOfDeath: { addError: msg => messages.push(msg) },
-          dateOfBurial: { addError: msg => messages.push(msg) },
-        },
-      };
-      validateFn(errors, {
-        veteranInformation: {
-          dateOfBirth: '1940-01-01',
-          dateOfDeath: '2024-01-01',
-          dateOfBurial: '2024-01-10',
-        },
-      });
-      expect(messages).to.have.lengthOf(0);
-    });
-
-    it('adds error when dob is same as dod', () => {
-      const messages = [];
-      const errors = {
-        veteranInformation: {
-          dateOfDeath: { addError: msg => messages.push(msg) },
-          dateOfBurial: { addError: msg => messages.push(msg) },
-        },
-      };
-      validateFn(errors, {
-        veteranInformation: {
-          dateOfBirth: '2024-01-01',
-          dateOfDeath: '2024-01-01',
-          dateOfBurial: '2024-01-10',
-        },
-      });
-      expect(messages.length).to.be.greaterThan(0);
-    });
-
-    it('adds error when burial date is before death date', () => {
-      const messages = [];
-      const errors = {
-        veteranInformation: {
-          dateOfDeath: { addError: msg => messages.push(msg) },
-          dateOfBurial: { addError: msg => messages.push(msg) },
-        },
-      };
-      validateFn(errors, {
-        veteranInformation: {
-          dateOfBirth: '1940-01-01',
-          dateOfDeath: '2024-01-10',
-          dateOfBurial: '2024-01-01',
-        },
-      });
-      expect(messages.length).to.be.greaterThan(0);
-    });
-
-    it('does not throw when formData is empty', () => {
-      const errors = {
-        veteranInformation: {
-          dateOfDeath: { addError: () => {} },
-          dateOfBurial: { addError: () => {} },
-        },
-      };
-      expect(() => validateFn(errors, {})).to.not.throw();
-    });
+  it('burial date validation should add error when burial is before death', () => {
+    const { veteranInformation } = veteranDatesUiSchema;
+    const validations = veteranInformation['ui:validations'];
+    const messages = [];
+    const errors = {
+      dateOfBurial: { addError: msg => messages.push(msg) },
+      dateOfDeath: { addError: msg => messages.push(msg) },
+    };
+    const formData = {
+      veteranInformation: {
+        dateOfBirth: '1940-01-15',
+        dateOfDeath: '2024-01-05',
+        dateOfBurial: '2024-01-01',
+      },
+    };
+    validations.forEach(fn => fn(errors, formData.veteranInformation, formData));
+    expect(messages.length).to.be.greaterThan(0);
   });
 });

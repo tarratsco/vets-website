@@ -1,33 +1,28 @@
 import { expect } from 'chai';
-import { applicantInfoUiSchema, applicantInfoSchema } from './applicantInfo';
+import {
+  applicantInfoUiSchema,
+  applicantInfoSchema,
+} from './applicantInfo';
 
 describe('chapters/applicantInfo', () => {
-  it('exports uiSchema and schema', () => {
+  it('should export uiSchema and schema', () => {
     expect(applicantInfoUiSchema).to.be.an('object');
     expect(applicantInfoSchema).to.be.an('object');
   });
 
-  it('has name fields in uiSchema', () => {
-    const fields = applicantInfoUiSchema.applicant;
-    expect(fields.firstName).to.exist;
-    expect(fields.middleName).to.exist;
-    expect(fields.lastName).to.exist;
+  it('uiSchema should have name and address fields', () => {
+    const { applicant } = applicantInfoUiSchema;
+    expect(applicant).to.have.property('firstName');
+    expect(applicant).to.have.property('lastName');
+    expect(applicant).to.have.property('addressLine1');
+    expect(applicant).to.have.property('city');
+    expect(applicant).to.have.property('state');
+    expect(applicant).to.have.property('zip');
+    expect(applicant).to.have.property('relationshipToVeteran');
   });
 
-  it('has address fields in uiSchema', () => {
-    const fields = applicantInfoUiSchema.applicant;
-    expect(fields.addressLine1).to.exist;
-    expect(fields.city).to.exist;
-    expect(fields.state).to.exist;
-    expect(fields.zip).to.exist;
-  });
-
-  it('has relationshipToVeteran in uiSchema', () => {
-    expect(applicantInfoUiSchema.applicant.relationshipToVeteran).to.exist;
-  });
-
-  it('schema requires first name, last name, address, and relationship', () => {
-    const required = applicantInfoSchema.properties.applicant.required;
+  it('schema should require core fields', () => {
+    const { required } = applicantInfoSchema.properties.applicant;
     expect(required).to.include('firstName');
     expect(required).to.include('lastName');
     expect(required).to.include('addressLine1');
@@ -35,19 +30,11 @@ describe('chapters/applicantInfo', () => {
     expect(required).to.include('state');
     expect(required).to.include('zip');
     expect(required).to.include('relationshipToVeteran');
-  });
-
-  it('schema does not require middleName', () => {
-    const required = applicantInfoSchema.properties.applicant.required;
     expect(required).to.not.include('middleName');
   });
 
-  it('relationshipToVeteran schema includes funeralDirector', () => {
-    const enumValues =
-      applicantInfoSchema.properties.applicant.properties
-        .relationshipToVeteran.enum;
-    expect(enumValues).to.include('funeralDirector');
-    expect(enumValues).to.include('survivingSpouse');
-    expect(enumValues).to.include('vsoRepresentative');
+  it('relationshipToVeteran enum should include funeralDirector', () => {
+    const { relationshipToVeteran } = applicantInfoSchema.properties.applicant.properties;
+    expect(relationshipToVeteran.enum).to.include('funeralDirector');
   });
 });
