@@ -1,0 +1,12 @@
+{
+  "appName": "Apply for Burial Flag",
+  "entryFile": "./app-entry.jsx",
+  "entryName": "burial-flag-27-2008",
+  "rootUrl": "/burials-memorials/memorial-items/burial-flag",
+  "productId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "template": {
+    "vagovprod": false,
+    "layout": "page-react.html",
+    "includeBreadcrumbs": true
+  }
+}
