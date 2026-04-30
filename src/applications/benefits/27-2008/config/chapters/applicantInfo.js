@@ -5,68 +5,33 @@ import {
   selectSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const US_STATE_LABELS = {
-  AL: 'Alabama',
-  AK: 'Alaska',
-  AZ: 'Arizona',
-  AR: 'Arkansas',
-  CA: 'California',
-  CO: 'Colorado',
-  CT: 'Connecticut',
-  DE: 'Delaware',
-  DC: 'District of Columbia',
-  FL: 'Florida',
-  GA: 'Georgia',
-  HI: 'Hawaii',
-  ID: 'Idaho',
-  IL: 'Illinois',
-  IN: 'Indiana',
-  IA: 'Iowa',
-  KS: 'Kansas',
-  KY: 'Kentucky',
-  LA: 'Louisiana',
-  ME: 'Maine',
-  MD: 'Maryland',
-  MA: 'Massachusetts',
-  MI: 'Michigan',
-  MN: 'Minnesota',
-  MS: 'Mississippi',
-  MO: 'Missouri',
-  MT: 'Montana',
-  NE: 'Nebraska',
-  NV: 'Nevada',
-  NH: 'New Hampshire',
-  NJ: 'New Jersey',
-  NM: 'New Mexico',
-  NY: 'New York',
-  NC: 'North Carolina',
-  ND: 'North Dakota',
-  OH: 'Ohio',
-  OK: 'Oklahoma',
-  OR: 'Oregon',
-  PA: 'Pennsylvania',
-  RI: 'Rhode Island',
-  SC: 'South Carolina',
-  SD: 'South Dakota',
-  TN: 'Tennessee',
-  TX: 'Texas',
-  UT: 'Utah',
-  VT: 'Vermont',
-  VA: 'Virginia',
-  WA: 'Washington',
-  WV: 'West Virginia',
-  WI: 'Wisconsin',
-  WY: 'Wyoming',
-  PR: 'Puerto Rico',
-  GU: 'Guam',
-  VI: 'U.S. Virgin Islands',
-  AS: 'American Samoa',
-  MP: 'Northern Mariana Islands',
-  UM: 'U.S. Minor Outlying Islands',
+const US_STATES = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'DC', 'FL',
+  'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME',
+  'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH',
+  'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI',
+  'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI',
+  'WY', 'PR', 'GU', 'VI', 'AS', 'MP', 'UM', 'OUTSIDE_US',
+];
+
+const STATE_LABELS = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas',
+  CA: 'California', CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware',
+  DC: 'District of Columbia', FL: 'Florida', GA: 'Georgia', HI: 'Hawaii',
+  ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa', KS: 'Kansas',
+  KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
+  MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi',
+  MO: 'Missouri', MT: 'Montana', NE: 'Nebraska', NV: 'Nevada',
+  NH: 'New Hampshire', NJ: 'New Jersey', NM: 'New Mexico', NY: 'New York',
+  NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio', OK: 'Oklahoma',
+  OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
+  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah',
+  VT: 'Vermont', VA: 'Virginia', WA: 'Washington', WV: 'West Virginia',
+  WI: 'Wisconsin', WY: 'Wyoming', PR: 'Puerto Rico', GU: 'Guam',
+  VI: 'U.S. Virgin Islands', AS: 'American Samoa',
+  MP: 'Northern Mariana Islands', UM: 'U.S. Minor Outlying Islands',
   OUTSIDE_US: 'Outside the United States',
 };
-
-const STATE_KEYS = Object.keys(US_STATE_LABELS);
 
 const APPLICANT_RELATIONSHIP_LABELS = {
   survivingSpouse: 'Surviving spouse',
@@ -77,8 +42,7 @@ const APPLICANT_RELATIONSHIP_LABELS = {
   nephewOrNiece: 'Nephew or niece',
   cousinOrGrandparent: 'Cousin or grandparent',
   funeralDirector: 'Funeral director or funeral home representative',
-  vsoRepresentative:
-    'Veterans Service Organization (VSO) representative',
+  vsoRepresentative: 'Veterans Service Organization (VSO) representative',
   closeFriend: 'Close friend',
   otherAuthorizedRepresentative: 'Other authorized representative',
 };
@@ -92,38 +56,55 @@ export const applicantInfoUiSchema = {
       'Enter your name as the person submitting this application. This may be different from the person entitled to receive the flag if you are a funeral director, VSO representative, or authorized submitter.',
     firstName: textUI({
       title: 'Your first name',
-      errorMessages: { required: 'Please enter your first name.' },
+      autocomplete: 'given-name',
+      errorMessages: {
+        required: 'Please enter your first name.',
+      },
     }),
     middleName: textUI({
       title: 'Your middle name (optional)',
+      autocomplete: 'additional-name',
     }),
     lastName: textUI({
       title: 'Your last name',
-      errorMessages: { required: 'Please enter your last name.' },
+      autocomplete: 'family-name',
+      errorMessages: {
+        required: 'Please enter your last name.',
+      },
     }),
     addressLine1: textUI({
       title: 'Your street address or rural route, or P.O. Box',
       autocomplete: 'street-address',
-      errorMessages: { required: 'Please enter your street address.' },
+      errorMessages: {
+        required: 'Please enter your street address.',
+      },
     }),
     addressLine2: textUI({
       title: 'Apartment, suite, unit (optional)',
+      autocomplete: 'address-line2',
     }),
     city: textUI({
       title: 'Your city',
       autocomplete: 'address-level2',
-      errorMessages: { required: 'Please enter your city.' },
+      errorMessages: {
+        required: 'Please enter your city.',
+      },
     }),
     state: selectUI({
       title: 'Your state or territory',
-      labels: US_STATE_LABELS,
-      errorMessages: { required: 'Please select your state.' },
+      labels: STATE_LABELS,
+      errorMessages: {
+        required: 'Please select your state or territory.',
+      },
     }),
     zip: textUI({
       title: 'Your ZIP code',
-      inputType: 'text',
       autocomplete: 'postal-code',
-      errorMessages: { required: 'Please enter a valid ZIP code.' },
+      inputType: 'text',
+      errorMessages: {
+        required: 'Please enter your ZIP code.',
+        pattern: 'Please enter a valid ZIP code (5 digits).',
+      },
     }),
     relationshipToVeteran: selectUI({
       title: 'Your relationship to the deceased Veteran',
@@ -134,24 +115,18 @@ export const applicantInfoUiSchema = {
         required: 'Please select your relationship to the deceased Veteran.',
       },
     }),
-    relationshipToVeteranOther: {
-      ...textUI({
-        title: 'Describe your relationship (required if "Other" selected)',
-        errorMessages: {
-          required: 'Please describe your relationship.',
-        },
-      }),
+    relationshipToVeteranOther: textUI({
+      title: 'Describe your relationship (optional)',
       'ui:options': {
         expandUnder: 'relationshipToVeteran',
         expandUnderCondition: 'otherAuthorizedRepresentative',
       },
-    },
+    }),
   },
 };
 
 export const applicantInfoSchema = {
   type: 'object',
-  required: ['applicant'],
   properties: {
     applicant: {
       type: 'object',
@@ -165,13 +140,35 @@ export const applicantInfoSchema = {
         'relationshipToVeteran',
       ],
       properties: {
-        firstName: { type: 'string', minLength: 1, maxLength: 30 },
-        middleName: { type: 'string', maxLength: 30 },
-        lastName: { type: 'string', minLength: 1, maxLength: 30 },
-        addressLine1: { type: 'string', minLength: 1, maxLength: 100 },
-        addressLine2: { type: 'string', maxLength: 100 },
-        city: { type: 'string', minLength: 1, maxLength: 50 },
-        state: selectSchema(STATE_KEYS),
+        firstName: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 30,
+        },
+        middleName: {
+          type: 'string',
+          maxLength: 30,
+        },
+        lastName: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 30,
+        },
+        addressLine1: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 100,
+        },
+        addressLine2: {
+          type: 'string',
+          maxLength: 100,
+        },
+        city: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 50,
+        },
+        state: selectSchema(US_STATES),
         zip: {
           type: 'string',
           pattern: '^[0-9]{5}(-[0-9]{4})?$',
@@ -179,7 +176,10 @@ export const applicantInfoSchema = {
           maxLength: 10,
         },
         relationshipToVeteran: selectSchema(APPLICANT_RELATIONSHIP_KEYS),
-        relationshipToVeteranOther: { type: 'string', maxLength: 100 },
+        relationshipToVeteranOther: {
+          type: 'string',
+          maxLength: 100,
+        },
       },
     },
   },

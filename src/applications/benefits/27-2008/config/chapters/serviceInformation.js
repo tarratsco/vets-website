@@ -20,9 +20,19 @@ const BRANCH_LABELS = {
 
 const BRANCH_KEYS = Object.keys(BRANCH_LABELS);
 
+function validateServiceDates(errors, formData) {
+  const entered = formData?.serviceInformation?.dateEnteredActiveDuty;
+  const released = formData?.serviceInformation?.dateReleasedFromActiveDuty;
+  if (entered && released && entered >= released) {
+    errors.serviceInformation.dateReleasedFromActiveDuty.addError(
+      'Date released from active duty must be after date entered active duty.',
+    );
+  }
+}
+
 export const serviceInformationUiSchema = {
   serviceInformation: {
-    'ui:title': 'Military service information',
+    'ui:title': "Veteran's service information",
     branchOfService: checkboxGroupUI({
       title: 'Branch of service',
       hint:
@@ -55,11 +65,11 @@ export const serviceInformationUiSchema = {
       },
     }),
   },
+  'ui:validations': [validateServiceDates],
 };
 
 export const serviceInformationSchema = {
   type: 'object',
-  required: ['serviceInformation'],
   properties: {
     serviceInformation: {
       type: 'object',

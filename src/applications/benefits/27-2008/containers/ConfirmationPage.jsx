@@ -16,28 +16,19 @@ export const ConfirmationPage = ({ route }) => {
   const veteranFirstName = form?.data?.veteranInformation?.firstName || '';
   const veteranLastName = form?.data?.veteranInformation?.lastName || '';
 
-  const alertContent = (
-    <div>
+  const submissionAlertContent = (
+    <>
       <p>
-        Thank you for submitting your application for a United States burial
-        flag.
+        We've received your application for a burial flag for{' '}
+        {veteranFirstName} {veteranLastName}. We'll review your application and
+        contact you if we need additional information.
       </p>
-      <p>
-        We've received your application and will process it according to VA
-        burial flag issuance procedures. NCA Field Programs will review your
-        application and contact you if additional information is needed.
-      </p>
-      {veteranFirstName && veteranLastName && (
-        <p>
-          <strong>Veteran:</strong> {veteranFirstName} {veteranLastName}
-        </p>
-      )}
       {confirmationNumber && (
         <p>
-          <strong>Confirmation number:</strong> {confirmationNumber}
+          <strong>Your confirmation number is {confirmationNumber}.</strong>
         </p>
       )}
-    </div>
+    </>
   );
 
   return (
@@ -49,17 +40,17 @@ export const ConfirmationPage = ({ route }) => {
     >
       <ConfirmationView.SubmissionAlert
         title="You've submitted your burial flag application"
-        content={alertContent}
+        content={submissionAlertContent}
         actions={<p />}
       />
       <ConfirmationView.ChapterSectionCollection />
       <ConfirmationView.PrintThisPage />
       <ConfirmationView.WhatsNextProcessList
-        item1Header="We'll review your application"
-        item1Content="NCA Field Programs will review your application. If we need more information, we'll contact you."
+        item1Header="VA reviews your application"
+        item1Content="We'll review your application and the discharge documentation you provided. If we need more information, we'll contact you."
         item1Actions={<p />}
-        item2Header="We'll process the flag issuance"
-        item2Content="Once approved, a burial flag will be issued through the appropriate channel."
+        item2Header="Flag is issued"
+        item2Content="If the Veteran is eligible, the National Cemetery Administration (NCA) Field Programs office will coordinate issuance of the burial flag."
       />
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />

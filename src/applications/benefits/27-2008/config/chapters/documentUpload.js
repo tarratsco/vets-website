@@ -4,7 +4,7 @@ import {
 } from 'platform/forms-system/src/js/web-component-patterns';
 
 function isDocumentationRequired(formData) {
-  return formData?.eligibility?.documentationAvailable === 'yes';
+  return formData?.eligibility?.documentationAvailable === 'Y';
 }
 
 export const documentUploadUiSchema = {

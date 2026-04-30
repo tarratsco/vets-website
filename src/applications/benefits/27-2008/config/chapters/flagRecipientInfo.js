@@ -35,37 +35,40 @@ export const flagRecipientInfoUiSchema = {
       title: 'Relationship to the deceased Veteran',
       hint:
         'Select the relationship of the person receiving the flag to the deceased Veteran. The flag is generally given in this order of precedence per Section F of the form instructions: surviving spouse, children, parents, brothers or sisters, uncles or aunts, nephews or nieces, others.',
+      labels: RELATIONSHIP_LABELS,
       errorMessages: {
         required:
           'Please select the relationship of the person receiving the flag to the deceased Veteran.',
       },
     }),
-    recipientRelationshipOther: {
-      ...textUI({
-        title: 'Describe the relationship (required if "Other" selected)',
-        errorMessages: {
-          required: 'Please describe the relationship.',
-        },
-      }),
+    recipientRelationshipOther: textUI({
+      title: 'Describe the relationship (optional)',
+      hint: 'Please describe the relationship to the deceased Veteran.',
       'ui:options': {
         expandUnder: 'recipientRelationship',
         expandUnderCondition: 'other',
       },
-    },
+    }),
   },
 };
 
 export const flagRecipientInfoSchema = {
   type: 'object',
-  required: ['flagRecipient'],
   properties: {
     flagRecipient: {
       type: 'object',
       required: ['recipientFullName', 'recipientRelationship'],
       properties: {
-        recipientFullName: { type: 'string', minLength: 1, maxLength: 80 },
+        recipientFullName: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 80,
+        },
         recipientRelationship: selectSchema(RELATIONSHIP_KEYS),
-        recipientRelationshipOther: { type: 'string', maxLength: 100 },
+        recipientRelationshipOther: {
+          type: 'string',
+          maxLength: 100,
+        },
       },
     },
   },

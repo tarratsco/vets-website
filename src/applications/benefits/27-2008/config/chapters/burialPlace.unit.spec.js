@@ -1,25 +1,31 @@
 import { expect } from 'chai';
 import { burialPlaceUiSchema, burialPlaceSchema } from './burialPlace';
 
-describe('burialPlace page', () => {
-  it('uiSchema has veteranInformation group with burial place fields', () => {
-    const vi = burialPlaceUiSchema.veteranInformation;
-    expect(vi).to.have.property('placeOfBurialCemeteryName');
-    expect(vi).to.have.property('placeOfBurialCity');
-    expect(vi).to.have.property('placeOfBurialState');
+describe('chapters/burialPlace', () => {
+  it('exports uiSchema and schema', () => {
+    expect(burialPlaceUiSchema).to.be.an('object');
+    expect(burialPlaceSchema).to.be.an('object');
   });
 
-  it('schema requires placeOfBurialCemeteryName, placeOfBurialCity, placeOfBurialState', () => {
-    const vi = burialPlaceSchema.properties.veteranInformation;
-    expect(vi.required).to.include('placeOfBurialCemeteryName');
-    expect(vi.required).to.include('placeOfBurialCity');
-    expect(vi.required).to.include('placeOfBurialState');
+  it('has placeOfBurialCemeteryName, placeOfBurialCity, placeOfBurialState in uiSchema', () => {
+    const fields = burialPlaceUiSchema.veteranInformation;
+    expect(fields.placeOfBurialCemeteryName).to.exist;
+    expect(fields.placeOfBurialCity).to.exist;
+    expect(fields.placeOfBurialState).to.exist;
   });
 
-  it('placeOfBurialState schema is a valid schema object', () => {
-    const props = burialPlaceSchema.properties.veteranInformation.properties;
-    expect(props.placeOfBurialState).to.be.an('object');
-    expect(props.placeOfBurialState.enum).to.be.an('array');
-    expect(props.placeOfBurialState.enum).to.include('OUTSIDE_US');
+  it('schema requires all three burial place fields', () => {
+    const required =
+      burialPlaceSchema.properties.veteranInformation.required;
+    expect(required).to.include('placeOfBurialCemeteryName');
+    expect(required).to.include('placeOfBurialCity');
+    expect(required).to.include('placeOfBurialState');
+  });
+
+  it('placeOfBurialState schema has OUTSIDE_US enum value', () => {
+    const stateSchema =
+      burialPlaceSchema.properties.veteranInformation.properties
+        .placeOfBurialState;
+    expect(stateSchema.enum).to.include('OUTSIDE_US');
   });
 });

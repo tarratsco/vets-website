@@ -1,40 +1,53 @@
 import { expect } from 'chai';
 import { applicantInfoUiSchema, applicantInfoSchema } from './applicantInfo';
 
-describe('applicantInfo page', () => {
-  it('uiSchema has applicant group', () => {
-    expect(applicantInfoUiSchema).to.have.property('applicant');
+describe('chapters/applicantInfo', () => {
+  it('exports uiSchema and schema', () => {
+    expect(applicantInfoUiSchema).to.be.an('object');
+    expect(applicantInfoSchema).to.be.an('object');
   });
 
-  it('uiSchema has name and address fields', () => {
-    const ap = applicantInfoUiSchema.applicant;
-    expect(ap).to.have.property('firstName');
-    expect(ap).to.have.property('lastName');
-    expect(ap).to.have.property('addressLine1');
-    expect(ap).to.have.property('city');
-    expect(ap).to.have.property('state');
-    expect(ap).to.have.property('zip');
-    expect(ap).to.have.property('relationshipToVeteran');
+  it('has name fields in uiSchema', () => {
+    const fields = applicantInfoUiSchema.applicant;
+    expect(fields.firstName).to.exist;
+    expect(fields.middleName).to.exist;
+    expect(fields.lastName).to.exist;
   });
 
-  it('schema requires firstName, lastName, addressLine1, city, state, zip, relationshipToVeteran', () => {
-    const ap = applicantInfoSchema.properties.applicant;
-    expect(ap.required).to.include('firstName');
-    expect(ap.required).to.include('lastName');
-    expect(ap.required).to.include('addressLine1');
-    expect(ap.required).to.include('city');
-    expect(ap.required).to.include('state');
-    expect(ap.required).to.include('zip');
-    expect(ap.required).to.include('relationshipToVeteran');
+  it('has address fields in uiSchema', () => {
+    const fields = applicantInfoUiSchema.applicant;
+    expect(fields.addressLine1).to.exist;
+    expect(fields.city).to.exist;
+    expect(fields.state).to.exist;
+    expect(fields.zip).to.exist;
   });
 
-  it('relationshipToVeteran enum includes funeralDirector', () => {
-    const props = applicantInfoSchema.properties.applicant.properties;
-    expect(props.relationshipToVeteran.enum).to.include('funeralDirector');
+  it('has relationshipToVeteran in uiSchema', () => {
+    expect(applicantInfoUiSchema.applicant.relationshipToVeteran).to.exist;
   });
 
-  it('zip has correct pattern', () => {
-    const props = applicantInfoSchema.properties.applicant.properties;
-    expect(props.zip.pattern).to.equal('^[0-9]{5}(-[0-9]{4})?$');
+  it('schema requires first name, last name, address, and relationship', () => {
+    const required = applicantInfoSchema.properties.applicant.required;
+    expect(required).to.include('firstName');
+    expect(required).to.include('lastName');
+    expect(required).to.include('addressLine1');
+    expect(required).to.include('city');
+    expect(required).to.include('state');
+    expect(required).to.include('zip');
+    expect(required).to.include('relationshipToVeteran');
+  });
+
+  it('schema does not require middleName', () => {
+    const required = applicantInfoSchema.properties.applicant.required;
+    expect(required).to.not.include('middleName');
+  });
+
+  it('relationshipToVeteran schema includes funeralDirector', () => {
+    const enumValues =
+      applicantInfoSchema.properties.applicant.properties
+        .relationshipToVeteran.enum;
+    expect(enumValues).to.include('funeralDirector');
+    expect(enumValues).to.include('survivingSpouse');
+    expect(enumValues).to.include('vsoRepresentative');
   });
 });

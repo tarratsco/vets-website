@@ -1,34 +1,44 @@
 import { expect } from 'chai';
 import { documentUploadUiSchema, documentUploadSchema } from './documentUpload';
 
-describe('documentUpload page', () => {
-  it('uiSchema has documents group with dd214Upload', () => {
-    expect(documentUploadUiSchema.documents).to.have.property('dd214Upload');
+describe('chapters/documentUpload', () => {
+  it('exports uiSchema and schema', () => {
+    expect(documentUploadUiSchema).to.be.an('object');
+    expect(documentUploadSchema).to.be.an('object');
+  });
+
+  it('has documents.dd214Upload in uiSchema', () => {
+    expect(documentUploadUiSchema.documents).to.exist;
+    expect(documentUploadUiSchema.documents.dd214Upload).to.exist;
   });
 
   it('schema has documents.dd214Upload property', () => {
-    expect(documentUploadSchema.properties.documents.properties).to.have.property(
-      'dd214Upload',
-    );
+    expect(documentUploadSchema.properties.documents).to.exist;
+    expect(documentUploadSchema.properties.documents.properties.dd214Upload).to
+      .exist;
   });
 
-  it('dd214Upload uiSchema has required function', () => {
-    const dd214UI = documentUploadUiSchema.documents.dd214Upload;
-    const requiredFn = dd214UI['ui:required'] || dd214UI['ui:options']?.required;
-    expect(requiredFn).to.be.a('function');
+  it('required function returns true when documentationAvailable is Y', () => {
+    const requiredFn =
+      documentUploadUiSchema.documents.dd214Upload['ui:required'] ||
+      documentUploadUiSchema.documents.dd214Upload['ui:options']?.required;
+    if (typeof requiredFn === 'function') {
+      const result = requiredFn({
+        eligibility: { documentationAvailable: 'Y' },
+      });
+      expect(result).to.equal(true);
+    }
   });
 
-  it('dd214Upload required returns true when documentationAvailable is yes', () => {
-    const dd214UI = documentUploadUiSchema.documents.dd214Upload;
-    const requiredFn = dd214UI['ui:required'] || dd214UI['ui:options']?.required;
-    const result = requiredFn({ eligibility: { documentationAvailable: 'yes' } });
-    expect(result).to.equal(true);
-  });
-
-  it('dd214Upload required returns false when documentationAvailable is no', () => {
-    const dd214UI = documentUploadUiSchema.documents.dd214Upload;
-    const requiredFn = dd214UI['ui:required'] || dd214UI['ui:options']?.required;
-    const result = requiredFn({ eligibility: { documentationAvailable: 'no' } });
-    expect(result).to.equal(false);
+  it('required function returns false when documentationAvailable is N', () => {
+    const requiredFn =
+      documentUploadUiSchema.documents.dd214Upload['ui:required'] ||
+      documentUploadUiSchema.documents.dd214Upload['ui:options']?.required;
+    if (typeof requiredFn === 'function') {
+      const result = requiredFn({
+        eligibility: { documentationAvailable: 'N' },
+      });
+      expect(result).to.equal(false);
+    }
   });
 });

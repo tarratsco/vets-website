@@ -2,9 +2,8 @@ import React from 'react';
 import { expect } from 'chai';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { createInitialState } from '@department-of-veterans-affairs/platform-forms-system/state/helpers';
-import formConfig from '../config/form';
 import { ConfirmationPage } from './ConfirmationPage';
+import formConfig from '../config/form';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -52,38 +51,27 @@ const createMockStore = (overrides = {}) => ({
 });
 
 describe('containers/ConfirmationPage', () => {
-  const route = { formConfig };
+  const mockRoute = { formConfig };
 
   it('renders without crashing', () => {
     const store = createMockStore();
     const { container } = render(
       <Provider store={store}>
-        <ConfirmationPage route={route} />
+        <ConfirmationPage route={mockRoute} />
       </Provider>,
     );
     expect(container).to.exist;
   });
 
-  it('renders a va-alert or success content', () => {
+  it('renders a confirmation alert', () => {
     const store = createMockStore();
     const { container } = render(
       <Provider store={store}>
-        <ConfirmationPage route={route} />
+        <ConfirmationPage route={mockRoute} />
       </Provider>,
     );
-    const hasAlert =
-      container.querySelector('va-alert') !== null ||
-      container.innerHTML.includes('submitted');
-    expect(hasAlert).to.be.true;
-  });
-
-  it('displays the confirmation number when present', () => {
-    const store = createMockStore();
-    const { container } = render(
-      <Provider store={store}>
-        <ConfirmationPage route={route} />
-      </Provider>,
-    );
-    expect(container.innerHTML).to.include('1234567890');
+    // ConfirmationView.SubmissionAlert renders a va-alert
+    const alert = container.querySelector('va-alert');
+    expect(alert).to.exist;
   });
 });

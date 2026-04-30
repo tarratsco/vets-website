@@ -1,92 +1,122 @@
 import { expect } from 'chai';
 import { remarksUiSchema, remarksSchema } from './remarks';
 
-describe('remarks page', () => {
-  it('uiSchema has remarks field', () => {
-    expect(remarksUiSchema).to.have.property('remarks');
+describe('chapters/remarks', () => {
+  it('exports uiSchema and schema', () => {
+    expect(remarksUiSchema).to.be.an('object');
+    expect(remarksSchema).to.be.an('object');
   });
 
-  it('schema has remarks property with maxLength 1500', () => {
+  it('remarks schema has maxLength of 1500', () => {
     expect(remarksSchema.properties.remarks.maxLength).to.equal(1500);
   });
 
-  it('remarks is required when documentationAvailable is no', () => {
-    const requiredFn = remarksUiSchema.remarks['ui:required'];
-    expect(requiredFn).to.be.a('function');
-    expect(
-      requiredFn({ eligibility: { documentationAvailable: 'no' } }),
-    ).to.equal(true);
+  it('has ui:validations array', () => {
+    expect(remarksUiSchema['ui:validations']).to.be.an('array');
+    expect(remarksUiSchema['ui:validations'].length).to.be.greaterThan(0);
   });
 
-  it('remarks is required when recipientRelationship is friend', () => {
-    const requiredFn = remarksUiSchema.remarks['ui:required'];
-    expect(
-      requiredFn({ flagRecipient: { recipientRelationship: 'friend' } }),
-    ).to.equal(true);
-  });
+  describe('validateRemarks', () => {
+    const validateFn = remarksUiSchema['ui:validations'][0];
 
-  it('remarks is required when applicantType is closeFriend', () => {
-    const requiredFn = remarksUiSchema.remarks['ui:required'];
-    expect(requiredFn({ applicantType: 'closeFriend' })).to.equal(true);
-  });
+    let messages;
+    let errors;
 
-  it('remarks is not required when no trigger conditions are met', () => {
-    const requiredFn = remarksUiSchema.remarks['ui:required'];
-    expect(
-      requiredFn({
-        eligibility: { documentationAvailable: 'yes', dischargeCharacter: 'honorable' },
+    beforeEach(() => {
+      messages = [];
+      errors = {
+        remarks: { addError: msg => messages.push(msg) },
+      };
+    });
+
+    it('does not add error when documentation is available and remarks empty', () => {
+      validateFn(errors, {
+        eligibility: { documentationAvailable: 'Y' },
         flagRecipient: { recipientRelationship: 'survivingSpouse' },
         applicantType: 'nextOfKin',
         serviceInformation: { branchOfService: ['army'] },
-      }),
-    ).to.equal(false);
-  });
+      });
+      expect(messages).to.have.lengthOf(0);
+    });
 
-  it('remarks validation adds error when required but empty', () => {
-    const messages = [];
-    const errors = { addError: msg => messages.push(msg || '') };
-    const [validate] = remarksUiSchema.remarks['ui:validations'];
-    validate(
-      errors,
-      '',
-      { eligibility: { documentationAvailable: 'no' } },
-    );
-    expect(messages.length).to.equal(1);
-  });
-
-  it('remarks validation passes when required and value provided', () => {
-    const messages = [];
-    const errors = { addError: msg => messages.push(msg || '') };
-    const [validate] = remarksUiSchema.remarks['ui:validations'];
-    validate(
-      errors,
-      'This is a valid remark explaining eligibility.',
-      { eligibility: { documentationAvailable: 'no' } },
-    );
-    expect(messages.length).to.equal(0);
-  });
-
-  it('remarks validation passes when not required and empty', () => {
-    const messages = [];
-    const errors = { addError: msg => messages.push(msg || '') };
-    const [validate] = remarksUiSchema.remarks['ui:validations'];
-    validate(
-      errors,
-      '',
-      {
-        eligibility: { documentationAvailable: 'yes' },
-        applicantType: 'nextOfKin',
+    it('adds error when documentationAvailable is N and remarks is empty', () => {
+      validateFn(errors, {
+        eligibility: { documentationAvailable: 'N' },
         flagRecipient: { recipientRelationship: 'survivingSpouse' },
+        applicantType: 'nextOfKin',
         serviceInformation: { branchOfService: ['army'] },
-      },
-    );
-    expect(messages.length).to.equal(0);
+      });
+      expect(messages.length).to.equal(1);
+    });
+
+    it('adds error when recipient relationship is friend and remarks is empty', () => {
+      validateFn(errors, {
+        eligibility: { documentationAvailable: 'Y' },
+        flagRecipient: { recipientRelationship: 'friend' },
+        applicantType: 'nextOfKin',
+        serviceInformation: { branchOfService: ['army'] },
+      });
+      expect(messages.length).to.equal(1);
+    });
+
+    it('adds error when applicantType is closeFriend and remarks is empty', () => {
+      validateFn(errors, {
+        eligibility: { documentationAvailable: 'Y' },
+        flagRecipient: { recipientRelationship: 'survivingSpouse' },
+        applicantType: 'closeFriend',
+        serviceInformation: { branchOfService: ['army'] },
+      });
+      expect(messages.length).to.equal(1);
+    });
+
+    it('does not add error when remarks is provided and required', () => {
+      validateFn(errors, {
+        eligibility: { documentationAvailable: 'N' },
+        flagRecipient: { recipientRelationship: 'survivingSpouse' },
+        applicantType: 'nextOfKin',
+        serviceInformation: { branchOfService: ['army'] },
+        remarks: 'I know the Veteran personally and can attest to service.',
+      });
+      expect(messages).to.have.lengthOf(0);
+    });
+
+    it('does not throw on empty formData', () => {
+      expect(() => validateFn(errors, {})).to.not.throw();
+    });
+
+    it('adds error when branchOfService includes other and remarks is empty', () => {
+      validateFn(errors, {
+        eligibility: { documentationAvailable: 'Y' },
+        flagRecipient: { recipientRelationship: 'survivingSpouse' },
+        applicantType: 'nextOfKin',
+        serviceInformation: { branchOfService: ['other'] },
+      });
+      expect(messages.length).to.equal(1);
+    });
   });
 
-  it('remarks is required when branchOfService includes other', () => {
-    const requiredFn = remarksUiSchema.remarks['ui:required'];
-    expect(
-      requiredFn({ serviceInformation: { branchOfService: ['army', 'other'] } }),
-    ).to.equal(true);
+  describe('isRemarksRequired function', () => {
+    it('uiSchema remarks has a ui:required function', () => {
+      expect(remarksUiSchema.remarks['ui:required']).to.be.a('function');
+    });
+
+    it('returns true when documentationAvailable is N', () => {
+      const fn = remarksUiSchema.remarks['ui:required'];
+      expect(
+        fn({ eligibility: { documentationAvailable: 'N' } }),
+      ).to.equal(true);
+    });
+
+    it('returns false when all conditions are false', () => {
+      const fn = remarksUiSchema.remarks['ui:required'];
+      expect(
+        fn({
+          eligibility: { documentationAvailable: 'Y' },
+          flagRecipient: { recipientRelationship: 'survivingSpouse' },
+          applicantType: 'nextOfKin',
+          serviceInformation: { branchOfService: ['army'] },
+        }),
+      ).to.equal(false);
+    });
   });
 });

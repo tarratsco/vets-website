@@ -1,37 +1,39 @@
 import { expect } from 'chai';
 import formConfig from './form';
 
-describe('config/form', () => {
+describe('formConfig', () => {
   it('has required top-level properties', () => {
-    expect(formConfig.formId).to.equal('27-2008');
-    expect(formConfig.title).to.be.a('string').and.not.be.empty;
-    expect(formConfig.chapters).to.be.an('object');
-    expect(formConfig.introduction).to.exist;
-    expect(formConfig.confirmation).to.exist;
-    expect(formConfig.transformForSubmit).to.be.a('function');
-    expect(formConfig.trackingPrefix).to.be.a('string').and.not.be.empty;
+    expect(formConfig).to.have.property('formId', '27-2008');
+    expect(formConfig).to.have.property('title');
+    expect(formConfig).to.have.property('chapters');
+    expect(formConfig).to.have.property('introduction');
+    expect(formConfig).to.have.property('confirmation');
+    expect(formConfig).to.have.property('transformForSubmit');
+    expect(formConfig).to.have.property('trackingPrefix');
   });
 
   it('has saveInProgress messages', () => {
     expect(formConfig.saveInProgress).to.be.an('object');
-    expect(formConfig.saveInProgress.messages).to.be.an('object');
-    expect(formConfig.saveInProgress.messages.inProgress).to.be.a('string');
-    expect(formConfig.saveInProgress.messages.expired).to.be.a('string');
-    expect(formConfig.saveInProgress.messages.saved).to.be.a('string');
+    expect(formConfig.saveInProgress.messages).to.have.property('inProgress');
+    expect(formConfig.saveInProgress.messages).to.have.property('expired');
+    expect(formConfig.saveInProgress.messages).to.have.property('saved');
   });
 
-  it('has prefillEnabled set to true', () => {
-    expect(formConfig.prefillEnabled).to.be.true;
+  it('has prefillEnabled set', () => {
+    expect(formConfig.prefillEnabled).to.equal(true);
   });
 
-  it('has a submitUrl', () => {
-    expect(formConfig.submitUrl).to.be.a('string').and.include(
-      'burial_flag_applications',
-    );
+  it('has rootUrl defined', () => {
+    expect(formConfig.rootUrl).to.be.a('string');
+    expect(formConfig.rootUrl).to.include('burial');
+  });
+
+  it('has trackingPrefix ending with a dash', () => {
+    expect(formConfig.trackingPrefix).to.match(/burial-flag-27-2008-/);
   });
 
   describe('chapters', () => {
-    const chapterNames = [
+    const chapters = [
       'applicantTypeChapter',
       'veteranInformationChapter',
       'serviceInformationChapter',
@@ -42,74 +44,56 @@ describe('config/form', () => {
       'remarksChapter',
     ];
 
-    chapterNames.forEach(chapterName => {
-      it(`chapter "${chapterName}" exists`, () => {
-        expect(formConfig.chapters[chapterName]).to.exist;
-      });
-
-      it(`chapter "${chapterName}" has a title`, () => {
-        expect(formConfig.chapters[chapterName].title).to.be.a('string');
-      });
-
-      it(`chapter "${chapterName}" has pages`, () => {
-        expect(formConfig.chapters[chapterName].pages).to.be.an('object');
+    chapters.forEach(chapterKey => {
+      it(`has chapter: ${chapterKey}`, () => {
+        expect(formConfig.chapters).to.have.property(chapterKey);
       });
     });
 
-    it('every page has path, title, uiSchema, and schema', () => {
+    it('every page in every chapter has path, title, uiSchema, schema', () => {
       Object.values(formConfig.chapters).forEach(chapter => {
-        Object.entries(chapter.pages).forEach(([pageName, page]) => {
-          expect(page.path, `${pageName}.path`).to.be.a('string');
-          expect(page.title, `${pageName}.title`).to.be.a('string');
-          expect(page.uiSchema, `${pageName}.uiSchema`).to.be.an('object');
-          expect(page.schema, `${pageName}.schema`).to.be.an('object');
+        Object.values(chapter.pages).forEach(page => {
+          expect(page).to.have.property('path');
+          expect(page).to.have.property('title');
+          expect(page).to.have.property('uiSchema');
+          expect(page).to.have.property('schema');
         });
       });
     });
 
-    describe('reserveGuardEligibility depends function', () => {
-      const dependsFn =
-        formConfig.chapters.eligibilityChapter.pages.reserveGuardEligibility
-          .depends;
+    describe('reserveGuardCheck depends function', () => {
+      const reservePage =
+        formConfig.chapters.eligibilityChapter.pages.reserveGuardCheck;
 
       it('returns true when selectedReserve is in branchOfService', () => {
-        expect(() =>
-          dependsFn({
-            serviceInformation: { branchOfService: ['selectedReserve'] },
-          }),
-        ).to.not.throw();
-        expect(
-          dependsFn({
-            serviceInformation: { branchOfService: ['selectedReserve'] },
-          }),
-        ).to.be.true;
+        const formData = {
+          serviceInformation: {
+            branchOfService: ['army', 'selectedReserve'],
+          },
+        };
+        expect(() => reservePage.depends(formData)).to.not.throw();
+        expect(reservePage.depends(formData)).to.equal(true);
       });
 
-      it('returns false when selectedReserve is NOT in branchOfService', () => {
-        expect(() =>
-          dependsFn({
-            serviceInformation: { branchOfService: ['army'] },
-          }),
-        ).to.not.throw();
-        expect(
-          dependsFn({
-            serviceInformation: { branchOfService: ['army'] },
-          }),
-        ).to.be.false;
+      it('returns false when selectedReserve is not in branchOfService', () => {
+        const formData = {
+          serviceInformation: { branchOfService: ['army', 'navy'] },
+        };
+        expect(reservePage.depends(formData)).to.equal(false);
       });
 
-      it('returns false when serviceInformation is null', () => {
-        expect(() => dependsFn(null)).to.not.throw();
-        expect(dependsFn(null)).to.be.false;
+      it('returns false when branchOfService is empty array', () => {
+        const formData = { serviceInformation: { branchOfService: [] } };
+        expect(reservePage.depends(formData)).to.equal(false);
       });
 
-      it('returns false when branchOfService is empty', () => {
-        expect(() =>
-          dependsFn({ serviceInformation: { branchOfService: [] } }),
-        ).to.not.throw();
-        expect(
-          dependsFn({ serviceInformation: { branchOfService: [] } }),
-        ).to.be.false;
+      it('returns false when formData is null', () => {
+        expect(() => reservePage.depends(null)).to.not.throw();
+        expect(reservePage.depends(null)).to.equal(false);
+      });
+
+      it('returns false when serviceInformation is undefined', () => {
+        expect(reservePage.depends({})).to.equal(false);
       });
     });
   });

@@ -1,112 +1,125 @@
 import { expect } from 'chai';
 import { burialFlagTransform } from './transform';
-
-const mockFormConfig = { formId: '27-2008' };
-
-const buildMockForm = (dataOverrides = {}) => ({
-  data: {
-    applicantType: 'nextOfKin',
-    veteranInformation: {
-      firstName: 'John',
-      middleName: 'A',
-      lastName: 'Smith',
-      dateOfBirth: '1940-05-01',
-      dateOfDeath: '2024-01-01',
-      dateOfBurial: '2024-01-15',
-      placeOfBurialCemeteryName: 'Arlington National Cemetery',
-      placeOfBurialCity: 'Arlington',
-      placeOfBurialState: 'VA',
-    },
-    serviceInformation: {
-      branchOfService: ['army'],
-      dateEnteredActiveDuty: '1960-01-01',
-      dateReleasedFromActiveDuty: '1965-01-01',
-    },
-    eligibility: {
-      documentationAvailable: true,
-      dischargeCharacter: 'honorable',
-    },
-    flagRecipient: {
-      recipientFullName: 'Jane Smith',
-      recipientRelationship: 'survivingSpouse',
-      recipientAddressLine1: '123 Main St',
-      recipientCity: 'Springfield',
-      recipientState: 'VA',
-      recipientZip: '22301',
-    },
-    applicant: {
-      firstName: 'Jane',
-      lastName: 'Smith',
-      addressLine1: '123 Main St',
-      city: 'Springfield',
-      state: 'VA',
-      zip: '22301',
-      relationshipToVeteran: 'survivingSpouse',
-    },
-    dateSigned: '2024-01-10',
-    certificationChecked: true,
-    ...dataOverrides,
-  },
-});
+import formConfig from './form';
 
 describe('config/transform', () => {
+  it('is a function', () => {
+    expect(burialFlagTransform).to.be.a('function');
+  });
+
   it('returns a JSON string', () => {
-    const result = burialFlagTransform(
-      mockFormConfig,
-      buildMockForm(),
-    );
+    const mockForm = {
+      data: {
+        applicantType: 'nextOfKin',
+        veteranInformation: {
+          firstName: 'John',
+          lastName: 'Smith',
+          dateOfBirth: '1940-01-01',
+          dateOfDeath: '2024-01-01',
+          dateOfBurial: '2024-01-10',
+          placeOfBurialCemeteryName: 'Arlington',
+          placeOfBurialCity: 'Arlington',
+          placeOfBurialState: 'VA',
+        },
+        serviceInformation: {
+          branchOfService: ['army'],
+          dateEnteredActiveDuty: '1960-01-01',
+          dateReleasedFromActiveDuty: '1965-01-01',
+        },
+        eligibility: {
+          documentationAvailable: 'Y',
+          dischargeCharacter: 'honorable',
+        },
+        flagRecipient: {
+          recipientFullName: 'Jane Smith',
+          recipientRelationship: 'survivingSpouse',
+          recipientAddressLine1: '123 Main St',
+          recipientCity: 'Richmond',
+          recipientState: 'VA',
+          recipientZip: '23220',
+        },
+        applicant: {
+          firstName: 'Jane',
+          lastName: 'Smith',
+          addressLine1: '123 Main St',
+          city: 'Richmond',
+          state: 'VA',
+          zip: '23220',
+          relationshipToVeteran: 'survivingSpouse',
+        },
+        dateSigned: '2024-01-15',
+        certificationChecked: true,
+      },
+      pages: {},
+    };
+
+    const result = burialFlagTransform(formConfig, mockForm);
     expect(result).to.be.a('string');
-    expect(() => JSON.parse(result)).to.not.throw();
+
+    const parsed = JSON.parse(result);
+    expect(parsed).to.have.property('burialFlagApplication');
   });
 
-  it('wraps output in burialFlagApplication key', () => {
-    const result = JSON.parse(
-      burialFlagTransform(mockFormConfig, buildMockForm()),
-    );
-    expect(result.burialFlagApplication).to.be.an('object');
+  it('maps veteranInformation fields correctly', () => {
+    const mockForm = {
+      data: {
+        veteranInformation: {
+          firstName: 'John',
+          lastName: 'Smith',
+          dateOfBirth: '1940-01-01',
+          dateOfDeath: '2024-01-01',
+          dateOfBurial: '2024-01-10',
+          placeOfBurialCemeteryName: 'Arlington',
+          placeOfBurialCity: 'Arlington',
+          placeOfBurialState: 'VA',
+        },
+        serviceInformation: { branchOfService: ['army'] },
+        eligibility: {},
+        flagRecipient: {},
+        applicant: {},
+      },
+      pages: {},
+    };
+
+    const result = JSON.parse(burialFlagTransform(formConfig, mockForm));
+    expect(result.burialFlagApplication.veteranFirstName).to.equal('John');
+    expect(result.burialFlagApplication.veteranLastName).to.equal('Smith');
+    expect(result.burialFlagApplication.placeOfBurialState).to.equal('VA');
   });
 
-  it('maps veteran name fields correctly', () => {
-    const result = JSON.parse(
-      burialFlagTransform(mockFormConfig, buildMockForm()),
-    );
-    const app = result.burialFlagApplication;
-    expect(app.veteranFirstName).to.equal('John');
-    expect(app.veteranLastName).to.equal('Smith');
+  it('maps serviceInformation branchOfService correctly', () => {
+    const mockForm = {
+      data: {
+        veteranInformation: {},
+        serviceInformation: { branchOfService: ['army', 'navy'] },
+        eligibility: {},
+        flagRecipient: {},
+        applicant: {},
+      },
+      pages: {},
+    };
+
+    const result = JSON.parse(burialFlagTransform(formConfig, mockForm));
+    expect(result.burialFlagApplication.branchOfService).to.deep.equal([
+      'army',
+      'navy',
+    ]);
   });
 
-  it('maps applicantType to payload', () => {
-    const result = JSON.parse(
-      burialFlagTransform(mockFormConfig, buildMockForm()),
-    );
-    expect(result.burialFlagApplication.applicantType).to.equal(
-      'nextOfKin',
-    );
-  });
+  it('maps remarks correctly', () => {
+    const mockForm = {
+      data: {
+        veteranInformation: {},
+        serviceInformation: {},
+        eligibility: {},
+        flagRecipient: {},
+        applicant: {},
+        remarks: 'Some remarks text',
+      },
+      pages: {},
+    };
 
-  it('maps branchOfService array', () => {
-    const result = JSON.parse(
-      burialFlagTransform(mockFormConfig, buildMockForm()),
-    );
-    expect(result.burialFlagApplication.branchOfService).to.deep.equal(
-      ['army'],
-    );
-  });
-
-  it('maps flagRecipient fields', () => {
-    const result = JSON.parse(
-      burialFlagTransform(mockFormConfig, buildMockForm()),
-    );
-    const app = result.burialFlagApplication;
-    expect(app.flagRecipientFullName).to.equal('Jane Smith');
-    expect(app.flagRecipientRelationship).to.equal('survivingSpouse');
-  });
-
-  it('handles missing optional fields gracefully', () => {
-    const form = buildMockForm();
-    delete form.data.veteranInformation.middleName;
-    expect(() =>
-      burialFlagTransform(mockFormConfig, form),
-    ).to.not.throw();
+    const result = JSON.parse(burialFlagTransform(formConfig, mockForm));
+    expect(result.burialFlagApplication.remarks).to.equal('Some remarks text');
   });
 });

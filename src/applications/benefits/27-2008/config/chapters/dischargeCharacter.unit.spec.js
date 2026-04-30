@@ -4,22 +4,27 @@ import {
   dischargeCharacterSchema,
 } from './dischargeCharacter';
 
-describe('dischargeCharacter page', () => {
-  it('uiSchema has eligibility.dischargeCharacter', () => {
-    expect(dischargeCharacterUiSchema.eligibility).to.have.property(
-      'dischargeCharacter',
-    );
+describe('chapters/dischargeCharacter', () => {
+  it('exports uiSchema and schema', () => {
+    expect(dischargeCharacterUiSchema).to.be.an('object');
+    expect(dischargeCharacterSchema).to.be.an('object');
+  });
+
+  it('has dischargeCharacter field in uiSchema', () => {
+    expect(dischargeCharacterUiSchema.eligibility.dischargeCharacter).to.exist;
   });
 
   it('schema requires dischargeCharacter', () => {
-    const elg = dischargeCharacterSchema.properties.eligibility;
-    expect(elg.required).to.include('dischargeCharacter');
+    const required = dischargeCharacterSchema.properties.eligibility.required;
+    expect(required).to.include('dischargeCharacter');
   });
 
-  it('schema enum includes honorable, dishonorable, unknown', () => {
-    const props = dischargeCharacterSchema.properties.eligibility.properties;
-    expect(props.dischargeCharacter.enum).to.include('honorable');
-    expect(props.dischargeCharacter.enum).to.include('dishonorable');
-    expect(props.dischargeCharacter.enum).to.include('unknown');
+  it('schema enum has honorable, dishonorable, unknown', () => {
+    const enumValues =
+      dischargeCharacterSchema.properties.eligibility.properties
+        .dischargeCharacter.enum;
+    expect(enumValues).to.include('honorable');
+    expect(enumValues).to.include('dishonorable');
+    expect(enumValues).to.include('unknown');
   });
 });
