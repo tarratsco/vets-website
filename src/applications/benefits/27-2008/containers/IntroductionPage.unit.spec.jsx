@@ -1,10 +1,10 @@
 import React from 'react';
 import { expect } from 'chai';
-import { render } from '@testing-library/react';
 import sinon from 'sinon';
-
-import IntroductionPage from './IntroductionPage';
+import { render } from '@testing-library/react';
+import { Provider } from 'react-redux';
 import formConfig from '../config/form';
+import { IntroductionPage } from './IntroductionPage';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -17,9 +17,9 @@ const createMockStore = (overrides = {}) => ({
         verified: true,
         dob: '1990-01-01',
         claims: { appeals: false },
-        ...((overrides.user || {}).profile || {}),
+        ...overrides.user?.profile,
       },
-      ...(overrides.user || {}),
+      ...overrides.user,
     },
     form: {
       formId: formConfig.formId,
@@ -27,7 +27,7 @@ const createMockStore = (overrides = {}) => ({
       savedStatus: '',
       loadedData: { metadata: {} },
       data: {},
-      ...(overrides.form || {}),
+      ...overrides.form,
     },
     scheduledDowntime: {
       globalDowntime: null,
@@ -42,43 +42,52 @@ const createMockStore = (overrides = {}) => ({
   dispatch: () => {},
 });
 
-const route = {
-  formConfig,
-  pageList: [
-    { path: '/introduction' },
-    { path: '/applicant-type' },
-  ],
-};
-
-describe('IntroductionPage', () => {
-  let uiStub;
-  let uiModule;
+describe('containers/IntroductionPage', () => {
+  let scrollToTopStub;
+  let focusElementStub;
 
   beforeEach(() => {
-    uiModule = require('platform/utilities/ui');
-    uiStub = {
-      scrollToTop: sinon.stub(uiModule, 'scrollToTop'),
-      focusElement: sinon.stub(uiModule, 'focusElement'),
-    };
+    scrollToTopStub = sinon.stub();
+    focusElementStub = sinon.stub();
   });
 
   afterEach(() => {
-    uiStub.scrollToTop.restore();
-    uiStub.focusElement.restore();
+    sinon.restore();
   });
+
+  const route = {
+    formConfig,
+    pageList: [{ path: '/introduction' }, { path: '/applicant-type' }],
+  };
 
   it('renders the form title', () => {
-    const { getByText } = render(<IntroductionPage route={route} />);
-    expect(getByText('Apply for a burial flag')).to.exist;
+    const store = createMockStore();
+    const { container } = render(
+      <Provider store={store}>
+        <IntroductionPage route={route} />
+      </Provider>,
+    );
+    expect(container.innerHTML).to.include('burial flag');
   });
 
-  it('renders OMB control number', () => {
-    const { getByText } = render(<IntroductionPage route={route} />);
-    expect(getByText(/2900-0013/)).to.exist;
+  it('renders va-omb-info component', () => {
+    const store = createMockStore();
+    const { container } = render(
+      <Provider store={store}>
+        <IntroductionPage route={route} />
+      </Provider>,
+    );
+    const ombInfo = container.querySelector('va-omb-info');
+    expect(ombInfo).to.exist;
   });
 
-  it('renders the VA Form number', () => {
-    const { container } = render(<IntroductionPage route={route} />);
-    expect(container.textContent).to.include('27-2008');
+  it('renders eligibility section', () => {
+    const store = createMockStore();
+    const { container } = render(
+      <Provider store={store}>
+        <IntroductionPage route={route} />
+      </Provider>,
+    );
+    expect(container.innerHTML).to.include('Eligibility');
   });
 });

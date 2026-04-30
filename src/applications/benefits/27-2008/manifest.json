@@ -3,7 +3,7 @@
   "entryFile": "./app-entry.jsx",
   "entryName": "burial-flag-27-2008",
   "rootUrl": "/burials-memorials/memorial-items/burial-flag",
-  "productId": "bf270208-0000-0000-0000-000000000001",
+  "productId": "burial-flag-27-2008",
   "template": {
     "vagovprod": false,
     "layout": "page-react.html",

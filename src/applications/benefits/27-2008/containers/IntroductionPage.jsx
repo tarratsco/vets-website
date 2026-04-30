@@ -5,14 +5,11 @@ import FormTitle from 'platform/forms-system/src/js/components/FormTitle';
 import SaveInProgressIntro from 'platform/forms/save-in-progress/SaveInProgressIntro';
 import { focusElement, scrollToTop } from 'platform/utilities/ui';
 
-const TITLE = 'Apply for a burial flag';
-const SUBTITLE = 'VA Form 27-2008';
-
 const OMB_RES_BURDEN = 15;
 const OMB_NUMBER = '2900-0013';
 const OMB_EXP_DATE = '05/31/2027';
 
-export default function IntroductionPage({ route }) {
+export const IntroductionPage = ({ route }) => {
   const { formConfig, pageList } = route;
 
   useEffect(() => {
@@ -22,92 +19,91 @@ export default function IntroductionPage({ route }) {
 
   return (
     <article className="schemaform-intro">
-      <FormTitle title={TITLE} subTitle={SUBTITLE} />
+      <FormTitle
+        title="Apply for a United States burial flag"
+        subTitle="VA Form 27-2008"
+      />
 
-      <p className="vads-u-font-size--lg">
-        Use this form to apply for a United States burial flag to drape over
-        the casket, urn, or place of interment of a deceased Veteran.
+      <p className="vads-u-font-size--lg vads-u-font-family--serif vads-u-font-weight--normal vads-u-line-height--4">
+        Use this form to request a United States burial flag to drape the
+        casket or accompany the urn of a deceased Veteran during burial
+        services.
       </p>
 
       <va-alert status="info" visible>
-        <h2 slot="headline">What to know before you apply</h2>
+        <h2 slot="headline">What to know before you fill out this form</h2>
         <div>
           <p>
-            You may be eligible to receive a burial flag if you are the
-            next-of-kin, a funeral director, a Veterans Service Organization
-            (VSO) representative, or a close friend of the Veteran with no
-            living next-of-kin available.
+            You can submit this form without signing in. Sign in with
+            Login.gov or ID.me to save your progress and pre-fill
+            information from VA records.
           </p>
           <p>
-            Only one flag may be issued for each deceased Veteran.
+            Gather these items before you start:
+          </p>
+          <ul>
+            <li>
+              DD Form 214 (Certificate of Release or Discharge from Active
+              Duty) or other discharge documentation
+            </li>
+            <li>
+              The Veteran's Social Security Number or VA file number
+              (optional but helpful)
+            </li>
+            <li>
+              Information about the burial location (cemetery name, city,
+              and state)
+            </li>
+          </ul>
+          <p>
+            If you don't have the Veteran's DD Form 214, you can request it
+            from the National Personnel Records Center (NPRC) at{' '}
+            <a href="https://www.archives.gov/veterans/military-service-records">
+              archives.gov/veterans/military-service-records
+            </a>{' '}
+            or call 1-86-NARA-NARA.
           </p>
         </div>
       </va-alert>
 
-      <h2 className="vads-u-margin-top--3">What you'll need to apply</h2>
-      <ul>
-        <li>
-          The Veteran's DD Form 214 (Certificate of Release or Discharge from
-          Active Duty) or other official discharge documentation
-        </li>
-        <li>The Veteran's Social Security Number or VA file number (optional)</li>
-        <li>Dates of the Veteran's military service</li>
-        <li>Date and place of burial</li>
-        <li>Name and address of the person who will receive the flag</li>
-      </ul>
-
-      <h2>Who can apply</h2>
-      <p>Any of the following may apply:</p>
-      <ul>
-        <li>Next-of-kin (surviving spouse, child, parent, sibling, or other relative)</li>
-        <li>Funeral director or funeral home representative</li>
-        <li>Veterans Service Organization (VSO) representative or other authorized representative</li>
-        <li>Close friend of the Veteran when no next-of-kin is available</li>
-      </ul>
-
+      <h2>Eligibility</h2>
       <p>
-        <strong>Note:</strong> You can complete this form without signing in to
-        VA.gov. However, signing in lets you save your progress and pre-fill
-        some information from your VA profile.
+        VA may issue a burial flag for Veterans who served in the U.S. Armed
+        Forces and were discharged under conditions other than dishonorable.
+        This includes certain members of the Selected Reserve and some
+        Veterans of the Philippine military.
       </p>
 
       <SaveInProgressIntro
         formConfig={formConfig}
         pageList={pageList}
-        startText="Start your application"
-        unauthStartText="Start your application without signing in"
+        headingLevel={2}
         messages={formConfig.saveInProgress.messages}
         prefillEnabled={formConfig.prefillEnabled}
         downtime={formConfig.downtime}
         devOnly={{ forceShowFormControls: true }}
       />
 
-      <p className="vads-u-margin-top--4">
-        <strong>OMB Control No. {OMB_NUMBER}</strong>
-        <br />
-        <strong>Respondent Burden:</strong> {OMB_RES_BURDEN} minutes
-        <br />
-        <strong>Expiration Date:</strong> {OMB_EXP_DATE}
-      </p>
-      <p>
-        <a href="https://www.va.gov/find-forms/about-form-27-2008/">
-          Download VA Form 27-2008 (PDF)
-        </a>{' '}
-        if you prefer to submit by mail or in person.
-      </p>
+      <va-omb-info
+        res-burden={OMB_RES_BURDEN}
+        omb-number={OMB_NUMBER}
+        exp-date={OMB_EXP_DATE}
+      />
     </article>
   );
-}
+};
 
 IntroductionPage.propTypes = {
   route: PropTypes.shape({
     formConfig: PropTypes.shape({
       prefillEnabled: PropTypes.bool,
+      savedFormMessages: PropTypes.shape({}),
       saveInProgress: PropTypes.shape({
-        messages: PropTypes.object,
+        messages: PropTypes.shape({}),
       }),
-      downtime: PropTypes.object,
     }),
     pageList: PropTypes.array,
   }),
 };
+
+export default IntroductionPage;

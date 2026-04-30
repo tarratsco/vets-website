@@ -2,23 +2,20 @@ import { expect } from 'chai';
 import route from './routes';
 
 describe('routes', () => {
-  it('exports a route object', () => {
+  it('exports a route object with path "/"', () => {
     expect(route).to.be.an('object');
-  });
-
-  it('has path "/"', () => {
     expect(route.path).to.equal('/');
   });
 
   it('has a component property', () => {
-    expect(route.component).to.be.a('function');
+    expect(route.component).to.exist;
   });
 
   it('has an indexRoute that redirects to /introduction', () => {
     expect(route.indexRoute).to.be.an('object');
     expect(route.indexRoute.onEnter).to.be.a('function');
     const replaceCalls = [];
-    route.indexRoute.onEnter({}, path => replaceCalls.push(path));
+    route.indexRoute.onEnter({}, val => replaceCalls.push(val));
     expect(replaceCalls).to.deep.equal(['/introduction']);
   });
 

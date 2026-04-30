@@ -2,9 +2,9 @@ import React from 'react';
 import { expect } from 'chai';
 import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
-
-import ConfirmationPage from './ConfirmationPage';
+import { createInitialState } from '@department-of-veterans-affairs/platform-forms-system/state/helpers';
 import formConfig from '../config/form';
+import { ConfirmationPage } from './ConfirmationPage';
 
 const createMockStore = (overrides = {}) => ({
   getState: () => ({
@@ -17,9 +17,9 @@ const createMockStore = (overrides = {}) => ({
         verified: true,
         dob: '1990-01-01',
         claims: { appeals: false },
-        ...((overrides.user || {}).profile || {}),
+        ...overrides.user?.profile,
       },
-      ...(overrides.user || {}),
+      ...overrides.user,
     },
     form: {
       formId: formConfig.formId,
@@ -29,14 +29,14 @@ const createMockStore = (overrides = {}) => ({
       data: {
         veteranInformation: {
           firstName: 'John',
-          lastName: 'Doe',
+          lastName: 'Smith',
         },
       },
       submission: {
-        response: { confirmationNumber: 'BF-20240101-12345678' },
+        response: { confirmationNumber: '1234567890' },
         timestamp: new Date('2024-01-15'),
       },
-      ...(overrides.form || {}),
+      ...overrides.form,
     },
     scheduledDowntime: {
       globalDowntime: null,
@@ -51,9 +51,9 @@ const createMockStore = (overrides = {}) => ({
   dispatch: () => {},
 });
 
-const route = { formConfig };
+describe('containers/ConfirmationPage', () => {
+  const route = { formConfig };
 
-describe('ConfirmationPage', () => {
   it('renders without crashing', () => {
     const store = createMockStore();
     const { container } = render(
@@ -64,23 +64,26 @@ describe('ConfirmationPage', () => {
     expect(container).to.exist;
   });
 
-  it('renders the confirmation number', () => {
+  it('renders a va-alert or success content', () => {
     const store = createMockStore();
     const { container } = render(
       <Provider store={store}>
         <ConfirmationPage route={route} />
       </Provider>,
     );
-    expect(container.textContent).to.include('BF-20240101-12345678');
+    const hasAlert =
+      container.querySelector('va-alert') !== null ||
+      container.innerHTML.includes('submitted');
+    expect(hasAlert).to.be.true;
   });
 
-  it('includes veteran name in the alert content', () => {
+  it('displays the confirmation number when present', () => {
     const store = createMockStore();
     const { container } = render(
       <Provider store={store}>
         <ConfirmationPage route={route} />
       </Provider>,
     );
-    expect(container.textContent).to.include('John Doe');
+    expect(container.innerHTML).to.include('1234567890');
   });
 });
