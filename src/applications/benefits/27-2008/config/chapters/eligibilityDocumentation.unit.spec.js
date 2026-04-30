@@ -5,33 +5,20 @@ import {
 } from './eligibilityDocumentation';
 
 describe('eligibilityDocumentation page', () => {
-  describe('uiSchema', () => {
-    it('has eligibility group with documentationAvailable field', () => {
-      expect(
-        eligibilityDocumentationUiSchema.eligibility.documentationAvailable,
-      ).to.be.an('object');
-    });
-
-    it('has a title for the radio field', () => {
-      const field =
-        eligibilityDocumentationUiSchema.eligibility.documentationAvailable;
-      expect(field['ui:title']).to.be.a('string');
-    });
+  it('uiSchema has eligibility.documentationAvailable', () => {
+    expect(eligibilityDocumentationUiSchema.eligibility).to.have.property(
+      'documentationAvailable',
+    );
   });
 
-  describe('schema', () => {
-    it('requires documentationAvailable', () => {
-      const required =
-        eligibilityDocumentationSchema.properties.eligibility.required;
-      expect(required).to.include('documentationAvailable');
-    });
+  it('schema requires documentationAvailable', () => {
+    const elg = eligibilityDocumentationSchema.properties.eligibility;
+    expect(elg.required).to.include('documentationAvailable');
+  });
 
-    it('has yes and no enum values', () => {
-      const enumValues =
-        eligibilityDocumentationSchema.properties.eligibility.properties
-          .documentationAvailable.enum;
-      expect(enumValues).to.include('yes');
-      expect(enumValues).to.include('no');
-    });
+  it('schema has yes/no enum values', () => {
+    const props = eligibilityDocumentationSchema.properties.eligibility.properties;
+    expect(props.documentationAvailable.enum).to.include('yes');
+    expect(props.documentationAvailable.enum).to.include('no');
   });
 });

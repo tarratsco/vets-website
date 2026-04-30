@@ -1,68 +1,40 @@
 import React from 'react';
 import { expect } from 'chai';
 import { render } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import formConfig from '../config/form';
+import sinon from 'sinon';
 import App from './App';
 
-const createMockStore = (overrides = {}) => ({
-  getState: () => ({
-    user: {
-      login: { currentlyLoggedIn: false },
-      profile: {
-        savedForms: [],
-        prefillsAvailable: [],
-        loa: { current: 3, highest: 3 },
-        verified: true,
-        dob: '1990-01-01',
-        claims: { appeals: false },
-        ...overrides.user?.profile,
-      },
-      ...overrides.user,
-    },
-    form: {
-      formId: formConfig.formId,
-      loadedStatus: 'success',
-      savedStatus: '',
-      loadedData: { metadata: {} },
-      data: {},
-      ...overrides.form,
-    },
-    scheduledDowntime: {
-      globalDowntime: null,
-      isReady: true,
-      isPending: false,
-      serviceMap: { get() {} },
-      dismissedDowntimeWarnings: [],
-    },
-    ...overrides,
-  }),
-  subscribe: () => {},
-  dispatch: () => {},
+// Minimal stub for RoutedSavableApp
+const mockFormConfig = { formId: '27-2008' };
+let stub;
+
+beforeEach(() => {
+  stub = sinon.stub(
+    require('platform/forms/save-in-progress/RoutedSavableApp'),
+    'default',
+  ).callsFake(({ children }) => <div data-testid="routed-savable">{children}</div>);
+});
+
+afterEach(() => {
+  stub.restore();
 });
 
 describe('App container', () => {
   it('renders without crashing', () => {
-    const mockStore = createMockStore();
     const { container } = render(
-      <Provider store={mockStore}>
-        <App location={{ pathname: '/introduction' }}>
-          <div>child</div>
-        </App>
-      </Provider>,
+      <App location={{ pathname: '/introduction' }}>
+        <div data-testid="child">child</div>
+      </App>,
     );
     expect(container).to.exist;
   });
 
   it('renders children', () => {
-    const mockStore = createMockStore();
-    const { getByText } = render(
-      <Provider store={mockStore}>
-        <App location={{ pathname: '/introduction' }}>
-          <div>Test child content</div>
-        </App>
-      </Provider>,
+    const { getByTestId } = render(
+      <App location={{ pathname: '/introduction' }}>
+        <div data-testid="child-content">child</div>
+      </App>,
     );
-    expect(getByText('Test child content')).to.exist;
+    expect(getByTestId('child-content')).to.exist;
   });
 });

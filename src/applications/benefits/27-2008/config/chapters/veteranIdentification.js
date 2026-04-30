@@ -19,7 +19,6 @@ export const veteranIdentificationUiSchema = {
       title: "Veteran's Social Security Number (optional)",
       hint:
         "Providing the SSN helps VA locate the Veteran's records more quickly. Per the Privacy Act notice on this form, providing the SSN is voluntary and refusal will not by itself result in denial of benefits.",
-      autocomplete: 'off',
       inputType: 'text',
       errorMessages: {
         pattern: 'Please enter a valid 9-digit Social Security Number.',
@@ -42,6 +41,8 @@ export const veteranIdentificationSchema = {
         vaFileNumber: {
           type: 'string',
           pattern: '^[0-9]{7,9}$',
+          minLength: 7,
+          maxLength: 9,
         },
         socialSecurityNumber: {
           type: 'string',

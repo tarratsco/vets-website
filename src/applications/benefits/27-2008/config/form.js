@@ -1,5 +1,5 @@
-import environment from 'platform/utilities/environment';
 import footerContent from 'platform/forms/components/FormFooter';
+import environment from 'platform/utilities/environment';
 
 import manifest from '../manifest.json';
 import IntroductionPage from '../containers/IntroductionPage';
@@ -76,9 +76,9 @@ const formConfig = {
   formId: '27-2008',
   saveInProgress: {
     messages: {
-      inProgress: 'Your burial flag application is in progress.',
+      inProgress: 'Your burial flag application (27-2008) is in progress.',
       expired:
-        'Your saved burial flag application has expired. If you want to apply, please start a new application.',
+        'Your saved burial flag application (27-2008) has expired. Please start over.',
       saved: 'Your burial flag application has been saved.',
     },
   },
@@ -92,24 +92,20 @@ const formConfig = {
   title: 'Apply for a burial flag',
   subTitle: 'VA Form 27-2008',
   defaultDefinitions: {},
-  dev: {
-    showNavLinks: true,
-    collapsibleNavLinks: true,
-  },
   chapters: {
     applicantTypeChapter: {
-      title: 'Who is submitting this application',
+      title: 'Applicant information',
       pages: {
         applicantType: {
           path: 'applicant-type',
-          title: 'Who is submitting this application',
+          title: 'Who is submitting this application?',
           uiSchema: applicantTypeUiSchema,
           schema: applicantTypeSchema,
         },
       },
     },
     veteranInformationChapter: {
-      title: 'Veteran information',
+      title: "Veteran's information",
       pages: {
         veteranName: {
           path: 'veteran-information/name',
@@ -119,7 +115,7 @@ const formConfig = {
         },
         veteranIdentification: {
           path: 'veteran-information/identification',
-          title: "Veteran's identification",
+          title: "Veteran's identification numbers",
           uiSchema: veteranIdentificationUiSchema,
           schema: veteranIdentificationSchema,
         },
@@ -142,18 +138,18 @@ const formConfig = {
       pages: {
         serviceInformation: {
           path: 'veteran-information/service',
-          title: 'Military service information',
+          title: "Veteran's service information",
           uiSchema: serviceInformationUiSchema,
           schema: serviceInformationSchema,
         },
       },
     },
     eligibilityChapter: {
-      title: 'Eligibility documentation',
+      title: 'Eligibility',
       pages: {
         eligibilityDocumentation: {
           path: 'eligibility/documentation-check',
-          title: 'Documentation and eligibility',
+          title: 'Documentation check',
           uiSchema: eligibilityDocumentationUiSchema,
           schema: eligibilityDocumentationSchema,
         },
@@ -179,7 +175,7 @@ const formConfig = {
       },
     },
     flagRecipientChapter: {
-      title: 'Flag recipient information',
+      title: 'Flag recipient',
       pages: {
         flagRecipientInfo: {
           path: 'flag-recipient/recipient-info',
@@ -200,7 +196,7 @@ const formConfig = {
       pages: {
         applicantInfo: {
           path: 'applicant/applicant-info',
-          title: 'Your information',
+          title: 'Your personal information',
           uiSchema: applicantInfoUiSchema,
           schema: applicantInfoSchema,
         },

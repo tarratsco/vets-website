@@ -3,90 +3,79 @@ import formConfig from './form';
 
 describe('formConfig', () => {
   it('has required top-level properties', () => {
-    expect(formConfig).to.be.an('object');
-    expect(formConfig.formId).to.equal('27-2008');
-    expect(formConfig.title).to.be.a('string');
-    expect(formConfig.chapters).to.be.an('object');
-    expect(formConfig.introduction).to.be.a('function');
-    expect(formConfig.confirmation).to.be.a('function');
-    expect(formConfig.transformForSubmit).to.be.a('function');
-    expect(formConfig.trackingPrefix).to.be.a('string');
+    expect(formConfig).to.have.property('formId', '27-2008');
+    expect(formConfig).to.have.property('title', 'Apply for a burial flag');
+    expect(formConfig).to.have.property('rootUrl');
+    expect(formConfig).to.have.property('trackingPrefix');
+    expect(formConfig).to.have.property('chapters');
+    expect(formConfig).to.have.property('introduction');
+    expect(formConfig).to.have.property('confirmation');
+    expect(formConfig).to.have.property('transformForSubmit');
   });
 
   it('has saveInProgress messages', () => {
     expect(formConfig.saveInProgress).to.be.an('object');
-    expect(formConfig.saveInProgress.messages).to.be.an('object');
-    expect(formConfig.saveInProgress.messages.inProgress).to.be.a('string');
-    expect(formConfig.saveInProgress.messages.expired).to.be.a('string');
-    expect(formConfig.saveInProgress.messages.saved).to.be.a('string');
+    expect(formConfig.saveInProgress.messages).to.have.property('inProgress');
+    expect(formConfig.saveInProgress.messages).to.have.property('expired');
+    expect(formConfig.saveInProgress.messages).to.have.property('saved');
   });
 
-  it('has prefillEnabled set to true', () => {
+  it('has prefillEnabled', () => {
     expect(formConfig.prefillEnabled).to.equal(true);
   });
 
-  it('all chapters have pages with required properties', () => {
+  it('has expected chapters', () => {
+    const chapterKeys = Object.keys(formConfig.chapters);
+    expect(chapterKeys).to.include('applicantTypeChapter');
+    expect(chapterKeys).to.include('veteranInformationChapter');
+    expect(chapterKeys).to.include('serviceInformationChapter');
+    expect(chapterKeys).to.include('eligibilityChapter');
+    expect(chapterKeys).to.include('flagRecipientChapter');
+    expect(chapterKeys).to.include('applicantChapter');
+    expect(chapterKeys).to.include('documentsChapter');
+    expect(chapterKeys).to.include('remarksChapter');
+  });
+
+  it('every page has path, title, uiSchema, schema', () => {
     Object.entries(formConfig.chapters).forEach(([chapterKey, chapter]) => {
-      expect(chapter.pages, `chapter ${chapterKey} should have pages`).to.be.an(
-        'object',
-      );
       Object.entries(chapter.pages).forEach(([pageKey, page]) => {
-        expect(page.path, `${chapterKey}.${pageKey} should have path`).to.be.a(
-          'string',
-        );
-        expect(page.title, `${chapterKey}.${pageKey} should have title`).to.be.a(
-          'string',
-        );
-        expect(
-          page.uiSchema,
-          `${chapterKey}.${pageKey} should have uiSchema`,
-        ).to.be.an('object');
-        expect(
-          page.schema,
-          `${chapterKey}.${pageKey} should have schema`,
-        ).to.be.an('object');
+        expect(page, `${chapterKey}.${pageKey} missing path`).to.have.property('path');
+        expect(page, `${chapterKey}.${pageKey} missing title`).to.have.property('title');
+        expect(page, `${chapterKey}.${pageKey} missing uiSchema`).to.have.property('uiSchema');
+        expect(page, `${chapterKey}.${pageKey} missing schema`).to.have.property('schema');
       });
     });
   });
 
-  describe('depends functions', () => {
-    const reserveGuardPage =
-      formConfig.chapters.eligibilityChapter.pages.reserveGuardEligibility;
-
-    it('reserveGuardEligibility depends returns true when selectedReserve included', () => {
-      const formData = {
-        serviceInformation: {
-          branchOfService: ['army', 'selectedReserve'],
-        },
-      };
-      expect(() => reserveGuardPage.depends(formData)).to.not.throw();
-      expect(reserveGuardPage.depends(formData)).to.be.true;
+  it('reserveGuardEligibility depends function returns true when selectedReserve is in branchOfService', () => {
+    const { depends } = formConfig.chapters.eligibilityChapter.pages.reserveGuardEligibility;
+    expect(depends).to.be.a('function');
+    const trueResult = depends({
+      serviceInformation: { branchOfService: ['army', 'selectedReserve'] },
     });
+    expect(trueResult).to.equal(true);
+  });
 
-    it('reserveGuardEligibility depends returns false when selectedReserve not included', () => {
-      const formData = {
-        serviceInformation: {
-          branchOfService: ['army', 'navy'],
-        },
-      };
-      expect(() => reserveGuardPage.depends(formData)).to.not.throw();
-      expect(reserveGuardPage.depends(formData)).to.be.false;
+  it('reserveGuardEligibility depends function returns false when selectedReserve is not present', () => {
+    const { depends } = formConfig.chapters.eligibilityChapter.pages.reserveGuardEligibility;
+    const falseResult = depends({
+      serviceInformation: { branchOfService: ['army', 'navy'] },
     });
+    expect(falseResult).to.equal(false);
+  });
 
-    it('reserveGuardEligibility depends returns false when branchOfService is empty', () => {
-      const formData = { serviceInformation: { branchOfService: [] } };
-      expect(() => reserveGuardPage.depends(formData)).to.not.throw();
-      expect(reserveGuardPage.depends(formData)).to.be.false;
-    });
+  it('reserveGuardEligibility depends function returns false for null input', () => {
+    const { depends } = formConfig.chapters.eligibilityChapter.pages.reserveGuardEligibility;
+    expect(() => depends(null)).to.not.throw();
+    expect(depends(null)).to.equal(false);
+  });
 
-    it('reserveGuardEligibility depends handles null formData gracefully', () => {
-      expect(() => reserveGuardPage.depends(null)).to.not.throw();
-      expect(reserveGuardPage.depends(null)).to.be.false;
-    });
+  it('reserveGuardEligibility depends function returns false for empty formData', () => {
+    const { depends } = formConfig.chapters.eligibilityChapter.pages.reserveGuardEligibility;
+    expect(depends({})).to.equal(false);
+  });
 
-    it('reserveGuardEligibility depends handles missing serviceInformation gracefully', () => {
-      expect(() => reserveGuardPage.depends({})).to.not.throw();
-      expect(reserveGuardPage.depends({})).to.be.false;
-    });
+  it('trackingPrefix is correct', () => {
+    expect(formConfig.trackingPrefix).to.equal('burial-flag-27-2008-');
   });
 });

@@ -1,43 +1,41 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { ConfirmationView } from 'platform/forms-system/src/js/components/ConfirmationView';
 
-const alertContent = confirmationNumber => (
-  <>
-    <p>
-      We&apos;ve received your application for a United States burial flag. We
-      will review your application and route it to the NCA Field Programs
-      Evidence Intake Center.
-    </p>
-    {confirmationNumber && (
-      <p>
-        Your confirmation number is{' '}
-        <strong>{confirmationNumber}</strong>.
-      </p>
-    )}
-    <p>
-      If you uploaded discharge documentation, it has been included with your
-      application. If you did not upload documentation, please be prepared to
-      provide it upon request.
-    </p>
-  </>
-);
-
-export const ConfirmationPage = ({ route }) => {
+export default function ConfirmationPage({ route }) {
   const form = useSelector(state => state.form || {});
-  const { submission, data } = form;
+  const submission = form?.submission || {};
   const submitDate = submission?.timestamp || '';
   const confirmationNumber =
     submission?.response?.confirmationNumber ||
     submission?.response?.attributes?.confirmationNumber ||
     '';
 
-  const veteranName = {
-    first: data?.veteranInformation?.firstName || '',
-    last: data?.veteranInformation?.lastName || '',
-  };
+  const veteranName = form?.data?.veteranInformation
+    ? `${form.data.veteranInformation.firstName || ''} ${form.data.veteranInformation.lastName || ''}`.trim()
+    : '';
+
+  const alertContent = (
+    <div>
+      <p>
+        We've received your application for a burial flag
+        {veteranName ? ` for ${veteranName}` : ''}.
+      </p>
+      <p>
+        We'll review your application and contact the National Cemetery
+        Administration (NCA) Field Programs Evidence Intake Center. You'll
+        receive a confirmation email if you provided an email address.
+      </p>
+      {confirmationNumber && (
+        <p>
+          <strong>Your confirmation number is:</strong>{' '}
+          <strong>{confirmationNumber}</strong>
+        </p>
+      )}
+    </div>
+  );
 
   return (
     <ConfirmationView
@@ -47,47 +45,28 @@ export const ConfirmationPage = ({ route }) => {
       devOnly={{ showButtons: true }}
     >
       <ConfirmationView.SubmissionAlert
-        title="You've submitted your application for a burial flag"
-        content={alertContent(confirmationNumber)}
+        title="You've submitted your burial flag application"
+        content={alertContent}
         actions={<p />}
       />
-      <div data-dd-privacy="mask" data-dd-action-name="confirmation summary">
-        <ConfirmationView.ChapterSectionCollection />
-      </div>
+      <ConfirmationView.ChapterSectionCollection />
       <ConfirmationView.PrintThisPage />
       <ConfirmationView.WhatsNextProcessList
         item1Header="We'll review your application"
-        item1Content="We'll review the information you submitted and route your application to NCA Field Programs for processing."
+        item1Content="We'll review the information you submitted and verify the Veteran's eligibility for a burial flag."
         item1Actions={<p />}
-        item2Header="VA will issue the burial flag"
-        item2Content="Once approved, the burial flag will be issued through the appropriate channel. Contact your nearest VA regional office if you have questions."
+        item2Header="We'll route your application to NCA Field Programs"
+        item2Content="Your application will be sent to the NCA Field Programs Evidence Intake Center in Janesville, WI for processing."
       />
       <ConfirmationView.HowToContact />
       <ConfirmationView.GoBackLink />
       <ConfirmationView.NeedHelp />
     </ConfirmationView>
   );
-};
+}
 
 ConfirmationPage.propTypes = {
   route: PropTypes.shape({
     formConfig: PropTypes.object,
   }),
-  form: PropTypes.shape({
-    data: PropTypes.object,
-    submission: PropTypes.shape({
-      response: PropTypes.shape({
-        confirmationNumber: PropTypes.string,
-      }),
-      timestamp: PropTypes.string,
-    }),
-  }),
 };
-
-function mapStateToProps(state) {
-  return {
-    form: state.form,
-  };
-}
-
-export default connect(mapStateToProps)(ConfirmationPage);

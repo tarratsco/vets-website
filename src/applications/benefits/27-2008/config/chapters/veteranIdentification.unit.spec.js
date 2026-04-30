@@ -5,44 +5,29 @@ import {
 } from './veteranIdentification';
 
 describe('veteranIdentification page', () => {
-  describe('uiSchema', () => {
-    it('has veteranInformation group', () => {
-      expect(veteranIdentificationUiSchema.veteranInformation).to.be.an(
-        'object',
-      );
-    });
-
-    it('has vaFileNumber field', () => {
-      expect(
-        veteranIdentificationUiSchema.veteranInformation.vaFileNumber,
-      ).to.be.an('object');
-    });
-
-    it('has socialSecurityNumber field', () => {
-      expect(
-        veteranIdentificationUiSchema.veteranInformation.socialSecurityNumber,
-      ).to.be.an('object');
-    });
-
-    it('has militaryServiceNumber field', () => {
-      expect(
-        veteranIdentificationUiSchema.veteranInformation.militaryServiceNumber,
-      ).to.be.an('object');
-    });
+  it('uiSchema has veteranInformation group', () => {
+    expect(veteranIdentificationUiSchema).to.have.property('veteranInformation');
   });
 
-  describe('schema', () => {
-    it('does not require any identification fields (all optional)', () => {
-      const props =
-        veteranIdentificationSchema.properties?.veteranInformation;
-      expect(props?.required).to.not.exist;
-    });
+  it('uiSchema has vaFileNumber, socialSecurityNumber, militaryServiceNumber', () => {
+    const vi = veteranIdentificationUiSchema.veteranInformation;
+    expect(vi).to.have.property('vaFileNumber');
+    expect(vi).to.have.property('socialSecurityNumber');
+    expect(vi).to.have.property('militaryServiceNumber');
+  });
 
-    it('vaFileNumber has correct pattern', () => {
-      const vaFileNumber =
-        veteranIdentificationSchema.properties.veteranInformation.properties
-          .vaFileNumber;
-      expect(vaFileNumber.pattern).to.equal('^[0-9]{7,9}$');
-    });
+  it('schema has no required fields (all optional)', () => {
+    const vi = veteranIdentificationSchema.properties.veteranInformation;
+    expect(vi.required || []).to.deep.equal([]);
+  });
+
+  it('schema has correct pattern for vaFileNumber', () => {
+    const props = veteranIdentificationSchema.properties.veteranInformation.properties;
+    expect(props.vaFileNumber.pattern).to.equal('^[0-9]{7,9}$');
+  });
+
+  it('schema has correct pattern for socialSecurityNumber', () => {
+    const props = veteranIdentificationSchema.properties.veteranInformation.properties;
+    expect(props.socialSecurityNumber.pattern).to.equal('^[0-9]{9}$');
   });
 });

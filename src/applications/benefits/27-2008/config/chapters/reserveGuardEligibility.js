@@ -10,26 +10,37 @@ const RESERVE_CRITERIA_LABELS = {
     'The Veteran served at least one full enlistment (or, as an officer, completed the period of initial obligation)',
   disabilityDischarge:
     'The Veteran was discharged for a disability incurred or aggravated in the line of duty',
-  diedWhileMember:
-    'The Veteran died while a member of the Selected Reserve',
+  diedWhileMember: 'The Veteran died while a member of the Selected Reserve',
 };
 
 const RESERVE_CRITERIA_KEYS = Object.keys(RESERVE_CRITERIA_LABELS);
 
+function validateAtLeastOneCriterion(errors, fieldData) {
+  if (!fieldData || !Array.isArray(fieldData) || fieldData.length === 0) {
+    errors.addError(
+      "Please select at least one criterion that applies to the Veteran's Selected Reserve service.",
+    );
+  }
+}
+
 export const reserveGuardEligibilityUiSchema = {
   eligibility: {
-    reserveGuardCriteria: checkboxGroupUI({
-      title:
-        "Which of the following applies to the Veteran's Selected Reserve service?",
-      hint:
-        'Select all that apply. The Veteran must meet at least one of these criteria to be eligible for a burial flag through Selected Reserve service, per Section C(2) and C(3) of VA Form 27-2008 instructions.',
-      required: false,
-      labels: RESERVE_CRITERIA_LABELS,
-      errorMessages: {
-        required:
-          "Please select at least one criterion that applies to the Veteran's Selected Reserve service.",
-      },
-    }),
+    'ui:title': 'Selected Reserve eligibility',
+    reserveGuardCriteria: {
+      ...checkboxGroupUI({
+        title:
+          "Which of the following applies to the Veteran's Selected Reserve service?",
+        hint:
+          'Select all that apply. The Veteran must meet at least one of these criteria to be eligible for a burial flag through Selected Reserve service, per Section C(2) and C(3) of VA Form 27-2008 instructions.',
+        required: true,
+        labels: RESERVE_CRITERIA_LABELS,
+        errorMessages: {
+          required:
+            "Please select at least one criterion that applies to the Veteran's Selected Reserve service.",
+        },
+      }),
+      'ui:validations': [validateAtLeastOneCriterion],
+    },
   },
 };
 

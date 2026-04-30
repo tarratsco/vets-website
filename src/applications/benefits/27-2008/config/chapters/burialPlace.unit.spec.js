@@ -2,37 +2,24 @@ import { expect } from 'chai';
 import { burialPlaceUiSchema, burialPlaceSchema } from './burialPlace';
 
 describe('burialPlace page', () => {
-  describe('uiSchema', () => {
-    it('has veteranInformation group', () => {
-      expect(burialPlaceUiSchema.veteranInformation).to.be.an('object');
-    });
-
-    it('has placeOfBurialCemeteryName field', () => {
-      expect(
-        burialPlaceUiSchema.veteranInformation.placeOfBurialCemeteryName,
-      ).to.be.an('object');
-    });
-
-    it('has placeOfBurialCity field', () => {
-      expect(
-        burialPlaceUiSchema.veteranInformation.placeOfBurialCity,
-      ).to.be.an('object');
-    });
-
-    it('has placeOfBurialState field', () => {
-      expect(
-        burialPlaceUiSchema.veteranInformation.placeOfBurialState,
-      ).to.be.an('object');
-    });
+  it('uiSchema has veteranInformation group with burial place fields', () => {
+    const vi = burialPlaceUiSchema.veteranInformation;
+    expect(vi).to.have.property('placeOfBurialCemeteryName');
+    expect(vi).to.have.property('placeOfBurialCity');
+    expect(vi).to.have.property('placeOfBurialState');
   });
 
-  describe('schema', () => {
-    it('requires cemetery name, city, and state', () => {
-      const required =
-        burialPlaceSchema.properties.veteranInformation.required;
-      expect(required).to.include('placeOfBurialCemeteryName');
-      expect(required).to.include('placeOfBurialCity');
-      expect(required).to.include('placeOfBurialState');
-    });
+  it('schema requires placeOfBurialCemeteryName, placeOfBurialCity, placeOfBurialState', () => {
+    const vi = burialPlaceSchema.properties.veteranInformation;
+    expect(vi.required).to.include('placeOfBurialCemeteryName');
+    expect(vi.required).to.include('placeOfBurialCity');
+    expect(vi.required).to.include('placeOfBurialState');
+  });
+
+  it('placeOfBurialState schema is a valid schema object', () => {
+    const props = burialPlaceSchema.properties.veteranInformation.properties;
+    expect(props.placeOfBurialState).to.be.an('object');
+    expect(props.placeOfBurialState.enum).to.be.an('array');
+    expect(props.placeOfBurialState.enum).to.include('OUTSIDE_US');
   });
 });

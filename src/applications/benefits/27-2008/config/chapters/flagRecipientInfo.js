@@ -5,18 +5,6 @@ import {
   selectSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
 
-const RELATIONSHIP_OPTIONS = [
-  'survivingSpouse',
-  'child',
-  'parent',
-  'brotherOrSister',
-  'uncleOrAunt',
-  'nephewOrNiece',
-  'cousinOrGrandparent',
-  'friend',
-  'other',
-];
-
 const RELATIONSHIP_LABELS = {
   survivingSpouse: 'Surviving spouse',
   child: 'Child',
@@ -29,15 +17,7 @@ const RELATIONSHIP_LABELS = {
   other: 'Other',
 };
 
-function validateOtherRelationship(errors, formData) {
-  const relationship = formData?.flagRecipient?.recipientRelationship;
-  const other = formData?.flagRecipient?.recipientRelationshipOther;
-  if (relationship === 'other' && (!other || !other.trim())) {
-    errors.flagRecipient.recipientRelationshipOther.addError(
-      'Please describe the relationship to the deceased Veteran.',
-    );
-  }
-}
+const RELATIONSHIP_KEYS = Object.keys(RELATIONSHIP_LABELS);
 
 export const flagRecipientInfoUiSchema = {
   flagRecipient: {
@@ -55,20 +35,24 @@ export const flagRecipientInfoUiSchema = {
       title: 'Relationship to the deceased Veteran',
       hint:
         'Select the relationship of the person receiving the flag to the deceased Veteran. The flag is generally given in this order of precedence per Section F of the form instructions: surviving spouse, children, parents, brothers or sisters, uncles or aunts, nephews or nieces, others.',
-      labels: RELATIONSHIP_LABELS,
       errorMessages: {
         required:
           'Please select the relationship of the person receiving the flag to the deceased Veteran.',
       },
     }),
-    recipientRelationshipOther: textUI({
-      title: 'Describe your relationship to the deceased Veteran',
-      hint: 'Required when "Other" is selected above.',
-      'ui:required': formData =>
-        formData?.flagRecipient?.recipientRelationship === 'other',
-    }),
+    recipientRelationshipOther: {
+      ...textUI({
+        title: 'Describe the relationship (required if "Other" selected)',
+        errorMessages: {
+          required: 'Please describe the relationship.',
+        },
+      }),
+      'ui:options': {
+        expandUnder: 'recipientRelationship',
+        expandUnderCondition: 'other',
+      },
+    },
   },
-  'ui:validations': [validateOtherRelationship],
 };
 
 export const flagRecipientInfoSchema = {
@@ -79,16 +63,9 @@ export const flagRecipientInfoSchema = {
       type: 'object',
       required: ['recipientFullName', 'recipientRelationship'],
       properties: {
-        recipientFullName: {
-          type: 'string',
-          minLength: 1,
-          maxLength: 80,
-        },
-        recipientRelationship: selectSchema(RELATIONSHIP_OPTIONS),
-        recipientRelationshipOther: {
-          type: 'string',
-          maxLength: 100,
-        },
+        recipientFullName: { type: 'string', minLength: 1, maxLength: 80 },
+        recipientRelationship: selectSchema(RELATIONSHIP_KEYS),
+        recipientRelationshipOther: { type: 'string', maxLength: 100 },
       },
     },
   },

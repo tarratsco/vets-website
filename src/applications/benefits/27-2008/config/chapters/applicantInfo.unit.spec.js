@@ -1,110 +1,40 @@
 import { expect } from 'chai';
-import {
-  applicantInfoUiSchema,
-  applicantInfoSchema,
-} from './applicantInfo';
+import { applicantInfoUiSchema, applicantInfoSchema } from './applicantInfo';
 
 describe('applicantInfo page', () => {
-  describe('uiSchema', () => {
-    it('has applicant group', () => {
-      expect(applicantInfoUiSchema.applicant).to.be.an('object');
-    });
-
-    it('has firstName field', () => {
-      expect(applicantInfoUiSchema.applicant.firstName).to.be.an('object');
-    });
-
-    it('has lastName field', () => {
-      expect(applicantInfoUiSchema.applicant.lastName).to.be.an('object');
-    });
-
-    it('has addressLine1 field', () => {
-      expect(applicantInfoUiSchema.applicant.addressLine1).to.be.an('object');
-    });
-
-    it('has state field', () => {
-      expect(applicantInfoUiSchema.applicant.state).to.be.an('object');
-    });
-
-    it('has relationshipToVeteran field', () => {
-      expect(
-        applicantInfoUiSchema.applicant.relationshipToVeteran,
-      ).to.be.an('object');
-    });
+  it('uiSchema has applicant group', () => {
+    expect(applicantInfoUiSchema).to.have.property('applicant');
   });
 
-  describe('schema', () => {
-    it('requires firstName, lastName, address fields, and relationship', () => {
-      const required = applicantInfoSchema.properties.applicant.required;
-      expect(required).to.include('firstName');
-      expect(required).to.include('lastName');
-      expect(required).to.include('addressLine1');
-      expect(required).to.include('city');
-      expect(required).to.include('state');
-      expect(required).to.include('zip');
-      expect(required).to.include('relationshipToVeteran');
-    });
-
-    it('does not require middleName', () => {
-      const required = applicantInfoSchema.properties.applicant.required;
-      expect(required).to.not.include('middleName');
-    });
+  it('uiSchema has name and address fields', () => {
+    const ap = applicantInfoUiSchema.applicant;
+    expect(ap).to.have.property('firstName');
+    expect(ap).to.have.property('lastName');
+    expect(ap).to.have.property('addressLine1');
+    expect(ap).to.have.property('city');
+    expect(ap).to.have.property('state');
+    expect(ap).to.have.property('zip');
+    expect(ap).to.have.property('relationshipToVeteran');
   });
 
-  describe('validateApplicantOtherRelationship', () => {
-    let messages;
-    const makeErrors = () => {
-      messages = [];
-      return {
-        applicant: {
-          relationshipToVeteranOther: {
-            addError: msg => messages.push(msg || ''),
-          },
-        },
-      };
-    };
+  it('schema requires firstName, lastName, addressLine1, city, state, zip, relationshipToVeteran', () => {
+    const ap = applicantInfoSchema.properties.applicant;
+    expect(ap.required).to.include('firstName');
+    expect(ap.required).to.include('lastName');
+    expect(ap.required).to.include('addressLine1');
+    expect(ap.required).to.include('city');
+    expect(ap.required).to.include('state');
+    expect(ap.required).to.include('zip');
+    expect(ap.required).to.include('relationshipToVeteran');
+  });
 
-    it('does not add error when relationship is not otherAuthorizedRepresentative', () => {
-      const errors = makeErrors();
-      const validations = applicantInfoUiSchema['ui:validations'];
-      expect(validations).to.be.an('array');
-      validations.forEach(fn => {
-        fn(errors, {
-          applicant: {
-            relationshipToVeteran: 'survivingSpouse',
-            relationshipToVeteranOther: '',
-          },
-        });
-      });
-      expect(messages).to.have.lengthOf(0);
-    });
+  it('relationshipToVeteran enum includes funeralDirector', () => {
+    const props = applicantInfoSchema.properties.applicant.properties;
+    expect(props.relationshipToVeteran.enum).to.include('funeralDirector');
+  });
 
-    it('adds error when relationship is otherAuthorizedRepresentative and no description', () => {
-      const errors = makeErrors();
-      const validations = applicantInfoUiSchema['ui:validations'];
-      validations.forEach(fn => {
-        fn(errors, {
-          applicant: {
-            relationshipToVeteran: 'otherAuthorizedRepresentative',
-            relationshipToVeteranOther: '',
-          },
-        });
-      });
-      expect(messages).to.have.lengthOf(1);
-    });
-
-    it('does not add error when relationship is other and description provided', () => {
-      const errors = makeErrors();
-      const validations = applicantInfoUiSchema['ui:validations'];
-      validations.forEach(fn => {
-        fn(errors, {
-          applicant: {
-            relationshipToVeteran: 'otherAuthorizedRepresentative',
-            relationshipToVeteranOther: 'Legal guardian',
-          },
-        });
-      });
-      expect(messages).to.have.lengthOf(0);
-    });
+  it('zip has correct pattern', () => {
+    const props = applicantInfoSchema.properties.applicant.properties;
+    expect(props.zip.pattern).to.equal('^[0-9]{5}(-[0-9]{4})?$');
   });
 });

@@ -1,30 +1,34 @@
 import { expect } from 'chai';
-import {
-  documentUploadUiSchema,
-  documentUploadSchema,
-} from './documentUpload';
+import { documentUploadUiSchema, documentUploadSchema } from './documentUpload';
 
 describe('documentUpload page', () => {
-  describe('uiSchema', () => {
-    it('has documents group', () => {
-      expect(documentUploadUiSchema.documents).to.be.an('object');
-    });
-
-    it('has dd214Upload field', () => {
-      expect(documentUploadUiSchema.documents.dd214Upload).to.be.an('object');
-    });
-
-    it('dd214Upload has a title', () => {
-      const field = documentUploadUiSchema.documents.dd214Upload;
-      expect(field['ui:title']).to.be.a('string');
-    });
+  it('uiSchema has documents group with dd214Upload', () => {
+    expect(documentUploadUiSchema.documents).to.have.property('dd214Upload');
   });
 
-  describe('schema', () => {
-    it('has documents group with dd214Upload property', () => {
-      expect(
-        documentUploadSchema.properties.documents.properties.dd214Upload,
-      ).to.be.an('object');
-    });
+  it('schema has documents.dd214Upload property', () => {
+    expect(documentUploadSchema.properties.documents.properties).to.have.property(
+      'dd214Upload',
+    );
+  });
+
+  it('dd214Upload uiSchema has required function', () => {
+    const dd214UI = documentUploadUiSchema.documents.dd214Upload;
+    const requiredFn = dd214UI['ui:required'] || dd214UI['ui:options']?.required;
+    expect(requiredFn).to.be.a('function');
+  });
+
+  it('dd214Upload required returns true when documentationAvailable is yes', () => {
+    const dd214UI = documentUploadUiSchema.documents.dd214Upload;
+    const requiredFn = dd214UI['ui:required'] || dd214UI['ui:options']?.required;
+    const result = requiredFn({ eligibility: { documentationAvailable: 'yes' } });
+    expect(result).to.equal(true);
+  });
+
+  it('dd214Upload required returns false when documentationAvailable is no', () => {
+    const dd214UI = documentUploadUiSchema.documents.dd214Upload;
+    const requiredFn = dd214UI['ui:required'] || dd214UI['ui:options']?.required;
+    const result = requiredFn({ eligibility: { documentationAvailable: 'no' } });
+    expect(result).to.equal(false);
   });
 });

@@ -5,26 +5,42 @@ import {
 } from './reserveGuardEligibility';
 
 describe('reserveGuardEligibility page', () => {
-  describe('uiSchema', () => {
-    it('has eligibility.reserveGuardCriteria field', () => {
-      expect(
-        reserveGuardEligibilityUiSchema.eligibility.reserveGuardCriteria,
-      ).to.be.an('object');
-    });
-
-    it('has a title', () => {
-      const field =
-        reserveGuardEligibilityUiSchema.eligibility.reserveGuardCriteria;
-      expect(field['ui:title']).to.be.a('string');
-    });
+  it('uiSchema has eligibility.reserveGuardCriteria', () => {
+    expect(reserveGuardEligibilityUiSchema.eligibility).to.have.property(
+      'reserveGuardCriteria',
+    );
   });
 
-  describe('schema', () => {
-    it('has reserveGuardCriteria as array type', () => {
-      const schema =
-        reserveGuardEligibilitySchema.properties.eligibility.properties
-          .reserveGuardCriteria;
-      expect(schema.type).to.equal('array');
-    });
+  it('schema has reserveGuardCriteria property', () => {
+    const elg = reserveGuardEligibilitySchema.properties.eligibility;
+    expect(elg.properties).to.have.property('reserveGuardCriteria');
+  });
+
+  it('reserveGuardCriteria validations adds error when empty array', () => {
+    const messages = [];
+    const errors = { addError: msg => messages.push(msg || '') };
+    const validations =
+      reserveGuardEligibilityUiSchema.eligibility.reserveGuardCriteria['ui:validations'];
+    expect(validations).to.be.an('array');
+    validations[0](errors, []);
+    expect(messages.length).to.equal(1);
+  });
+
+  it('reserveGuardCriteria validations passes when criteria selected', () => {
+    const messages = [];
+    const errors = { addError: msg => messages.push(msg || '') };
+    const validations =
+      reserveGuardEligibilityUiSchema.eligibility.reserveGuardCriteria['ui:validations'];
+    validations[0](errors, ['retiredPayEligible']);
+    expect(messages.length).to.equal(0);
+  });
+
+  it('reserveGuardCriteria validations adds error when null', () => {
+    const messages = [];
+    const errors = { addError: msg => messages.push(msg || '') };
+    const validations =
+      reserveGuardEligibilityUiSchema.eligibility.reserveGuardCriteria['ui:validations'];
+    validations[0](errors, null);
+    expect(messages.length).to.equal(1);
   });
 });

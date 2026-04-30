@@ -5,34 +5,21 @@ import {
 } from './dischargeCharacter';
 
 describe('dischargeCharacter page', () => {
-  describe('uiSchema', () => {
-    it('has eligibility.dischargeCharacter field', () => {
-      expect(
-        dischargeCharacterUiSchema.eligibility.dischargeCharacter,
-      ).to.be.an('object');
-    });
-
-    it('has a title', () => {
-      const field =
-        dischargeCharacterUiSchema.eligibility.dischargeCharacter;
-      expect(field['ui:title']).to.be.a('string');
-    });
+  it('uiSchema has eligibility.dischargeCharacter', () => {
+    expect(dischargeCharacterUiSchema.eligibility).to.have.property(
+      'dischargeCharacter',
+    );
   });
 
-  describe('schema', () => {
-    it('requires dischargeCharacter', () => {
-      const required =
-        dischargeCharacterSchema.properties.eligibility.required;
-      expect(required).to.include('dischargeCharacter');
-    });
+  it('schema requires dischargeCharacter', () => {
+    const elg = dischargeCharacterSchema.properties.eligibility;
+    expect(elg.required).to.include('dischargeCharacter');
+  });
 
-    it('has honorable, dishonorable, unknown enum values', () => {
-      const enumValues =
-        dischargeCharacterSchema.properties.eligibility.properties
-          .dischargeCharacter.enum;
-      expect(enumValues).to.include('honorable');
-      expect(enumValues).to.include('dishonorable');
-      expect(enumValues).to.include('unknown');
-    });
+  it('schema enum includes honorable, dishonorable, unknown', () => {
+    const props = dischargeCharacterSchema.properties.eligibility.properties;
+    expect(props.dischargeCharacter.enum).to.include('honorable');
+    expect(props.dischargeCharacter.enum).to.include('dishonorable');
+    expect(props.dischargeCharacter.enum).to.include('unknown');
   });
 });

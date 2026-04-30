@@ -2,20 +2,12 @@ import {
   currentOrPastDateUI,
   currentOrPastDateSchema,
 } from 'platform/forms-system/src/js/web-component-patterns';
-import VaMemorableDateField from 'platform/forms-system/src/js/web-component-fields/VaMemorableDateField';
 
-function validateVeteranDates(errors, formData) {
-  const dob = formData?.veteranInformation?.dateOfBirth;
-  const dod = formData?.veteranInformation?.dateOfDeath;
-  const dob2 = formData?.veteranInformation?.dateOfBurial;
-
-  if (dob && dod && dob >= dod) {
-    errors.veteranInformation.dateOfDeath.addError(
-      "Date of death must be after the Veteran's date of birth.",
-    );
-  }
-  if (dod && dob2 && dod > dob2) {
-    errors.veteranInformation.dateOfBurial.addError(
+function validateDateOfBurialNotBeforeDeath(errors, fieldData, formData) {
+  const dateOfDeath = formData?.veteranInformation?.dateOfDeath;
+  const dateOfBurial = fieldData;
+  if (dateOfDeath && dateOfBurial && dateOfBurial < dateOfDeath) {
+    errors.addError(
       'Date of burial must be on or after the date of death.',
     );
   }
@@ -23,12 +15,13 @@ function validateVeteranDates(errors, formData) {
 
 export const veteranDatesUiSchema = {
   veteranInformation: {
+    'ui:title': 'Dates of birth, death, and burial',
     dateOfBirth: currentOrPastDateUI({
       title: "Veteran's date of birth",
       hint: 'Format: Month Day Year.',
       errorMessages: {
         required: "Please enter the Veteran's date of birth.",
-        pattern: "Please enter a valid date of birth.",
+        pattern: "Please enter the Veteran's date of birth.",
       },
     }),
     dateOfDeath: currentOrPastDateUI({
@@ -37,23 +30,22 @@ export const veteranDatesUiSchema = {
         "Format: Month Day Year. This date appears on the Veteran's death certificate.",
       errorMessages: {
         required: "Please enter the Veteran's date of death.",
-        pattern: "Please enter a valid date of death.",
+        pattern: "Please enter the Veteran's date of death.",
       },
     }),
     dateOfBurial: {
-      'ui:title': 'Date of burial',
-      'ui:webComponentField': VaMemorableDateField,
-      'ui:options': {
+      ...currentOrPastDateUI({
+        title: 'Date of burial',
         hint:
           'Format: Month Day Year. If burial has not yet occurred, enter the scheduled burial date.',
-      },
-      'ui:errorMessages': {
-        required: 'Please enter the date of burial.',
-        pattern: 'Please enter a valid date of burial.',
-      },
+        errorMessages: {
+          required: 'Please enter the date of burial.',
+          pattern: 'Please enter the date of burial.',
+        },
+      }),
+      'ui:validations': [validateDateOfBurialNotBeforeDeath],
     },
   },
-  'ui:validations': [validateVeteranDates],
 };
 
 export const veteranDatesSchema = {
@@ -66,11 +58,7 @@ export const veteranDatesSchema = {
       properties: {
         dateOfBirth: currentOrPastDateSchema,
         dateOfDeath: currentOrPastDateSchema,
-        dateOfBurial: {
-          type: 'string',
-          format: 'date',
-          pattern: '^\\d{4}-\\d{2}-\\d{2}$',
-        },
+        dateOfBurial: currentOrPastDateSchema,
       },
     },
   },

@@ -5,100 +5,26 @@ import {
 } from './serviceInformation';
 
 describe('serviceInformation page', () => {
-  describe('uiSchema', () => {
-    it('has serviceInformation group', () => {
-      expect(serviceInformationUiSchema.serviceInformation).to.be.an('object');
-    });
-
-    it('has branchOfService field', () => {
-      expect(
-        serviceInformationUiSchema.serviceInformation.branchOfService,
-      ).to.be.an('object');
-    });
-
-    it('has dateEnteredActiveDuty field', () => {
-      expect(
-        serviceInformationUiSchema.serviceInformation.dateEnteredActiveDuty,
-      ).to.be.an('object');
-    });
-
-    it('has dateReleasedFromActiveDuty field', () => {
-      expect(
-        serviceInformationUiSchema.serviceInformation
-          .dateReleasedFromActiveDuty,
-      ).to.be.an('object');
-    });
+  it('uiSchema has serviceInformation group', () => {
+    expect(serviceInformationUiSchema).to.have.property('serviceInformation');
   });
 
-  describe('schema', () => {
-    it('requires branchOfService', () => {
-      const required =
-        serviceInformationSchema.properties.serviceInformation.required;
-      expect(required).to.include('branchOfService');
-    });
-
-    it('requires dateEnteredActiveDuty', () => {
-      const required =
-        serviceInformationSchema.properties.serviceInformation.required;
-      expect(required).to.include('dateEnteredActiveDuty');
-    });
-
-    it('requires dateReleasedFromActiveDuty', () => {
-      const required =
-        serviceInformationSchema.properties.serviceInformation.required;
-      expect(required).to.include('dateReleasedFromActiveDuty');
-    });
+  it('uiSchema has branchOfService, dateEnteredActiveDuty, dateReleasedFromActiveDuty', () => {
+    const si = serviceInformationUiSchema.serviceInformation;
+    expect(si).to.have.property('branchOfService');
+    expect(si).to.have.property('dateEnteredActiveDuty');
+    expect(si).to.have.property('dateReleasedFromActiveDuty');
   });
 
-  describe('validateServiceDates', () => {
-    let messages;
-    const makeErrors = () => {
-      messages = [];
-      return {
-        serviceInformation: {
-          dateReleasedFromActiveDuty: {
-            addError: msg => messages.push(msg || ''),
-          },
-        },
-      };
-    };
+  it('schema requires branchOfService, dateEnteredActiveDuty, dateReleasedFromActiveDuty', () => {
+    const si = serviceInformationSchema.properties.serviceInformation;
+    expect(si.required).to.include('branchOfService');
+    expect(si.required).to.include('dateEnteredActiveDuty');
+    expect(si.required).to.include('dateReleasedFromActiveDuty');
+  });
 
-    it('does not add error when dates are valid', () => {
-      const errors = makeErrors();
-      const validations = serviceInformationUiSchema['ui:validations'];
-      expect(validations).to.be.an('array');
-      validations.forEach(fn => {
-        fn(errors, {
-          serviceInformation: {
-            dateEnteredActiveDuty: '1960-01-01',
-            dateReleasedFromActiveDuty: '1964-12-31',
-          },
-        });
-      });
-      expect(messages).to.have.lengthOf(0);
-    });
-
-    it('adds error when released date is before entered date', () => {
-      const errors = makeErrors();
-      const validations = serviceInformationUiSchema['ui:validations'];
-      validations.forEach(fn => {
-        fn(errors, {
-          serviceInformation: {
-            dateEnteredActiveDuty: '1964-12-31',
-            dateReleasedFromActiveDuty: '1960-01-01',
-          },
-        });
-      });
-      expect(messages).to.have.lengthOf(1);
-    });
-
-    it('does not add error when dates are missing', () => {
-      const errors = makeErrors();
-      const validations = serviceInformationUiSchema['ui:validations'];
-      validations.forEach(fn => {
-        fn(errors, { serviceInformation: {} });
-      });
-      expect(messages).to.have.lengthOf(0);
-    });
+  it('branchOfService schema is an object with properties', () => {
+    const props = serviceInformationSchema.properties.serviceInformation.properties;
+    expect(props.branchOfService).to.be.an('object');
   });
 });

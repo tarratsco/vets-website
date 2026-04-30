@@ -1,30 +1,25 @@
 import { expect } from 'chai';
-import { applicantTypeUiSchema } from './applicantType';
+import { applicantTypeUiSchema, applicantTypeSchema } from './applicantType';
 
 describe('applicantType page', () => {
-  describe('uiSchema', () => {
-    it('has applicantType field with ui:title', () => {
-      expect(applicantTypeUiSchema.applicantType).to.be.an('object');
-      expect(applicantTypeUiSchema.applicantType['ui:title']).to.be.a('string');
-    });
+  it('uiSchema has applicantType field', () => {
+    expect(applicantTypeUiSchema).to.have.property('applicantType');
+  });
 
-    it('has four label options', () => {
-      const labels =
-        applicantTypeUiSchema.applicantType['ui:options']?.labels;
-      expect(labels).to.be.an('object');
-      expect(Object.keys(labels)).to.have.lengthOf(4);
-    });
+  it('schema requires applicantType', () => {
+    expect(applicantTypeSchema.properties.applicantType).to.be.an('object');
+    expect(applicantTypeSchema.required).to.include('applicantType');
+  });
 
-    it('includes nextOfKin label', () => {
-      const labels =
-        applicantTypeUiSchema.applicantType['ui:options']?.labels;
-      expect(labels).to.have.property('nextOfKin');
-    });
+  it('schema includes all applicant type enum values', () => {
+    const enumValues = applicantTypeSchema.properties.applicantType.enum;
+    expect(enumValues).to.include('nextOfKin');
+    expect(enumValues).to.include('funeralDirector');
+    expect(enumValues).to.include('vsoRepresentative');
+    expect(enumValues).to.include('closeFriend');
+  });
 
-    it('includes funeralDirector label', () => {
-      const labels =
-        applicantTypeUiSchema.applicantType['ui:options']?.labels;
-      expect(labels).to.have.property('funeralDirector');
-    });
+  it('uiSchema has error message', () => {
+    expect(applicantTypeUiSchema.applicantType['ui:errorMessages']).to.be.an('object');
   });
 });

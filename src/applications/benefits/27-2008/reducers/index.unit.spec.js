@@ -2,19 +2,20 @@ import { expect } from 'chai';
 import reducers from './index';
 
 describe('reducers', () => {
-  it('is a non-null object', () => {
+  it('exports an object with a form key', () => {
     expect(reducers).to.be.an('object');
-    expect(reducers).to.not.be.null;
+    expect(reducers).to.have.property('form');
   });
 
-  it('has a "form" slice', () => {
-    expect(reducers).to.have.property('form');
+  it('form reducer is a function', () => {
     expect(reducers.form).to.be.a('function');
   });
 
-  it('form slice returns state on @@INIT', () => {
-    const result = reducers.form(undefined, { type: '@@INIT' });
+  it('form reducer handles @@INIT without throwing', () => {
+    let result;
+    expect(() => {
+      result = reducers.form(undefined, { type: '@@INIT' });
+    }).to.not.throw();
     expect(result).to.be.an('object');
-    expect(result).to.not.be.null;
   });
 });
